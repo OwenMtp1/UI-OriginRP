@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>OriginRP Tablette</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="tablet" class="tablet hidden">
+        <div class="screen">
+            <!-- En-tête -->
+            <header class="topbar">
+                <div id="org-logo" class="org-logo"></div>
+                <div class="org-heading">
+                    <h1 id="org-name"></h1>
+                    <p id="org-subtitle"></p>
+                </div>
+                <div class="topbar-actions">
+                    <button id="btn-recruit" class="btn btn-primary" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="4"/><path d="M2.5 20v-.5A5.5 5.5 0 0 1 8 14h2a5.5 5.5 0 0 1 5.5 5.5v.5"/><path d="M19 8v6M16 11h6"/></svg>
+                        Recruter
+                    </button>
+                    <button id="btn-close" class="icon-btn" type="button" aria-label="Fermer">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+                    </button>
+                </div>
+            </header>
+
+            <div class="layout">
+                <!-- Onglets -->
+                <nav class="sidebar">
+                    <button class="tab active" data-tab="members" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-.5A5.5 5.5 0 0 1 8 14h2a5.5 5.5 0 0 1 5.5 5.5v.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M18.5 14.2a5.5 5.5 0 0 1 3 4.8v1"/></svg>
+                        <span>Membres</span>
+                        <em id="count-members" class="tab-count"></em>
+                    </button>
+                    <button class="tab" data-tab="grades" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>
+                        <span>Grades</span>
+                        <em id="count-grades" class="tab-count"></em>
+                    </button>
+                    <div class="sidebar-foot">
+                        <span class="live-dot"></span>
+                        <span id="online-count"></span>
+                    </div>
+                </nav>
+
+                <main class="content">
+                    <!-- Onglet Membres -->
+                    <section id="tab-members" class="panel active">
+                        <div class="stats">
+                            <div class="stat">
+                                <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4"/><path d="M4 4h13l-2 4.5L17 13H4"/></svg></div>
+                                <div><p class="stat-label">Type</p><p id="stat-type" class="stat-value"></p></div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H12L11 22l8.5-11.5H12z"/></svg></div>
+                                <div><p class="stat-label">Points d'expérience</p><p id="stat-xp" class="stat-value"></p></div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/></svg></div>
+                                <div><p class="stat-label">Ton grade</p><p id="stat-grade" class="stat-value"></p></div>
+                            </div>
+                        </div>
+
+                        <div class="toolbar">
+                            <label class="search">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                                <input id="search" type="text" placeholder="Rechercher un membre…" autocomplete="off">
+                            </label>
+                            <div class="filters">
+                                <button class="chip-btn active" data-filter="all" type="button">Tous</button>
+                                <button class="chip-btn" data-filter="online" type="button">En ligne</button>
+                                <button class="chip-btn" data-filter="duty" type="button">En service</button>
+                            </div>
+                        </div>
+
+                        <ul id="members" class="list"></ul>
+                    </section>
+
+                    <!-- Onglet Grades -->
+                    <section id="tab-grades" class="panel">
+                        <div class="panel-head">
+                            <h2>Grades</h2>
+                            <p>Du plus haut au plus bas. Clique sur un grade pour modifier ses permissions.</p>
+                        </div>
+                        <ul id="grades" class="list"></ul>
+                    </section>
+                </main>
+            </div>
+
+            <!-- Volet latéral (fiche membre / édition de grade) -->
+            <div id="overlay" class="overlay"></div>
+            <aside id="drawer" class="drawer"></aside>
+
+            <!-- Fenêtre Recruter -->
+            <div id="modal" class="modal">
+                <div class="modal-card">
+                    <h3>Recruter un joueur</h3>
+                    <p>Le joueur rejoindra le grade le plus bas.</p>
+                    <button id="recruit-closest" class="btn btn-primary btn-block" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+                        Joueur le plus proche
+                    </button>
+                    <div class="modal-sep"><span>ou par ID</span></div>
+                    <div class="modal-row">
+                        <input id="recruit-id" type="number" min="1" placeholder="ID du joueur">
+                        <button id="recruit-by-id" class="btn btn-ghost" type="button">Recruter</button>
+                    </div>
+                    <button id="modal-cancel" class="btn-link" type="button">Annuler</button>
+                </div>
+            </div>
+
+            <div id="toast" class="toast"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

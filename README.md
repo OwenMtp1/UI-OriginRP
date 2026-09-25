@@ -7,6 +7,7 @@
 | `originrp_playercard` | Fiche joueur (nom, ID, emploi, organisation) |
 | `originrp_hud` | HUD à côté de la minimap (vie, armure, soif, faim) |
 | `originrp_idcard` | Carte d'identité et permis de conduire Los Santos |
+| `originrp_tablet` | Tablette organisation / entreprise (membres, grades, recrutement) |
 
 ## originrp_menu
 
