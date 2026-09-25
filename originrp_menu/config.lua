@@ -10,6 +10,7 @@ Config.Logo = nil
 Config.Keybinds = {
     { menu = 'main', command = 'menuf5', key = 'F5', description = 'Ouvrir le menu F5' },
     { menu = 'organisation', command = 'menuf7', key = 'F7', description = 'Ouvrir le menu organisation' },
+    { menu = 'staff', command = 'menustaff', key = 'F10', description = 'Ouvrir le menu staff' },
 }
 
 --[[
@@ -20,6 +21,12 @@ Config.Keybinds = {
         subtitle    Sous-titre (optionnel)
         key         Touche affichée à droite de l'en-tête (optionnel). Appuyer
                     dessus quand le menu est ouvert le ferme.
+        ace         Permission ACE requise pour ouvrir le menu (optionnel), vérifiée
+                    par le serveur. Ex. dans server.cfg :
+                    add_ace group.admin originrp.staff allow
+        counter     true pour afficher la position « 1 / 6 » dans l'en-tête
+                    (remplace la touche)
+        hints       true pour afficher la barre d'aide en bas (Choisir, Valider…)
         onOpen      function() appelée à chaque ouverture (optionnel). Elle peut
                     renvoyer des valeurs à jour :
                     { title = ..., subtitle = ..., items = { [id] = { value = ..., checked = ... } } }
@@ -87,6 +94,37 @@ Config.Menus = {
         --   return { title = gang.label, items = { grade = { value = gang.grade.name } } }
         onOpen = function()
             return nil
+        end,
+    },
+
+    staff = {
+        title = 'Menu Staff',
+        subtitle = 'Outils de modération',
+        key = 'F10',                          -- masquée par le compteur, ferme le menu
+        ace = 'originrp.staff',
+        counter = true,
+        hints = true,
+        items = {
+            { id = 'reports', icon = 'flag',     label = 'Reports',            description = 'Traiter les signalements des joueurs', value = '0 en attente', event = 'originrp_menu:staff:reports' },
+            { id = 'moi',     icon = 'user',     label = 'Moi',                description = 'Noclip, invisibilité, téléportation',  event = 'originrp_menu:staff:moi' },
+            { id = 'joueurs', icon = 'users',    label = 'Joueurs',            description = 'Liste et actions sur les joueurs',     value = '0 en ligne', event = 'originrp_menu:staff:joueurs' },
+            { id = 'serveur', icon = 'server',   label = 'Gestion du serveur', description = 'Météo, heure, annonces',               event = 'originrp_menu:staff:serveur' },
+            { id = 'bans',    icon = 'ban',      label = 'Bans',               description = 'Consulter et gérer les bannissements', event = 'originrp_menu:staff:bans' },
+            { id = 'params',  icon = 'settings', label = 'Paramètres',         description = 'Préférences du staff',                 event = 'originrp_menu:staff:parametres' },
+        },
+
+        -- Joueurs en ligne : mis à jour automatiquement par server.lua.
+        -- Reports en attente : le système de reports de la base doit faire,
+        -- côté serveur, GlobalState.originrp_reports = <nombre>
+        onOpen = function()
+            local reports = GlobalState.originrp_reports or 0
+            local players = GlobalState.originrp_players or 0
+            return {
+                items = {
+                    reports = { value = ('%d en attente'):format(reports) },
+                    joueurs = { value = ('%d en ligne'):format(players) },
+                },
+            }
         end,
     },
 

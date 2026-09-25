@@ -6,10 +6,9 @@ name 'originrp_menu'
 description 'OriginRP - Menus NUI'
 version '1.0.0'
 
-client_scripts {
-    'config.lua',
-    'client.lua',
-}
+shared_script 'config.lua'
+client_script 'client.lua'
+server_script 'server.lua'
 
 ui_page 'html/index.html'
 

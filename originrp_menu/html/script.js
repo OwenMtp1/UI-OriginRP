@@ -29,6 +29,10 @@ const ICONS = {
     file: stroke('<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6"/>'),
     star: filled('<path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/>'),
     badge: stroke('<path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z"/><path d="m9 12 2 2 4-4"/>'),
+    flag: stroke('<path d="M4 22V4"/><path d="M4 4h13l-2 4.5L17 13H4"/>'),
+    users: stroke('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-.5A5.5 5.5 0 0 1 8 14h2a5.5 5.5 0 0 1 5.5 5.5v.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M18.5 14.2a5.5 5.5 0 0 1 3 4.8v1"/>'),
+    server: stroke('<rect x="3" y="3" width="18" height="7" rx="2"/><rect x="3" y="14" width="18" height="7" rx="2"/><path d="M7 6.5h.01M7 17.5h.01M11 6.5h6M11 17.5h6"/>'),
+    ban: stroke('<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>'),
     tablet: stroke('<rect x="4" y="2" width="16" height="20" rx="2.5"/><path d="M11 18h2"/>'),
     info: stroke('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>'),
 };
@@ -77,6 +81,21 @@ const PREVIEW = {
                 { icon: 'tablet', label: 'Ouvrir la tablette', description: "Accéder à la tablette de l'organisation", close: true },
             ],
         },
+        staff: {
+            title: 'Menu Staff',
+            subtitle: 'Outils de modération',
+            key: 'F10',
+            counter: true,
+            hints: true,
+            items: [
+                { icon: 'flag', label: 'Reports', description: 'Traiter les signalements des joueurs', value: '0 en attente', close: true },
+                { icon: 'user', label: 'Moi', description: 'Noclip, invisibilité, téléportation', close: true },
+                { icon: 'users', label: 'Joueurs', description: 'Liste et actions sur les joueurs', value: '2 en ligne', close: true },
+                { icon: 'server', label: 'Gestion du serveur', description: 'Météo, heure, annonces', close: true },
+                { icon: 'ban', label: 'Bans', description: 'Consulter et gérer les bannissements', close: true },
+                { icon: 'settings', label: 'Paramètres', description: 'Préférences du staff', close: true },
+            ],
+        },
         parametres: {
             title: 'Paramètres',
             subtitle: 'Exemple de sous-menu',
@@ -97,6 +116,8 @@ const el = {
     title: document.getElementById('menu-title'),
     subtitle: document.getElementById('menu-subtitle'),
     key: document.getElementById('menu-key'),
+    counter: document.getElementById('menu-counter'),
+    hintBack: document.getElementById('hint-back'),
     items: document.getElementById('menu-items'),
 };
 
@@ -153,6 +174,9 @@ function render(direction) {
     el.subtitle.textContent = menu.subtitle || '';
     el.key.firstElementChild.textContent = menu.key || '';
     el.key.classList.toggle('empty', !menu.key);
+    el.menu.classList.toggle('has-counter', !!menu.counter);
+    el.menu.classList.toggle('has-hints', !!menu.hints);
+    el.hintBack.hidden = state.stack.length < 2;
 
     const items = menu.items || [];
     el.items.innerHTML = items.map((item, index) => `
@@ -208,6 +232,8 @@ function setActive(index, scroll = true) {
         node.classList.toggle('active', i === index);
         if (i === index && scroll) node.scrollIntoView({ block: 'nearest' });
     });
+    const total = (currentMenu().items || []).length;
+    el.counter.textContent = total ? `${index + 1} / ${total}` : '';
 }
 
 function move(step) {
@@ -349,12 +375,12 @@ document.addEventListener('keydown', (event) => {
 
 if (!RESOURCE) {
     document.body.classList.add('preview');
-    // index.html#organisation ouvre directement le menu F7
+    // index.html#organisation (ou #staff) ouvre directement ce menu
     const previewRoot = () => (PREVIEW.menus[location.hash.slice(1)] ? location.hash.slice(1) : PREVIEW.root);
     open({ ...PREVIEW, root: previewRoot() });
     document.addEventListener('keydown', (event) => {
         if (state.open) return;
-        const root = event.key === 'F5' ? 'main' : event.key === 'F7' ? 'organisation' : null;
+        const root = { F5: 'main', F7: 'organisation', F10: 'staff' }[event.key];
         if (root) {
             event.preventDefault();
             open({ ...PREVIEW, root });

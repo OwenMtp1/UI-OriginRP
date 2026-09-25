@@ -61,6 +61,8 @@ local function buildNuiMenus()
             title = o.title or menu.title,
             subtitle = o.subtitle or menu.subtitle,
             key = menu.key,
+            counter = menu.counter == true,
+            hints = menu.hints == true,
             items = items,
         }
     end
@@ -80,14 +82,11 @@ local function closeMenu()
     SendNUIMessage({ action = 'close' })
 end
 
--- data (optionnel) : { title = ..., subtitle = ..., items = { [itemId] = { value = ..., checked = ... } } }
-local function openMenu(menuId, data)
+local pendingData = {}
+
+local function showMenu(menuId, data)
     if isOpen then return end
     local menu = Config.Menus[menuId]
-    if not menu then
-        print(('[originrp_menu] Menu inconnu : %s'):format(tostring(menuId)))
-        return
-    end
 
     if menu.onOpen then
         local ok, result = pcall(menu.onOpen)
@@ -110,6 +109,32 @@ local function openMenu(menuId, data)
         logo = Config.Logo,
     })
 end
+
+-- data (optionnel) : { title = ..., subtitle = ..., items = { [itemId] = { value = ..., checked = ... } } }
+local function openMenu(menuId, data)
+    if isOpen then return end
+    local menu = Config.Menus[menuId]
+    if not menu then
+        print(('[originrp_menu] Menu inconnu : %s'):format(tostring(menuId)))
+        return
+    end
+
+    -- Menu protégé par une permission ACE : le serveur vérifie avant d'ouvrir
+    if menu.ace then
+        pendingData[menuId] = data or false
+        TriggerServerEvent('originrp_menu:requestOpen', menuId)
+        return
+    end
+
+    showMenu(menuId, data)
+end
+
+RegisterNetEvent('originrp_menu:openAllowed', function(menuId)
+    local data = pendingData[menuId]
+    if data == nil then return end -- pas de demande en attente
+    pendingData[menuId] = nil
+    showMenu(menuId, data or nil)
+end)
 
 -- Met à jour un menu, même ouvert. Ex. :
 -- exports.originrp_menu:setMenu('organisation', { items = { service = { checked = true } } })

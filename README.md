@@ -8,8 +8,8 @@ Menus NUI (style violet « glass ») pour FiveM, standalone (aucune dépendance 
 
 1. Copier le dossier `originrp_menu` dans `resources/`.
 2. Ajouter `ensure originrp_menu` dans `server.cfg`.
-3. En jeu : **F5** ouvre le menu principal, **F7** le menu organisation
-   (réassignables dans les raccourcis clavier FiveM).
+3. En jeu : **F5** ouvre le menu principal, **F7** le menu organisation,
+   **F10** le menu staff (réassignables dans les raccourcis clavier FiveM).
 
 ### Contrôles
 
@@ -60,7 +60,32 @@ end)
 Pour synchroniser la case si le service change ailleurs :
 `exports.originrp_menu:setMenu('organisation', { items = { service = { checked = true } } })`.
 
+### Menu F10 — Staff
+
+Réservé aux joueurs ayant la permission ACE `originrp.staff` (vérifiée par le serveur).
+Dans `server.cfg` :
+
+```cfg
+add_ace group.admin originrp.staff allow
+add_principal identifier.license:XXXXXXXX group.admin   # pour chaque membre du staff
+```
+
+| Rubrique | Event client déclenché |
+| --- | --- |
+| Reports | `originrp_menu:staff:reports` |
+| Moi | `originrp_menu:staff:moi` |
+| Joueurs | `originrp_menu:staff:joueurs` |
+| Gestion du serveur | `originrp_menu:staff:serveur` |
+| Bans | `originrp_menu:staff:bans` |
+| Paramètres | `originrp_menu:staff:parametres` |
+
+- « X en ligne » est calculé automatiquement par `server.lua`.
+- « X en attente » : le système de reports doit faire, côté serveur,
+  `GlobalState.originrp_reports = nombreDeReports` à chaque nouveau report / report traité.
+- **Important** : la permission protège seulement l'ouverture du menu. Chaque action
+  staff (kick, ban, téléportation…) doit revérifier la permission côté serveur.
+
 ### Aperçu hors jeu
 
 Ouvrir `originrp_menu/html/index.html` dans un navigateur (données de démo, avec un exemple de sous-menu sur « Paramètres »).
-`index.html#organisation` ouvre directement le menu F7. Menu fermé : F5 ou F7 pour le rouvrir.
+`index.html#organisation` et `index.html#staff` ouvrent directement ces menus. Menu fermé : F5, F7 ou F10 pour le rouvrir.
