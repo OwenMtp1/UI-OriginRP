@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>OriginRP KOTH</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <section id="board" class="board hidden" aria-live="polite">
+        <header class="board-header">
+            <div class="board-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7.5 7.5 11 12 4l4.5 7L21 7.5 19.5 18h-15zM4.5 19.5h15V21h-15z"/></svg>
+            </div>
+            <div class="board-heading">
+                <h1 id="board-title" class="board-title">KOTH</h1>
+                <p id="board-subtitle" class="board-subtitle"></p>
+            </div>
+            <span class="board-live"><i></i>LIVE</span>
+        </header>
+        <ol id="board-rows" class="board-rows"></ol>
+        <p id="board-empty" class="board-empty">Aucun joueur pour le moment</p>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
