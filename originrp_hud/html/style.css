@@ -27,20 +27,93 @@ body {
     user-select: none;
 }
 
-/* Jauges alignées à droite de la minimap, en bas */
-.hud {
+/* Bloc aligné à droite de la minimap, en bas : identité puis jauges */
+.hud-wrap {
     position: absolute;
     left: calc(var(--anchor-right) + var(--gap));
     bottom: var(--anchor-bottom);
     display: flex;
-    align-items: center;
-    gap: calc(var(--size) * 0.24);
+    flex-direction: column;
+    align-items: stretch;
+    gap: calc(var(--size) * 0.22);
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.hud.hidden {
+.hud-wrap.hidden {
     opacity: 0;
     transform: translateY(6px);
+}
+
+.hud {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--size) * 0.24);
+}
+
+/* ---------- Identité ---------- */
+
+.identity {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--size) * 0.22);
+    width: 0;
+    min-width: 100%;
+    padding: calc(var(--size) * 0.16) calc(var(--size) * 0.28) calc(var(--size) * 0.16) calc(var(--size) * 0.16);
+    border-radius: calc(var(--size) * 0.3);
+    border: 1px solid var(--panel-border);
+    background: linear-gradient(180deg, var(--panel-top), var(--panel-bottom));
+    box-shadow:
+        0 6px 18px rgba(8, 4, 20, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    color: #fff;
+}
+
+.identity.off {
+    display: none;
+}
+
+.identity-icon {
+    width: calc(var(--size) * 0.68);
+    height: calc(var(--size) * 0.68);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: calc(var(--size) * 0.2);
+    border: 1px solid rgba(200, 172, 255, 0.3);
+    background: linear-gradient(135deg, #6a3fd0, #8b5cf6);
+    box-shadow: 0 4px 12px rgba(106, 63, 208, 0.35);
+}
+
+.identity-icon svg {
+    width: 55%;
+    height: 55%;
+}
+
+.identity-text {
+    min-width: 0;
+    flex: 1;
+}
+
+.identity-name {
+    font-size: calc(var(--size) * 0.31);
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.identity-age {
+    margin-top: 1px;
+    font-size: calc(var(--size) * 0.25);
+    font-weight: 500;
+    color: #c9adff;
+}
+
+.identity-age:empty {
+    display: none;
 }
 
 .gauge {

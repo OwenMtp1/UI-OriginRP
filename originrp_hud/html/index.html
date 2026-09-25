@@ -3,10 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <title>OriginRP HUD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="hud" class="hud hidden"></div>
+    <div id="hud-wrap" class="hud-wrap hidden">
+        <div id="identity" class="identity">
+            <div class="identity-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5v-.5a6 6 0 0 1 6-6h3a6 6 0 0 1 6 6v.5z"/></svg>
+            </div>
+            <div class="identity-text">
+                <p id="identity-name" class="identity-name"></p>
+                <p id="identity-age" class="identity-age"></p>
+            </div>
+        </div>
+        <div id="hud" class="hud"></div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
