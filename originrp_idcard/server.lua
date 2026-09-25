@@ -42,10 +42,46 @@ local function getIdentity(src)
     return Config.GetIdentity(src)
 end
 
+-- Catégories du permis : { car = true/false, bike = true/false, truck = true/false }
+local function getLicenses(src)
+    if framework == 'esx' then
+        -- esx_license répond de façon asynchrone
+        if GetResourceState('esx_license') ~= 'started' then return {} end
+        local p = promise.new()
+        TriggerEvent('esx_license:getLicenses', src, function(list) p:resolve(list or {}) end)
+        SetTimeout(3000, function() if p.state == 0 then p:resolve({}) end end)
+        local owned = {}
+        for _, license in ipairs(Citizen.Await(p)) do owned[license.type] = true end
+        local types = Config.EsxLicenseTypes
+        return { car = owned[types.car] == true, bike = owned[types.bike] == true, truck = owned[types.truck] == true }
+    elseif framework == 'qb' then
+        local player = QBCore.Functions.GetPlayer(src)
+        local licences = player and player.PlayerData.metadata.licences or {}
+        return { car = licences.driver == true, bike = licences.bike == true, truck = licences.truck == true }
+    end
+    return Config.GetLicenses(src) or {}
+end
+
+-- Document demandé : 'id' (carte d'identité) ou 'license' (permis de conduire)
+local function buildDocument(src, docType)
+    local data = getIdentity(src)
+    if not data then return nil end
+    data.type = docType
+    if docType == 'license' then
+        data.licenses = getLicenses(src)
+        local l = data.licenses
+        if Config.RequireLicense and not (l.car or l.bike or l.truck) then
+            return nil, "Vous n'avez pas de permis de conduire."
+        end
+    end
+    return data
+end
+
 local lastUse = {}
 
 -- targetId : joueur à qui montrer la carte (nil = soi-même)
-RegisterNetEvent('originrp_idcard:show', function(targetId)
+-- docType : 'id' (défaut) ou 'license'
+RegisterNetEvent('originrp_idcard:show', function(targetId, docType)
     local src = source
     local now = GetGameTimer()
     if lastUse[src] and now - lastUse[src] < 1500 then return end
@@ -59,12 +95,16 @@ RegisterNetEvent('originrp_idcard:show', function(targetId)
         if #(from - to) > Config.ShowDistance + 1.0 then return end
     end
 
-    local identity = getIdentity(src)
-    if not identity then return end
+    docType = docType == 'license' and 'license' or 'id'
+    local document, reason = buildDocument(src, docType)
+    if not document then
+        if reason then TriggerClientEvent('originrp_idcard:notify', src, reason) end
+        return
+    end
 
-    TriggerClientEvent('originrp_idcard:open', target, identity)
+    TriggerClientEvent('originrp_idcard:open', target, document)
     if target ~= src then
-        TriggerClientEvent('originrp_idcard:open', src, identity)
+        TriggerClientEvent('originrp_idcard:open', src, document)
     end
 end)
 
@@ -73,8 +113,16 @@ AddEventHandler('playerDropped', function()
 end)
 
 -- Pour afficher une carte depuis un autre script serveur (ex. item utilisable) :
--- exports.originrp_idcard:showCard(source, target)
-exports('showCard', function(src, target)
-    local identity = getIdentity(src)
-    if identity then TriggerClientEvent('originrp_idcard:open', target or src, identity) end
-end)
+-- exports.originrp_idcard:showCard(source, target)      -- carte d'identité
+-- exports.originrp_idcard:showLicense(source, target)   -- permis de conduire
+local function showDocument(src, target, docType)
+    local document, reason = buildDocument(src, docType)
+    if document then
+        TriggerClientEvent('originrp_idcard:open', target or src, document)
+    elseif reason then
+        TriggerClientEvent('originrp_idcard:notify', src, reason)
+    end
+end
+
+exports('showCard', function(src, target) showDocument(src, target, 'id') end)
+exports('showLicense', function(src, target) showDocument(src, target, 'license') end)

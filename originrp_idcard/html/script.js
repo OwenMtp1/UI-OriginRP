@@ -44,11 +44,17 @@ function pad(text, length) {
     return (text + '<'.repeat(length)).slice(0, length);
 }
 
+const DOCS = {
+    id: { title: "Carte d'identité", subtitle: 'Identity card', created: 'Date de création', code: 'ID' },
+    license: { title: 'Permis de conduire', subtitle: 'Driver license', created: 'Délivré le', code: 'DL' },
+};
+
 function buildMrz(data, birthdate) {
     const d = birthdate.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
     const yymmdd = d ? d[3].slice(2) + d[2] + d[1] : '<<<<<<';
     const sex = formatSex(data.sex) === 'Femme' ? 'F' : 'M';
-    const line1 = pad(`IDLSC${mrzText(data.number)}`, 30);
+    const code = (DOCS[data.type] || DOCS.id).code;
+    const line1 = pad(`${code}LSC${mrzText(data.number)}`, 30);
     const line2 = pad(`${yymmdd}${sex}<${mrzText(data.lastname)}<<${mrzText(data.firstname)}`, 30);
     return `${line1}\n${line2}`;
 }
@@ -56,6 +62,15 @@ function buildMrz(data, birthdate) {
 /* ---------- Affichage ---------- */
 
 function render(data) {
+    const doc = DOCS[data.type] ? data.type : 'id';
+    card.dataset.doc = doc;
+    $('doc-title').textContent = DOCS[doc].title;
+    $('doc-subtitle').textContent = DOCS[doc].subtitle;
+    $('created-label').textContent = DOCS[doc].created;
+
+    const licenses = data.licenses || {};
+    ['car', 'bike', 'truck'].forEach((key) => $(`cat-${key}`).classList.toggle('on', licenses[key] === true));
+
     const lastname = capitalize(data.lastname);
     const firstname = capitalize(data.firstname);
     const birthdate = formatDate(data.birthdate || data.dateofbirth);
@@ -102,8 +117,12 @@ window.addEventListener('message', (event) => {
 /* ---------- Aperçu hors jeu ---------- */
 
 if (typeof GetParentResourceName !== 'function') {
+    // index.html#permis affiche le permis de conduire
+    const license = location.hash === '#permis';
     card.dataset.position = 'center';
     render({
+        type: license ? 'license' : 'id',
+        licenses: { car: true, bike: true, truck: false },
         lastname: 'Azar',
         firstname: 'Raph',
         sex: 'm',

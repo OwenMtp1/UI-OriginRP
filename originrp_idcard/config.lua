@@ -7,6 +7,14 @@ Config.Framework = 'auto'
 -- Commandes (nil pour désactiver)
 Config.CommandSelf = 'carte'          -- regarder sa propre carte
 Config.CommandShow = 'montrercarte'   -- montrer sa carte au joueur le plus proche
+Config.CommandLicenseSelf = 'permis'          -- regarder son permis
+Config.CommandLicenseShow = 'montrerpermis'   -- montrer son permis au joueur le plus proche
+
+-- Refuser d'afficher le permis si le joueur n'a aucune catégorie
+Config.RequireLicense = true
+
+-- ESX (esx_license) : nom des licences pour chaque catégorie
+Config.EsxLicenseTypes = { car = 'drive', bike = 'drive_bike', truck = 'drive_truck' }
 
 -- Distance max (mètres) pour montrer sa carte à quelqu'un
 Config.ShowDistance = 3.0
@@ -36,5 +44,11 @@ Config.DefaultBirthplace = 'Los Santos'
     }
 ]]
 Config.GetIdentity = function(source)
+    return nil
+end
+
+-- Base sans ESX / QBCore : catégories du permis du joueur (côté serveur)
+-- Doit renvoyer { car = true/false, bike = true/false, truck = true/false }
+Config.GetLicenses = function(source)
     return nil
 end

@@ -336,3 +336,78 @@ body {
     0%, 20% { background-position: 100% 0; }
     70%, 100% { background-position: 0% 0; }
 }
+
+/* ---------- Permis de conduire ---------- */
+
+.idcard[data-doc='license'] .only-id,
+.idcard[data-doc='id'] .only-license {
+    display: none;
+}
+
+.id-cats {
+    grid-column: 1 / -1;
+}
+
+.id-cats dd {
+    display: flex;
+    gap: 16px;
+    margin-top: 7px;
+    overflow: visible;
+}
+
+.cat {
+    position: relative;
+    width: 62px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: 1.5px dashed rgba(34, 28, 77, 0.25);
+    background: rgba(255, 255, 255, 0.35);
+    color: rgba(34, 28, 77, 0.3);
+}
+
+.cat > svg {
+    width: 28px;
+    height: 28px;
+}
+
+.cat.on {
+    border: 1.5px solid #221c4d;
+    background: rgba(34, 28, 77, 0.06);
+    color: #221c4d;
+}
+
+.cat-badge {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    width: 19px;
+    height: 19px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 2px solid var(--paper);
+    background: #b04a4a;
+    color: #fff;
+}
+
+.cat-badge svg {
+    width: 11px;
+    height: 11px;
+}
+
+.cat .cat-ok,
+.cat.on .cat-no {
+    display: none;
+}
+
+.cat.on .cat-ok {
+    display: block;
+}
+
+.cat.on .cat-badge {
+    background: #2f8a58;
+}
