@@ -12,13 +12,7 @@ const ICONS = {
 const RADIUS = 20.4;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-const wrap = document.getElementById('hud-wrap');
 const hud = document.getElementById('hud');
-const identityEl = {
-    box: document.getElementById('identity'),
-    name: document.getElementById('identity-name'),
-    age: document.getElementById('identity-age'),
-};
 const gauges = {};
 
 const config = {
@@ -27,35 +21,7 @@ const config = {
     gap: 14,
     lowThreshold: 20,
     hideArmorWhenEmpty: false,
-    showIdentity: true,
 };
-
-/* ---------- Identité ---------- */
-
-// Âge à partir de 'JJ/MM/AAAA', 'AAAA-MM-JJ' ou 'AAAA/MM/JJ'
-function ageFromBirthdate(value) {
-    if (!value) return null;
-    const text = String(value).trim();
-    let year, month, day;
-    let m = text.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
-    if (m) [, year, month, day] = m.map(Number);
-    else if ((m = text.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/))) [, day, month, year] = m.map(Number);
-    else return null;
-
-    const now = new Date();
-    let age = now.getFullYear() - year;
-    if (now.getMonth() + 1 < month || (now.getMonth() + 1 === month && now.getDate() < day)) age--;
-    return age >= 0 && age < 150 ? age : null;
-}
-
-function setIdentity(data) {
-    const info = data || {};
-    const name = [info.firstname, info.lastname].filter(Boolean).join(' ');
-    const age = info.age != null ? Number(info.age) : ageFromBirthdate(info.birthdate);
-    identityEl.name.textContent = name;
-    identityEl.age.textContent = Number.isFinite(age) ? `${age} ans` : '';
-    identityEl.box.classList.toggle('off', !config.showIdentity || !name);
-}
 
 function build() {
     hud.textContent = '';
@@ -90,7 +56,6 @@ function applyConfig(data) {
     root.setProperty('--size', `${44 * (Number(config.scale) || 1)}px`);
     root.setProperty('--gap', `${Number(config.gap) || 0}px`);
     build();
-    setIdentity(config.identity);
 }
 
 function setValue(type, value) {
@@ -115,12 +80,8 @@ window.addEventListener('message', (event) => {
         case 'status':
             Object.entries(msg.values || {}).forEach(([type, value]) => setValue(type, value));
             break;
-        case 'identity':
-            config.identity = msg.identity;
-            setIdentity(msg.identity);
-            break;
         case 'visible':
-            wrap.classList.toggle('hidden', !msg.visible);
+            hud.classList.toggle('hidden', !msg.visible);
             break;
         case 'anchor':
             setAnchor(msg.anchor);
@@ -130,7 +91,6 @@ window.addEventListener('message', (event) => {
 
 if (RESOURCE) {
     build();
-    setIdentity(null);
     fetch(`https://${RESOURCE}/ready`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json; charset=UTF-8' },
@@ -141,11 +101,11 @@ if (RESOURCE) {
         .catch(() => {});
 } else {
     // Aperçu hors jeu : valeurs de démo qui évoluent
-    applyConfig({ identity: { firstname: 'Liam', lastname: 'Coelho', birthdate: '14/03/1998' } });
+    applyConfig();
     setAnchor({ right: 0.02, bottom: 0.9 });
     const demo = { health: 85, armor: 0, thirst: 60, hunger: 35 };
     Object.entries(demo).forEach(([t, v]) => setValue(t, v));
-    requestAnimationFrame(() => wrap.classList.remove('hidden'));
+    requestAnimationFrame(() => hud.classList.remove('hidden'));
     setInterval(() => {
         demo.thirst = demo.thirst <= 10 ? 90 : demo.thirst - 7;
         demo.hunger = demo.hunger <= 10 ? 80 : demo.hunger - 4;

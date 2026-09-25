@@ -33,34 +33,7 @@ end
 
 local framework = detectFramework()
 
----------------------------------------------------------------------------
--- Identité du personnage (cadre au-dessus des jauges)
--- birthdate : 'JJ/MM/AAAA' ou 'AAAA-MM-JJ' (l'âge est calculé par la NUI),
--- ou age : nombre directement.
----------------------------------------------------------------------------
-local identity = nil
-
-local function setIdentity(data)
-    if type(data) ~= 'table' then return end
-    identity = {
-        firstname = data.firstname or data.firstName,
-        lastname = data.lastname or data.lastName,
-        birthdate = data.birthdate or data.dateofbirth,
-        age = tonumber(data.age),
-    }
-    SendNUIMessage({ action = 'identity', identity = identity })
-end
-
 if framework == 'esx' then
-    local ESX = exports['es_extended']:getSharedObject()
-
-    local function fromPlayerData(data)
-        if data and data.firstName then setIdentity(data) end
-    end
-
-    RegisterNetEvent('esx:playerLoaded', fromPlayerData)
-    fromPlayerData(ESX.GetPlayerData())
-
     -- esx_status envoie toutes les valeurs à chaque tick
     AddEventHandler('esx_status:onTick', function(data)
         for _, s in ipairs(data) do
@@ -78,8 +51,6 @@ elseif framework == 'qb' then
             status.hunger = meta.hunger or status.hunger
             status.thirst = meta.thirst or status.thirst
         end
-        local info = data and data.charinfo
-        if info then setIdentity(info) end
     end
 
     RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
@@ -112,8 +83,6 @@ RegisterNUICallback('ready', function(_, cb)
         gap = Config.Gap,
         lowThreshold = Config.LowThreshold,
         hideArmorWhenEmpty = Config.HideArmorWhenEmpty,
-        showIdentity = Config.ShowIdentity,
-        identity = identity,
     })
 end)
 
@@ -166,7 +135,4 @@ end
 exports('setStatus', function(name, value)
     if name == 'hunger' or name == 'thirst' then status[name] = value end
 end)
--- Pour les bases sans ESX / QBCore :
--- exports.originrp_hud:setIdentity({ firstname = 'Liam', lastname = 'Coelho', birthdate = '14/03/1998' })
-exports('setIdentity', setIdentity)
 exports('setVisible', function(visible) hidden = not visible end)

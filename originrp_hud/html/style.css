@@ -8,7 +8,7 @@
     --panel-bottom: rgba(24, 16, 44, 0.9);
     --panel-border: rgba(176, 148, 255, 0.18);
     --track: rgba(255, 255, 255, 0.08);
-    --low: #d98282;
+    --low: #c98a9a;
 }
 
 * {
@@ -27,62 +27,20 @@ body {
     user-select: none;
 }
 
-/* Bloc aligné à droite de la minimap, en bas : identité puis jauges */
-.hud-wrap {
+/* Jauges alignées à droite de la minimap, en bas */
+.hud {
     position: absolute;
     left: calc(var(--anchor-right) + var(--gap));
     bottom: var(--anchor-bottom);
     display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: calc(var(--size) * 0.22);
+    align-items: center;
+    gap: calc(var(--size) * 0.24);
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.hud-wrap.hidden {
+.hud.hidden {
     opacity: 0;
     transform: translateY(6px);
-}
-
-.hud {
-    display: flex;
-    align-items: center;
-    gap: calc(var(--size) * 0.24);
-}
-
-/* ---------- Identité (texte seul, sans cadre) ---------- */
-
-.identity {
-    width: 0;
-    min-width: 100%;
-    padding-left: 2px;
-    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-    color: #fff;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75), 0 0 8px rgba(0, 0, 0, 0.35);
-}
-
-.identity.off {
-    display: none;
-}
-
-.identity-name {
-    font-size: calc(var(--size) * 0.34);
-    font-weight: 600;
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.identity-age {
-    margin-top: 1px;
-    font-size: calc(var(--size) * 0.27);
-    font-weight: 500;
-    color: #d6cce8;
-}
-
-.identity-age:empty {
-    display: none;
 }
 
 .gauge {
@@ -149,10 +107,6 @@ body {
     color: rgba(255, 255, 255, 0.3);
 }
 
-.gauge.empty .icon svg {
-    filter: none;
-}
-
 .gauge.empty .bar {
     opacity: 0;
 }
@@ -160,20 +114,20 @@ body {
 /* Valeur basse */
 .gauge.low {
     --c1: var(--low) !important;
-    --c2: #c26b6b !important;
+    --c2: #a86b7e !important;
     animation: low-pulse 1.1s ease-in-out infinite;
 }
 
 @keyframes low-pulse {
     50% {
         box-shadow:
-            0 0 0 3px rgba(217, 130, 130, 0.2),
+            0 0 0 3px rgba(201, 138, 154, 0.2),
             0 6px 18px rgba(8, 4, 20, 0.5);
     }
 }
 
-/* Couleurs douces par jauge, dégradé qui finit en violet */
-.gauge[data-type='health'] { --c1: #d9a9e3; --c2: #9d7fd1; }
-.gauge[data-type='armor']  { --c1: #a8bddb; --c2: #8a80c7; }
-.gauge[data-type='thirst'] { --c1: #9cc9d6; --c2: #8590c4; }
-.gauge[data-type='hunger'] { --c1: #dcc792; --c2: #a58fc9; }
+/* Nuances de violet doux (lavande, mauve, violet-bleu, lilas) */
+.gauge[data-type='health'] { --c1: #c3a6e6; --c2: #8f6fc9; }
+.gauge[data-type='armor']  { --c1: #a9a3d6; --c2: #7a70b5; }
+.gauge[data-type='thirst'] { --c1: #a2aee0; --c2: #7a78bf; }
+.gauge[data-type='hunger'] { --c1: #d0b2de; --c2: #9a7cbd; }

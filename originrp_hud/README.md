@@ -1,6 +1,6 @@
 # originrp_hud
 
-HUD à côté de la minimap : prénom, nom et âge du personnage, puis vie, armure, soif, faim, dans le style des menus OriginRP.
+HUD à côté de la minimap : vie, armure, soif, faim, dans le style des menus OriginRP.
 Les jauges se placent automatiquement à droite de la minimap, quelles que soient
 la résolution et la zone de sécurité du joueur.
 
@@ -20,19 +20,6 @@ la résolution et la zone de sécurité du joueur.
 exports.originrp_hud:setStatus('hunger', 75)
 exports.originrp_hud:setStatus('thirst', 40)
 ```
-
-## Identité (prénom, nom, âge, affichés au-dessus des jauges)
-
-- **ESX** (`firstName`, `lastName`, `dateofbirth`) et **QBCore** (`charinfo`) : automatique.
-- L'âge est calculé à partir de la date de naissance (`JJ/MM/AAAA` ou `AAAA-MM-JJ`).
-- Autre système :
-
-```lua
-exports.originrp_hud:setIdentity({ firstname = 'Liam', lastname = 'Coelho', birthdate = '14/03/1998' })
--- ou avec l'âge directement : { firstname = 'Liam', lastname = 'Coelho', age = 28 }
-```
-
-- `Config.ShowIdentity = false` pour masquer le nom et l'âge.
 
 ## Divers
 
