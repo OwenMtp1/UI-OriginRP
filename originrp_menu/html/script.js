@@ -71,6 +71,17 @@ const PREVIEW = {
                 { icon: 'settings', label: 'Paramètres', description: 'Régler vos préférences', submenu: 'parametres' },
             ],
         },
+        entreprise: {
+            title: 'EMS',
+            subtitle: 'Menu entreprise',
+            key: 'F6',
+            counter: true,
+            hints: true,
+            items: [
+                { icon: 'star', label: 'Grade', description: "Votre poste dans l'entreprise", value: 'Stagiaire', static: true },
+                { icon: 'badge', label: 'Prise de service', description: 'Passer en service ou hors service', checkbox: true, checked: false },
+            ],
+        },
         organisation: {
             title: 'Cartelgoon',
             subtitle: 'Menu organisation',
@@ -375,12 +386,12 @@ document.addEventListener('keydown', (event) => {
 
 if (!RESOURCE) {
     document.body.classList.add('preview');
-    // index.html#organisation (ou #staff) ouvre directement ce menu
+    // index.html#entreprise (ou #organisation, #staff) ouvre directement ce menu
     const previewRoot = () => (PREVIEW.menus[location.hash.slice(1)] ? location.hash.slice(1) : PREVIEW.root);
     open({ ...PREVIEW, root: previewRoot() });
     document.addEventListener('keydown', (event) => {
         if (state.open) return;
-        const root = { F5: 'main', F7: 'organisation', F10: 'staff' }[event.key];
+        const root = { F5: 'main', F6: 'entreprise', F7: 'organisation', F10: 'staff' }[event.key];
         if (root) {
             event.preventDefault();
             open({ ...PREVIEW, root });

@@ -2,7 +2,7 @@
 
 | Ressource | Contenu |
 | --- | --- |
-| `originrp_menu` | Menus F5, F7 (Organisation), F10 (Staff) |
+| `originrp_menu` | Menus F5, F6 (Entreprise), F7 (Organisation), F10 (Staff) |
 | `originrp_koth` | Classement KOTH |
 | `originrp_playercard` | Fiche joueur (nom, ID, emploi, organisation) |
 | `originrp_hud` | HUD à côté de la minimap (vie, armure, soif, faim) |
@@ -16,8 +16,8 @@ Menus NUI (style violet « glass ») pour FiveM, standalone (aucune dépendance 
 
 1. Copier le dossier `originrp_menu` dans `resources/`.
 2. Ajouter `ensure originrp_menu` dans `server.cfg`.
-3. En jeu : **F5** ouvre le menu principal, **F7** le menu organisation,
-   **F10** le menu staff (réassignables dans les raccourcis clavier FiveM).
+3. En jeu : **F5** ouvre le menu principal, **F6** le menu entreprise,
+   **F7** le menu organisation, **F10** le menu staff (réassignables dans les raccourcis clavier FiveM).
 
 ### Contrôles
 
@@ -43,6 +43,26 @@ end)
 ```
 
 Exports : `exports.originrp_menu:openMenu('main')`, `closeMenu()`, `setMenu(id, données)`, `isOpen()`.
+
+### Menu F6 — Entreprise
+
+| Rubrique | Type | Source |
+| --- | --- | --- |
+| Titre (ex. « EMS ») | Nom du métier | Automatique (ESX / QBCore) |
+| Grade | Valeur affichée à droite | Automatique (ESX / QBCore) |
+| Prise de service | Case à cocher | Event serveur `originrp_menu:entreprise:service` reçu avec `true` / `false` |
+
+- Joueur sans emploi (`unemployed`) : le menu ne s'ouvre pas.
+- QBCore : la case reflète `job.onduty`. Pour utiliser la prise de service native de
+  QBCore, remplacer `serverEvent` par `'QBCore:ToggleDuty'` dans `config.lua`.
+
+```lua
+-- server.lua de la base (ESX ou système de service maison)
+RegisterNetEvent('originrp_menu:entreprise:service', function(enService)
+    local src = source
+    -- passer le joueur en service / hors service
+end)
+```
 
 ### Menu F7 — Organisation
 
@@ -96,4 +116,4 @@ add_principal identifier.license:XXXXXXXX group.admin   # pour chaque membre du 
 ### Aperçu hors jeu
 
 Ouvrir `originrp_menu/html/index.html` dans un navigateur (données de démo, avec un exemple de sous-menu sur « Paramètres »).
-`index.html#organisation` et `index.html#staff` ouvrent directement ces menus. Menu fermé : F5, F7 ou F10 pour le rouvrir.
+`index.html#entreprise`, `#organisation` et `#staff` ouvrent directement ces menus. Menu fermé : F5, F6, F7 ou F10 pour le rouvrir.

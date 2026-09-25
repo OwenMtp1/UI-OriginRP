@@ -9,6 +9,7 @@ Config.Logo = nil
 -- Paramètres > Raccourcis clavier > FiveM.
 Config.Keybinds = {
     { menu = 'main', command = 'menuf5', key = 'F5', description = 'Ouvrir le menu F5' },
+    { menu = 'entreprise', command = 'menuf6', key = 'F6', description = 'Ouvrir le menu entreprise' },
     { menu = 'organisation', command = 'menuf7', key = 'F7', description = 'Ouvrir le menu organisation' },
     { menu = 'staff', command = 'menustaff', key = 'F10', description = 'Ouvrir le menu staff' },
 }
@@ -69,6 +70,40 @@ Config.Menus = {
             { icon = 'run',      label = 'Animations', description = 'Accéder aux animations',            event = 'originrp_menu:animations' },
             { icon = 'settings', label = 'Paramètres', description = 'Régler vos préférences',            event = 'originrp_menu:parametres' },
         },
+    },
+
+    entreprise = {
+        title = 'Entreprise',                -- remplacé par le nom du métier (onOpen)
+        subtitle = 'Menu entreprise',
+        key = 'F6',
+        counter = true,
+        hints = true,
+        items = {
+            { id = 'grade',   icon = 'star',  label = 'Grade',            description = 'Votre poste dans l\'entreprise', value = '-' },
+            { id = 'service', icon = 'badge', label = 'Prise de service', description = 'Passer en service ou hors service', checkbox = true, serverEvent = 'originrp_menu:entreprise:service' },
+            -- QBCore : pour utiliser la prise de service native, remplacer
+            -- serverEvent par 'QBCore:ToggleDuty'
+        },
+
+        -- Nom du métier, grade et état du service lus automatiquement (ESX / QBCore).
+        -- Pas de métier (chômeur) : le menu ne s'ouvre pas.
+        onOpen = function()
+            if GetResourceState('es_extended') == 'started' then
+                local job = exports['es_extended']:getSharedObject().GetPlayerData().job
+                if not job or job.name == 'unemployed' then return false end
+                return { title = job.label, items = { grade = { value = job.grade_label } } }
+            elseif GetResourceState('qb-core') == 'started' then
+                local job = exports['qb-core']:GetCoreObject().Functions.GetPlayerData().job
+                if not job or job.name == 'unemployed' then return false end
+                return {
+                    title = job.label,
+                    items = {
+                        grade = { value = job.grade and job.grade.name },
+                        service = { checked = job.onduty == true },
+                    },
+                }
+            end
+        end,
     },
 
     organisation = {
