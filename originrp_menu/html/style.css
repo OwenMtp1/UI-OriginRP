@@ -1,6 +1,7 @@
 :root {
     --accent: #8b5cf6;
     --accent-light: #a47dff;
+    --accent-soft: #c9adff;
     --accent-glow: rgba(139, 92, 246, 0.55);
 
     --panel-top: rgba(36, 24, 62, 0.94);
@@ -368,4 +369,68 @@ body.preview {
 
 .menu-item.active .item-chevron {
     color: #fff;
+}
+
+/* ---------- Rubrique informative, valeur, case à cocher ---------- */
+
+.menu-item.static {
+    cursor: default;
+}
+
+.item-value {
+    flex-shrink: 0;
+    max-width: 180px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(200, 172, 255, 0.25);
+    background: rgba(139, 92, 246, 0.18);
+    color: var(--accent-soft);
+    font-size: 13.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.menu-item.active .item-value {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+}
+
+.item-checkbox {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.55);
+    color: transparent;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.item-checkbox svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 3;
+}
+
+.menu-item.checked .item-checkbox {
+    border-color: var(--accent-light);
+    background: var(--accent-light);
+    color: #fff;
+    box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.menu-item.active .item-checkbox {
+    border-color: rgba(255, 255, 255, 0.9);
+}
+
+.menu-item.active.checked .item-checkbox {
+    border-color: #fff;
+    background: #fff;
+    color: #6a3fd0;
+    box-shadow: none;
 }

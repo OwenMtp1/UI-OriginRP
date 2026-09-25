@@ -27,10 +27,14 @@ const ICONS = {
     heart: stroke('<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"/>'),
     shirt: stroke('<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>'),
     file: stroke('<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><path d="M14 2v6h6"/>'),
+    star: filled('<path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/>'),
+    badge: stroke('<path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z"/><path d="m9 12 2 2 4-4"/>'),
+    tablet: stroke('<rect x="4" y="2" width="16" height="20" rx="2.5"/><path d="M11 18h2"/>'),
     info: stroke('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>'),
 };
 
 const CHEVRON = stroke('<path d="m9 5 7 7-7 7"/>');
+const CHECK = stroke('<path d="m5 12.5 4.5 4.5L19 7.5"/>');
 const BACK = stroke('<path d="m15 5-7 7 7 7"/>');
 
 const LOGO = `
@@ -61,6 +65,16 @@ const PREVIEW = {
                 { icon: 'car', label: 'Véhicules', description: 'Gérer vos véhicules', close: true },
                 { icon: 'run', label: 'Animations', description: 'Accéder aux animations', close: true },
                 { icon: 'settings', label: 'Paramètres', description: 'Régler vos préférences', submenu: 'parametres' },
+            ],
+        },
+        organisation: {
+            title: 'Cartelgoon',
+            subtitle: 'Menu organisation',
+            key: 'F7',
+            items: [
+                { icon: 'star', label: 'Grade', description: "Votre rang dans l'organisation", value: 'Chef', static: true },
+                { icon: 'badge', label: 'Prendre son service', description: 'Passer en service ou hors service', checkbox: true, checked: false },
+                { icon: 'tablet', label: 'Ouvrir la tablette', description: "Accéder à la tablette de l'organisation", close: true },
             ],
         },
         parametres: {
@@ -142,13 +156,13 @@ function render(direction) {
 
     const items = menu.items || [];
     el.items.innerHTML = items.map((item, index) => `
-        <li class="menu-item${item.disabled ? ' disabled' : ''}" role="menuitem" data-index="${index}">
+        <li class="${itemClass(item)}" role="${item.checkbox ? 'menuitemcheckbox' : 'menuitem'}"${item.checkbox ? ` aria-checked="${!!item.checked}"` : ''} data-index="${index}">
             <div class="item-icon">${ICONS[item.icon] || ICONS.info}</div>
             <div class="item-text">
                 <div class="item-label">${escapeHtml(item.label)}</div>
                 ${item.description ? `<div class="item-description">${escapeHtml(item.description)}</div>` : ''}
             </div>
-            <span class="item-chevron">${CHEVRON}</span>
+            ${itemEnd(item)}
         </li>`).join('');
 
     if (direction) {
@@ -158,6 +172,23 @@ function render(direction) {
     }
 
     setActive(firstEnabled(state.active), false);
+}
+
+function itemClass(item) {
+    let name = 'menu-item';
+    if (item.disabled) name += ' disabled';
+    if (item.static) name += ' static';
+    if (item.checkbox && item.checked) name += ' checked';
+    return name;
+}
+
+// Élément à droite de la rubrique : case à cocher, valeur et/ou chevron
+function itemEnd(item) {
+    if (item.checkbox) return `<span class="item-checkbox">${CHECK}</span>`;
+    let html = '';
+    if (item.value != null && item.value !== '') html += `<span class="item-value">${escapeHtml(item.value)}</span>`;
+    if (!item.static) html += `<span class="item-chevron">${CHEVRON}</span>`;
+    return html;
 }
 
 function firstEnabled(from) {
@@ -229,6 +260,17 @@ function select(index) {
     const item = (currentMenu().items || [])[index];
     if (!item || item.disabled) return;
 
+    if (item.static) return;
+
+    if (item.checkbox) {
+        item.checked = !item.checked;
+        const node = el.items.children[index];
+        node.classList.toggle('checked', item.checked);
+        node.setAttribute('aria-checked', String(item.checked));
+        post('select', { menu: currentId(), index });
+        return;
+    }
+
     if (item.submenu) {
         if (!state.menus[item.submenu]) return;
         state.stack.push(item.submenu);
@@ -247,6 +289,12 @@ window.addEventListener('message', (event) => {
     const data = event.data || {};
     if (data.action === 'open') open(data);
     else if (data.action === 'close') hide();
+    else if (data.action === 'refresh' && state.open) {
+        state.menus = data.menus || state.menus;
+        state.stack = state.stack.filter((id) => state.menus[id]);
+        if (state.stack.length) render();
+        else hide();
+    }
 });
 
 el.items.addEventListener('mousemove', (event) => {
@@ -301,11 +349,15 @@ document.addEventListener('keydown', (event) => {
 
 if (!RESOURCE) {
     document.body.classList.add('preview');
-    open(PREVIEW);
+    // index.html#organisation ouvre directement le menu F7
+    const previewRoot = () => (PREVIEW.menus[location.hash.slice(1)] ? location.hash.slice(1) : PREVIEW.root);
+    open({ ...PREVIEW, root: previewRoot() });
     document.addEventListener('keydown', (event) => {
-        if (!state.open && event.key === 'F5') {
+        if (state.open) return;
+        const root = event.key === 'F5' ? 'main' : event.key === 'F7' ? 'organisation' : null;
+        if (root) {
             event.preventDefault();
-            open(PREVIEW);
+            open({ ...PREVIEW, root });
         }
     });
 }

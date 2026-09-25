@@ -9,6 +9,7 @@ Config.Logo = nil
 -- Paramètres > Raccourcis clavier > FiveM.
 Config.Keybinds = {
     { menu = 'main', command = 'menuf5', key = 'F5', description = 'Ouvrir le menu F5' },
+    { menu = 'organisation', command = 'menuf7', key = 'F7', description = 'Ouvrir le menu organisation' },
 }
 
 --[[
@@ -19,6 +20,10 @@ Config.Keybinds = {
         subtitle    Sous-titre (optionnel)
         key         Touche affichée à droite de l'en-tête (optionnel). Appuyer
                     dessus quand le menu est ouvert le ferme.
+        onOpen      function() appelée à chaque ouverture (optionnel). Elle peut
+                    renvoyer des valeurs à jour :
+                    { title = ..., subtitle = ..., items = { [id] = { value = ..., checked = ... } } }
+                    ou false pour empêcher l'ouverture.
         items       Liste des rubriques
 
     Rubrique :
@@ -26,6 +31,13 @@ Config.Keybinds = {
         label       Titre
         description Texte secondaire (optionnel)
         disabled    true pour griser la rubrique (optionnel)
+        id          Identifiant, pour modifier la rubrique en jeu (voir onOpen / setMenu)
+        value       Texte affiché à droite (ex. 'Chef'). Une rubrique sans action
+                    est purement informative.
+        checkbox    true pour une case à cocher : le menu reste ouvert et l'état
+                    (true / false) est ajouté en dernier argument de event /
+                    serverEvent, et en 2e argument de onSelect.
+        checked     État initial de la case (défaut : false)
 
         Et une (ou plusieurs) action(s) au clic :
         submenu     Id d'un autre menu de Config.Menus à ouvrir
@@ -50,6 +62,32 @@ Config.Menus = {
             { icon = 'run',      label = 'Animations', description = 'Accéder aux animations',            event = 'originrp_menu:animations' },
             { icon = 'settings', label = 'Paramètres', description = 'Régler vos préférences',            event = 'originrp_menu:parametres' },
         },
+    },
+
+    organisation = {
+        title = 'Organisation',              -- remplacé par le nom de l'organisation (onOpen)
+        subtitle = 'Menu organisation',
+        key = 'F7',
+        items = {
+            { id = 'grade',   icon = 'star',   label = 'Grade',              description = 'Votre rang dans l\'organisation', value = '-' },
+            { id = 'service', icon = 'badge',  label = 'Prendre son service', description = 'Passer en service ou hors service', checkbox = true, serverEvent = 'originrp_menu:organisation:service' },
+            { id = 'tablette', icon = 'tablet', label = 'Ouvrir la tablette', description = 'Accéder à la tablette de l\'organisation', event = 'originrp_menu:organisation:tablette' },
+        },
+
+        -- À adapter à la base : renvoie le nom de l'organisation, le grade et
+        -- l'état du service du joueur. Exemples :
+        --
+        -- ESX :
+        --   local job = ESX.GetPlayerData().job  -- ou .job2 / .faction selon la base
+        --   return { title = job.label, items = { grade = { value = job.grade_label } } }
+        --
+        -- QBCore (gangs) :
+        --   local gang = QBCore.Functions.GetPlayerData().gang
+        --   if gang.name == 'none' then return false end
+        --   return { title = gang.label, items = { grade = { value = gang.grade.name } } }
+        onOpen = function()
+            return nil
+        end,
     },
 
     -- Exemple de sous-menu : dans "main", remplacez

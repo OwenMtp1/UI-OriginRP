@@ -1,5 +1,39 @@
 local isOpen = false
 
+-- Valeurs modifiées en jeu (titre, valeur d'une rubrique, case cochée…),
+-- par menu : overrides[menuId] = { title = ..., items = { [itemId] = { ... } } }
+local overrides = {}
+
+local ITEM_FIELDS = { 'label', 'description', 'icon', 'value', 'checked', 'disabled' }
+
+local function hasAction(item)
+    return item.event or item.serverEvent or item.command or item.onSelect
+end
+
+local function merge(menuId, data)
+    if type(data) ~= 'table' then return end
+    local target = overrides[menuId] or { items = {} }
+    overrides[menuId] = target
+    if data.title ~= nil then target.title = data.title end
+    if data.subtitle ~= nil then target.subtitle = data.subtitle end
+    for itemId, fields in pairs(data.items or {}) do
+        target.items[itemId] = target.items[itemId] or {}
+        for _, field in ipairs(ITEM_FIELDS) do
+            if fields[field] ~= nil then target.items[itemId][field] = fields[field] end
+        end
+    end
+end
+
+local function itemOverride(menuId, item)
+    local menu = overrides[menuId]
+    return item.id and menu and menu.items[item.id] or {}
+end
+
+local function field(override, item, name)
+    if override[name] ~= nil then return override[name] end
+    return item[name]
+end
+
 -- Copie des menus sans les fonctions (onSelect), seule la partie
 -- affichable est envoyée à la NUI.
 local function buildNuiMenus()
@@ -7,23 +41,36 @@ local function buildNuiMenus()
     for id, menu in pairs(Config.Menus) do
         local items = {}
         for i, item in ipairs(menu.items or {}) do
+            local o = itemOverride(id, item)
+            local value = field(o, item, 'value')
             items[i] = {
-                icon = item.icon,
-                label = item.label,
-                description = item.description,
-                disabled = item.disabled == true,
+                icon = field(o, item, 'icon'),
+                label = field(o, item, 'label'),
+                description = field(o, item, 'description'),
+                value = value ~= nil and tostring(value) or nil,
+                disabled = field(o, item, 'disabled') == true,
+                checkbox = item.checkbox == true,
+                checked = field(o, item, 'checked') == true,
                 submenu = item.submenu,
-                close = item.submenu == nil and item.close ~= false,
+                static = not item.submenu and not item.checkbox and not hasAction(item),
+                close = not item.submenu and not item.checkbox and item.close ~= false,
             }
         end
+        local o = overrides[id] or {}
         menus[id] = {
-            title = menu.title,
-            subtitle = menu.subtitle,
+            title = o.title or menu.title,
+            subtitle = o.subtitle or menu.subtitle,
             key = menu.key,
             items = items,
         }
     end
     return menus
+end
+
+local function refresh()
+    if isOpen then
+        SendNUIMessage({ action = 'refresh', menus = buildNuiMenus() })
+    end
 end
 
 local function closeMenu()
@@ -33,12 +80,27 @@ local function closeMenu()
     SendNUIMessage({ action = 'close' })
 end
 
-local function openMenu(menuId)
+-- data (optionnel) : { title = ..., subtitle = ..., items = { [itemId] = { value = ..., checked = ... } } }
+local function openMenu(menuId, data)
     if isOpen then return end
-    if not Config.Menus[menuId] then
+    local menu = Config.Menus[menuId]
+    if not menu then
         print(('[originrp_menu] Menu inconnu : %s'):format(tostring(menuId)))
         return
     end
+
+    if menu.onOpen then
+        local ok, result = pcall(menu.onOpen)
+        if not ok then
+            print(('[originrp_menu] Erreur onOpen (%s) : %s'):format(menuId, result))
+        elseif result == false then
+            return -- onOpen peut refuser l'ouverture (ex. pas d'organisation)
+        else
+            merge(menuId, result)
+        end
+    end
+    merge(menuId, data)
+
     isOpen = true
     SetNuiFocus(true, true)
     SendNUIMessage({
@@ -47,6 +109,13 @@ local function openMenu(menuId)
         menus = buildNuiMenus(),
         logo = Config.Logo,
     })
+end
+
+-- Met à jour un menu, même ouvert. Ex. :
+-- exports.originrp_menu:setMenu('organisation', { items = { service = { checked = true } } })
+local function setMenu(menuId, data)
+    merge(menuId, data)
+    refresh()
 end
 
 for _, bind in ipairs(Config.Keybinds) do
@@ -66,17 +135,34 @@ end)
 RegisterNUICallback('select', function(data, cb)
     cb('ok')
 
-    local menu = Config.Menus[data.menu]
+    local menuId = data.menu
+    local menu = Config.Menus[menuId]
     local item = menu and menu.items[(tonumber(data.index) or -1) + 1]
-    if not item or item.disabled or item.submenu then return end
+    if not item or item.submenu then return end
 
-    if item.close ~= false then closeMenu() end
+    local o = itemOverride(menuId, item)
+    if field(o, item, 'disabled') then return end
 
-    local args = item.args or {}
+    local args = { table.unpack(item.args or {}) }
+    local checked
+
+    if item.checkbox then
+        checked = not field(o, item, 'checked')
+        if item.id then
+            merge(menuId, { items = { [item.id] = { checked = checked } } })
+        else
+            item.checked = checked
+        end
+        args[#args + 1] = checked
+        refresh()
+    elseif item.close ~= false then
+        closeMenu()
+    end
+
     if item.event then TriggerEvent(item.event, table.unpack(args)) end
     if item.serverEvent then TriggerServerEvent(item.serverEvent, table.unpack(args)) end
     if item.command then ExecuteCommand(item.command) end
-    if item.onSelect then item.onSelect(item) end
+    if item.onSelect then item.onSelect(item, checked) end
 end)
 
 AddEventHandler('onResourceStop', function(resource)
@@ -87,4 +173,5 @@ end)
 
 exports('openMenu', openMenu)
 exports('closeMenu', closeMenu)
+exports('setMenu', setMenu)
 exports('isOpen', function() return isOpen end)
