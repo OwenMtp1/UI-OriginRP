@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>OriginRP Carte d'identité</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Serif+Display&family=Caveat:wght@600&family=Space+Mono&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <article id="card" class="idcard hidden" data-position="right">
+        <!-- Sceau du comté en filigrane -->
+        <svg class="seal" viewBox="0 0 200 200" aria-hidden="true">
+            <defs>
+                <path id="seal-path" d="M100 100 m-76 0 a76 76 0 1 1 152 0 a76 76 0 1 1 -152 0"/>
+            </defs>
+            <circle cx="100" cy="100" r="96" fill="none" stroke="currentColor" stroke-width="3"/>
+            <circle cx="100" cy="100" r="62" fill="none" stroke="currentColor" stroke-width="2"/>
+            <text font-size="15" font-weight="700" letter-spacing="3" fill="currentColor">
+                <textPath href="#seal-path">COUNTY OF LOS SANTOS • STATE OF SAN ANDREAS •</textPath>
+            </text>
+            <path fill="currentColor" d="M100 58l9.9 20.1 22.1 3.2-16 15.6 3.8 22-19.8-10.4-19.8 10.4 3.8-22-16-15.6 22.1-3.2z"/>
+            <path fill="none" stroke="currentColor" stroke-width="2.5" d="M66 132q34 16 68 0"/>
+        </svg>
+
+        <header class="id-header">
+            <svg class="skyline" viewBox="0 0 560 90" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+                <!-- Immeubles -->
+                <path d="M250 90V52h14V40h10v12h12V30h8l4-10 4 10h8v60zM312 90V46h20v44zM336 90V36h10V24h14v12h8v54zM372 90V56h18v34zM394 90V42h12l6-8 6 8h10v48zM432 90V60h22v30zM458 90V50h16v40z"/>
+                <!-- Palmiers -->
+                <g transform="translate(152 0)">
+                <path d="M86 90c2-18 3-38 1-58l4 .5c2 20 1 40-1 57.5z"/>
+                <path d="M89 32c-10-8-24-9-34-4 11-1 22 2 31 8-9-2-19 0-27 6 10-3 20-3 29 0-6 4-10 11-11 18 5-6 10-11 14-14 1 7 0 14-2 20 5-6 7-13 7-20 5 4 9 10 11 16 0-8-4-15-9-20 9 0 18 4 24 10-3-9-12-15-21-17 9-3 19-2 27 2-7-7-18-9-28-7 7-5 16-7 24-6-10-5-22-3-30 4z"/>
+                </g>
+                <path d="M526 90c1-14 2-30 0-45l3 .5c2 15 1 30 0 44.5z"/>
+                <path d="M528 45c-8-6-18-7-26-3 8-1 17 1 24 6-7-1-14 0-20 5 7-2 15-2 22 0-5 3-8 8-8 14 4-5 7-8 10-10 1 5 0 10-1 15 4-5 5-10 5-15 4 3 7 7 8 12 0-6-3-11-7-15 7 0 14 3 18 8-2-7-9-11-16-13 7-2 14-1 20 2-5-5-13-7-21-5 5-4 12-5 18-5-8-4-17-2-23 3z"/>
+                <!-- Collines de Vinewood -->
+                <path d="M0 90V70c40-18 80-24 120-14s70 4 110-6v40z" opacity=".6"/>
+            </svg>
+            <div class="id-heading">
+                <p class="id-state">State of San Andreas</p>
+                <h1 class="id-county">Los Santos County</h1>
+            </div>
+            <div class="id-type">
+                <span>Carte d'identité</span>
+                <small>Identity card</small>
+            </div>
+        </header>
+
+        <section class="id-body">
+            <div class="id-photo-col">
+                <div class="id-photo">
+                    <img id="id-photo-img" alt="">
+                    <svg class="id-photo-empty" viewBox="0 0 100 120" aria-hidden="true">
+                        <circle cx="50" cy="44" r="20"/>
+                        <path d="M14 120c0-24 16-40 36-40s36 16 36 40z"/>
+                    </svg>
+                </div>
+                <p id="id-signature" class="id-signature"></p>
+            </div>
+
+            <dl class="id-fields">
+                <div><dt>Nom</dt><dd id="f-lastname"></dd></div>
+                <div><dt>Prénom</dt><dd id="f-firstname"></dd></div>
+                <div><dt>Sexe</dt><dd id="f-sex"></dd></div>
+                <div><dt>Date de naissance</dt><dd id="f-birthdate"></dd></div>
+                <div><dt>Taille</dt><dd id="f-height"></dd></div>
+                <div><dt>Lieu de naissance</dt><dd id="f-birthplace"></dd></div>
+            </dl>
+        </section>
+
+        <footer class="id-footer">
+            <div id="row-created"><span>Date de création</span><strong id="f-created"></strong></div>
+            <div id="row-number" class="id-number"><span>N°</span><strong id="f-number"></strong></div>
+        </footer>
+
+        <div id="id-mrz" class="id-mrz"></div>
+        <div class="id-holo" aria-hidden="true"></div>
+    </article>
+
+    <script src="script.js"></script>
+</body>
+</html>
