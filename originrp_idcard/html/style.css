@@ -6,7 +6,6 @@
     --violet: #6a3fd0;
     --gold: #c8a45c;
     --gold-light: #e2c98f;
-    --stamp-ink: rgba(52, 44, 150, 0.72);
     --card-width: 560px;
 }
 
@@ -74,12 +73,12 @@ body {
 
 .seal {
     position: absolute;
-    right: -30px;
-    bottom: -40px;
+    right: -24px;
+    top: 104px;
     width: 250px;
     height: 250px;
     color: #2b2566;
-    opacity: 0.075;
+    opacity: 0.09;
 }
 
 /* ---------- En-tête officiel ---------- */
@@ -190,18 +189,6 @@ body {
     flex-shrink: 0;
 }
 
-/* Tampon à l'encre qui chevauche le coin de la photo */
-.id-stamp {
-    position: absolute;
-    left: 44px;
-    top: 92px;
-    width: 80px;
-    height: 80px;
-    color: var(--stamp-ink);
-    transform: rotate(-16deg);
-    mix-blend-mode: multiply;
-    z-index: 2;
-}
 
 .id-photo {
     position: relative;
