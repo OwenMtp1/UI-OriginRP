@@ -4,6 +4,9 @@
     --ink: #1e1633;
     --ink-soft: #8b80a3;
     --violet: #6a3fd0;
+    --gold: #c8a45c;
+    --gold-light: #e2c98f;
+    --stamp-ink: rgba(52, 44, 150, 0.72);
     --card-width: 560px;
 }
 
@@ -71,99 +74,104 @@ body {
 
 .seal {
     position: absolute;
-    right: -38px;
-    bottom: -30px;
+    right: -30px;
+    bottom: -40px;
     width: 250px;
     height: 250px;
-    color: var(--violet);
-    opacity: 0.07;
-    transform: rotate(-12deg);
+    color: #2b2566;
+    opacity: 0.075;
 }
 
-/* ---------- En-tête : coucher de soleil sur Los Santos ---------- */
+/* ---------- En-tête officiel ---------- */
 
 .id-header {
     position: relative;
-    height: 86px;
+    height: 84px;
     flex-shrink: 0;
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 14px 22px 0;
+    align-items: center;
+    gap: 14px;
+    padding: 0 20px;
     color: #fff;
-    background: linear-gradient(100deg, #2b1a55 0%, #5b36b8 38%, #b0479b 72%, #f08a5d 100%);
-    overflow: hidden;
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='14' viewBox='0 0 80 14'%3E%3Cpath d='M0 7c10-6 20-6 30 0s20 6 30 0 20-6 30 0' fill='none' stroke='%23ffffff' stroke-opacity='.06' stroke-width='.8'/%3E%3C/svg%3E"),
+        linear-gradient(180deg, #221c4d 0%, #17123a 100%);
+    border-bottom: 3px solid var(--gold);
+    box-shadow: 0 1px 0 rgba(200, 164, 92, 0.5), 0 4px 0 -1px #17123a;
 }
 
 .id-header::after {
-    /* Soleil */
+    /* Double filet doré sous l'en-tête */
     content: '';
     position: absolute;
-    right: 120px;
-    bottom: -38px;
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 210, 150, 0.85), rgba(255, 170, 120, 0) 70%);
-}
-
-.skyline {
-    position: absolute;
     left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 90px;
-    fill: rgba(22, 10, 45, 0.55);
-    z-index: 1;
+    right: 0;
+    bottom: -8px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(200, 164, 92, 0.8) 12%, rgba(200, 164, 92, 0.8) 88%, transparent);
 }
 
-.id-heading,
-.id-type {
-    position: relative;
-    z-index: 2;
+.id-emblem {
+    width: 58px;
+    height: 58px;
+    flex-shrink: 0;
+    color: var(--gold);
+}
+
+.id-heading {
+    flex: 1;
+    min-width: 0;
+    padding-left: 14px;
+    border-left: 1px solid rgba(200, 164, 92, 0.45);
 }
 
 .id-state {
-    font-size: 9.5px;
+    font-size: 9px;
     font-weight: 700;
-    letter-spacing: 2.2px;
+    letter-spacing: 2.6px;
     text-transform: uppercase;
-    opacity: 0.8;
+    color: var(--gold-light);
 }
 
 .id-county {
     margin-top: 1px;
     font-family: 'DM Serif Display', Georgia, serif;
-    font-size: 25px;
+    font-size: 23px;
     font-weight: 400;
     line-height: 1.1;
-    text-shadow: 0 2px 8px rgba(20, 8, 40, 0.35);
+}
+
+.id-dept {
+    margin-top: 2px;
+    font-size: 8.5px;
+    font-weight: 500;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .id-type {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    padding: 6px 10px;
-    border-radius: 9px;
-    background: rgba(255, 255, 255, 0.16);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    backdrop-filter: blur(4px);
+    padding: 6px 0 6px 14px;
+    border-left: 1px solid rgba(200, 164, 92, 0.45);
 }
 
 .id-type span {
-    font-size: 10.5px;
-    font-weight: 800;
-    letter-spacing: 1.4px;
-    text-transform: uppercase;
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 14px;
+    letter-spacing: 0.6px;
+    color: #fff;
 }
 
 .id-type small {
+    margin-top: 1px;
     font-size: 8.5px;
-    font-weight: 500;
-    letter-spacing: 1px;
+    font-weight: 600;
+    letter-spacing: 1.8px;
     text-transform: uppercase;
-    opacity: 0.8;
+    color: var(--gold-light);
 }
 
 /* ---------- Corps ---------- */
@@ -173,12 +181,26 @@ body {
     flex: 1;
     display: flex;
     gap: 26px;
-    padding: 16px 22px 0;
+    padding: 20px 22px 0;
 }
 
 .id-photo-col {
+    position: relative;
     width: 112px;
     flex-shrink: 0;
+}
+
+/* Tampon à l'encre qui chevauche le coin de la photo */
+.id-stamp {
+    position: absolute;
+    left: 44px;
+    top: 92px;
+    width: 80px;
+    height: 80px;
+    color: var(--stamp-ink);
+    transform: rotate(-16deg);
+    mix-blend-mode: multiply;
+    z-index: 2;
 }
 
 .id-photo {
