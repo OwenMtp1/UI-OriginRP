@@ -5,6 +5,7 @@
 | `originrp_menu` | Menus F5, F7 (Organisation), F10 (Staff) |
 | `originrp_koth` | Classement KOTH |
 | `originrp_playercard` | Fiche joueur (nom, ID, emploi, organisation) |
+| `originrp_hud` | HUD à côté de la minimap (vie, armure, soif, faim) |
 
 ## originrp_menu
 
