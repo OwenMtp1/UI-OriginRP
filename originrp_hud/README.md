@@ -21,7 +21,7 @@ exports.originrp_hud:setStatus('hunger', 75)
 exports.originrp_hud:setStatus('thirst', 40)
 ```
 
-## Identité (prénom, nom, âge)
+## Identité (prénom, nom, âge, affichés au-dessus des jauges)
 
 - **ESX** (`firstName`, `lastName`, `dateofbirth`) et **QBCore** (`charinfo`) : automatique.
 - L'âge est calculé à partir de la date de naissance (`JJ/MM/AAAA` ou `AAAA-MM-JJ`).
@@ -32,7 +32,7 @@ exports.originrp_hud:setIdentity({ firstname = 'Liam', lastname = 'Coelho', birt
 -- ou avec l'âge directement : { firstname = 'Liam', lastname = 'Coelho', age = 28 }
 ```
 
-- `Config.ShowIdentity = false` pour masquer le cadre.
+- `Config.ShowIdentity = false` pour masquer le nom et l'âge.
 
 ## Divers
 

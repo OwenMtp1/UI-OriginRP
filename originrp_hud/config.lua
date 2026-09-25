@@ -8,7 +8,7 @@ Config.Framework = 'auto'
 -- Jauges affichées, dans l'ordre (retirer une ligne pour la masquer)
 Config.Gauges = { 'health', 'armor', 'thirst', 'hunger' }
 
--- Cadre avec prénom, nom et âge du personnage au-dessus des jauges
+-- Prénom, nom et âge du personnage au-dessus des jauges
 Config.ShowIdentity = true
 
 -- Taille des jauges (1.0 = 44 px en 1080p)

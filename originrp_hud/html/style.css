@@ -8,7 +8,7 @@
     --panel-bottom: rgba(24, 16, 44, 0.9);
     --panel-border: rgba(176, 148, 255, 0.18);
     --track: rgba(255, 255, 255, 0.08);
-    --low: #f87171;
+    --low: #d98282;
 }
 
 * {
@@ -50,54 +50,23 @@ body {
     gap: calc(var(--size) * 0.24);
 }
 
-/* ---------- Identité ---------- */
+/* ---------- Identité (texte seul, sans cadre) ---------- */
 
 .identity {
-    display: flex;
-    align-items: center;
-    gap: calc(var(--size) * 0.22);
     width: 0;
     min-width: 100%;
-    padding: calc(var(--size) * 0.16) calc(var(--size) * 0.28) calc(var(--size) * 0.16) calc(var(--size) * 0.16);
-    border-radius: calc(var(--size) * 0.3);
-    border: 1px solid var(--panel-border);
-    background: linear-gradient(180deg, var(--panel-top), var(--panel-bottom));
-    box-shadow:
-        0 6px 18px rgba(8, 4, 20, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    padding-left: 2px;
     font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
     color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75), 0 0 8px rgba(0, 0, 0, 0.35);
 }
 
 .identity.off {
     display: none;
 }
 
-.identity-icon {
-    width: calc(var(--size) * 0.68);
-    height: calc(var(--size) * 0.68);
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: calc(var(--size) * 0.2);
-    border: 1px solid rgba(200, 172, 255, 0.3);
-    background: linear-gradient(135deg, #6a3fd0, #8b5cf6);
-    box-shadow: 0 4px 12px rgba(106, 63, 208, 0.35);
-}
-
-.identity-icon svg {
-    width: 55%;
-    height: 55%;
-}
-
-.identity-text {
-    min-width: 0;
-    flex: 1;
-}
-
 .identity-name {
-    font-size: calc(var(--size) * 0.31);
+    font-size: calc(var(--size) * 0.34);
     font-weight: 600;
     line-height: 1.2;
     white-space: nowrap;
@@ -107,9 +76,9 @@ body {
 
 .identity-age {
     margin-top: 1px;
-    font-size: calc(var(--size) * 0.25);
+    font-size: calc(var(--size) * 0.27);
     font-weight: 500;
-    color: #c9adff;
+    color: #d6cce8;
 }
 
 .identity-age:empty {
@@ -159,9 +128,6 @@ body {
     transition: stroke-dashoffset 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease;
 }
 
-.gauge .glow {
-    filter: drop-shadow(0 0 3px var(--c1));
-}
 
 .gauge .icon {
     position: absolute;
@@ -176,8 +142,6 @@ body {
 .gauge .icon svg {
     width: 42%;
     height: 42%;
-    filter: drop-shadow(0 0 3px var(--c1));
-    opacity: 0.95;
 }
 
 /* Valeur vide (ex. pas d'armure) */
@@ -196,20 +160,20 @@ body {
 /* Valeur basse */
 .gauge.low {
     --c1: var(--low) !important;
-    --c2: #ef4444 !important;
+    --c2: #c26b6b !important;
     animation: low-pulse 1.1s ease-in-out infinite;
 }
 
 @keyframes low-pulse {
     50% {
         box-shadow:
-            0 0 0 3px rgba(248, 113, 113, 0.25),
+            0 0 0 3px rgba(217, 130, 130, 0.2),
             0 6px 18px rgba(8, 4, 20, 0.5);
     }
 }
 
-/* Couleurs par jauge : dégradé qui finit toujours en violet */
-.gauge[data-type='health'] { --c1: #f0abfc; --c2: #a855f7; }
-.gauge[data-type='armor']  { --c1: #93c5fd; --c2: #8b5cf6; }
-.gauge[data-type='thirst'] { --c1: #67e8f9; --c2: #818cf8; }
-.gauge[data-type='hunger'] { --c1: #fcd34d; --c2: #c084fc; }
+/* Couleurs douces par jauge, dégradé qui finit en violet */
+.gauge[data-type='health'] { --c1: #d9a9e3; --c2: #9d7fd1; }
+.gauge[data-type='armor']  { --c1: #a8bddb; --c2: #8a80c7; }
+.gauge[data-type='thirst'] { --c1: #9cc9d6; --c2: #8590c4; }
+.gauge[data-type='hunger'] { --c1: #dcc792; --c2: #a58fc9; }

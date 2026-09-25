@@ -75,7 +75,7 @@ function build() {
                     </linearGradient>
                 </defs>
                 <circle class="track" cx="23" cy="23" r="${RADIUS}"/>
-                <circle class="bar glow" cx="23" cy="23" r="${RADIUS}" stroke="url(#grad-${type})"
+                <circle class="bar" cx="23" cy="23" r="${RADIUS}" stroke="url(#grad-${type})"
                     stroke-dasharray="${CIRCUMFERENCE}" stroke-dashoffset="${CIRCUMFERENCE}"/>
             </svg>
             <div class="icon">${ICONS[type]}</div>`;
