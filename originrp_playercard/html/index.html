@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>OriginRP Fiche joueur</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <section id="card" class="card hidden" aria-live="polite">
+        <header class="card-header">
+            <div class="card-avatar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5v-.5a6 6 0 0 1 6-6h3a6 6 0 0 1 6 6v.5z"/></svg>
+            </div>
+            <h1 id="card-name" class="card-name"></h1>
+            <span id="card-id" class="card-id"></span>
+        </header>
+
+        <div class="card-section">
+            <p class="section-label">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 3h6a2 2 0 0 1 2 2v1h3a2 2 0 0 1 2 2v3H2V8a2 2 0 0 1 2-2h3V5a2 2 0 0 1 2-2zm0 3h6V5H9z"/><path d="M2 13h8v1a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-1h8v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/></svg>
+                <span id="label-job"></span>
+            </p>
+            <div class="section-row">
+                <p id="card-job" class="section-value"></p>
+                <div id="card-badges" class="badges"></div>
+            </div>
+        </div>
+
+        <div class="card-section">
+            <p class="section-label">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-.5A5.5 5.5 0 0 1 8 14h2a5.5 5.5 0 0 1 5.5 5.5v.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M18.5 14.2a5.5 5.5 0 0 1 3 4.8v1"/></svg>
+                <span id="label-org"></span>
+            </p>
+            <p id="card-org" class="section-value"></p>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>

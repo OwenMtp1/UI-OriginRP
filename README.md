@@ -1,5 +1,11 @@
 # UI-OriginRP
 
+| Ressource | Contenu |
+| --- | --- |
+| `originrp_menu` | Menus F5, F7 (Organisation), F10 (Staff) |
+| `originrp_koth` | Classement KOTH |
+| `originrp_playercard` | Fiche joueur (nom, ID, emploi, organisation) |
+
 ## originrp_menu
 
 Menus NUI (style violet « glass ») pour FiveM, standalone (aucune dépendance ESX / QBCore).
