@@ -81,6 +81,7 @@ Config.Menus = {
         items = {
             { id = 'grade',   icon = 'star',  label = 'Grade',            description = 'Votre poste dans l\'entreprise', value = '-' },
             { id = 'service', icon = 'badge', label = 'Prise de service', description = 'Passer en service ou hors service', checkbox = true, serverEvent = 'originrp_menu:entreprise:service' },
+            { id = 'tablette', icon = 'tablet', label = 'Ouvrir la tablette', description = 'Accéder à la tablette de l\'entreprise', event = 'originrp_menu:entreprise:tablette' },
             -- QBCore : pour utiliser la prise de service native, remplacer
             -- serverEvent par 'QBCore:ToggleDuty'
         },

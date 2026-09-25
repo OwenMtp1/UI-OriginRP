@@ -80,6 +80,7 @@ const PREVIEW = {
             items: [
                 { icon: 'star', label: 'Grade', description: "Votre poste dans l'entreprise", value: 'Stagiaire', static: true },
                 { icon: 'badge', label: 'Prise de service', description: 'Passer en service ou hors service', checkbox: true, checked: false },
+                { icon: 'tablet', label: 'Ouvrir la tablette', description: "Accéder à la tablette de l'entreprise", close: true },
             ],
         },
         organisation: {

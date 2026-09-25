@@ -51,6 +51,7 @@ Exports : `exports.originrp_menu:openMenu('main')`, `closeMenu()`, `setMenu(id, 
 | Titre (ex. « EMS ») | Nom du métier | Automatique (ESX / QBCore) |
 | Grade | Valeur affichée à droite | Automatique (ESX / QBCore) |
 | Prise de service | Case à cocher | Event serveur `originrp_menu:entreprise:service` reçu avec `true` / `false` |
+| Ouvrir la tablette | Action | Event client `originrp_menu:entreprise:tablette` |
 
 - Joueur sans emploi (`unemployed`) : le menu ne s'ouvre pas.
 - QBCore : la case reflète `job.onduty`. Pour utiliser la prise de service native de
