@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>OriginRP Menu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="menu" class="menu hidden" role="dialog" aria-labelledby="menu-title">
+        <header class="menu-header">
+            <div class="menu-brand">
+                <button id="menu-back" class="menu-back" type="button" aria-label="Retour"></button>
+                <div id="menu-logo" class="menu-logo"></div>
+            </div>
+            <span class="menu-divider"></span>
+            <div class="menu-heading">
+                <h1 id="menu-title" class="menu-title"></h1>
+                <p id="menu-subtitle" class="menu-subtitle"></p>
+            </div>
+            <div id="menu-key" class="menu-key"><span></span></div>
+        </header>
+        <ul id="menu-items" class="menu-items" role="menu"></ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
