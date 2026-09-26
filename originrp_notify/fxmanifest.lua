@@ -16,4 +16,5 @@ files {
     'html/index.html',
     'html/style.css',
     'html/script.js',
+    'html/img/*',
 }

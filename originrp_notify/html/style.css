@@ -1,10 +1,12 @@
 :root {
+    --accent: #8b5cf6;
     --accent-light: #a47dff;
-    --panel-top: rgba(34, 33, 40, 0.94);
-    --panel-bottom: rgba(24, 23, 29, 0.94);
-    --border: rgba(255, 255, 255, 0.08);
-    --text: #f4f4f5;
-    --text-muted: #a1a1aa;
+    --accent-glow: rgba(139, 92, 246, 0.5);
+    --panel-top: rgba(36, 24, 62, 0.94);
+    --panel-bottom: rgba(24, 16, 44, 0.94);
+    --panel-border: rgba(176, 148, 255, 0.16);
+    --text: #ffffff;
+    --text-muted: #b6aecb;
     --offset-x: 24px;
     --offset-y: 24px;
     --radius: 16px;
@@ -29,29 +31,28 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* ---------- Couleur par type ---------- */
+/* ---------- Couleur de l'icône selon le type ---------- */
 
-.notif[data-type='info']    { --tone: #9b7cf4; --tone-bg: rgba(155, 124, 244, 0.14); }
-.notif[data-type='success'] { --tone: #5fd38d; --tone-bg: rgba(95, 211, 141, 0.13); }
-.notif[data-type='error']   { --tone: #f07a8a; --tone-bg: rgba(240, 122, 138, 0.13); }
-.notif[data-type='warning'] { --tone: #f2b65a; --tone-bg: rgba(242, 182, 90, 0.13); }
+.notif[data-type='info']    { --tone: #a47dff; }
+.notif[data-type='success'] { --tone: #5fd38d; }
+.notif[data-type='error']   { --tone: #f07a8a; }
+.notif[data-type='warning'] { --tone: #f2b65a; }
 
 /* ---------- Notification ---------- */
 
 .notif {
     position: absolute;
-    width: 360px;
+    width: 380px;
+    min-height: 72px;
     display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 16px 17px 14px;
+    align-items: stretch;
     overflow: hidden;
     border-radius: var(--radius);
-    border: 1px solid var(--border);
+    border: 1px solid var(--panel-border);
     background: linear-gradient(180deg, var(--panel-top), var(--panel-bottom));
     backdrop-filter: blur(18px);
     box-shadow:
-        0 16px 40px rgba(0, 0, 0, 0.45),
+        0 16px 40px rgba(8, 4, 20, 0.55),
         inset 0 1px 0 rgba(255, 255, 255, 0.05);
     opacity: 0;
     transform: translateX(28px) scale(0.97);
@@ -74,7 +75,7 @@ body {
 .notif[data-position='top-left']     { top: var(--offset-y); left: var(--offset-x); }
 .notif[data-position='bottom-right'] { bottom: var(--offset-y); right: var(--offset-x); }
 .notif[data-position='bottom-left']  { bottom: var(--offset-y); left: var(--offset-x); }
-.notif[data-position='top']          { top: var(--offset-y); left: 50%; margin-left: -180px; }
+.notif[data-position='top']          { top: var(--offset-y); left: 50%; margin-left: -190px; }
 
 .notif[data-position$='left'],
 .notif[data-position$='left'].leave {
@@ -90,59 +91,56 @@ body {
     transform: none;
 }
 
-/* Arcs lumineux discrets (repris des menus) */
-.notif::before,
+/* Arc lumineux en bas à droite (repris des menus) */
 .notif::after {
     content: '';
     position: absolute;
-    width: 60px;
-    height: 44px;
-    border: 2px solid var(--accent-light);
-    opacity: 0.85;
-    pointer-events: none;
-}
-
-.notif::before {
-    top: -1px;
-    left: -1px;
-    border-right: none;
-    border-bottom: none;
-    border-top-left-radius: var(--radius);
-    -webkit-mask-image: radial-gradient(circle at 0 0, #000 30%, transparent 70%);
-    mask-image: radial-gradient(circle at 0 0, #000 30%, transparent 70%);
-}
-
-.notif::after {
     right: -1px;
     bottom: -1px;
+    width: 70px;
+    height: 46px;
+    border: 2.5px solid var(--accent-light);
     border-left: none;
     border-top: none;
     border-bottom-right-radius: var(--radius);
+    filter: drop-shadow(0 0 4px var(--accent-glow));
     -webkit-mask-image: radial-gradient(circle at 100% 100%, #000 30%, transparent 70%);
     mask-image: radial-gradient(circle at 100% 100%, #000 30%, transparent 70%);
+    pointer-events: none;
 }
 
-.notif-icon {
-    width: 42px;
-    height: 42px;
+/* ---------- Colonne logo ---------- */
+
+.notif-logo {
+    position: relative;
+    width: 70px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
-    background: var(--tone-bg);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    color: var(--tone);
+    background:
+        radial-gradient(circle at 50% 40%, rgba(139, 92, 246, 0.28), transparent 70%),
+        rgba(10, 6, 22, 0.35);
+    border-right: 1px solid rgba(176, 148, 255, 0.14);
 }
 
-.notif-icon svg {
-    width: 21px;
-    height: 21px;
+.notif-logo svg,
+.notif-logo img {
+    width: 38px;
+    height: 30px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 6px rgba(124, 77, 255, 0.45));
 }
 
-.notif-text {
+/* ---------- Texte ---------- */
+
+.notif-body {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 14px 18px 14px 16px;
 }
 
 .notif-title {
@@ -154,7 +152,25 @@ body {
     line-height: 1.25;
 }
 
-.notif-title span {
+.notif-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--tone);
+    color: #1a1230;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
+}
+
+.notif-icon svg {
+    width: 12px;
+    height: 12px;
+}
+
+.notif-title-text {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -164,11 +180,12 @@ body {
     flex-shrink: 0;
     padding: 1px 7px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(139, 92, 246, 0.25);
+    border: 1px solid rgba(176, 148, 255, 0.25);
     font-size: 11px;
     font-style: normal;
     font-weight: 700;
-    color: var(--text-muted);
+    color: #d9ccff;
 }
 
 .notif-count:empty {
@@ -184,7 +201,7 @@ body {
 }
 
 .notif-message {
-    margin-top: 3px;
+    margin-top: 4px;
     font-size: 13px;
     line-height: 1.4;
     color: var(--text-muted);
@@ -194,20 +211,23 @@ body {
     overflow: hidden;
 }
 
-/* Barre de temps restant */
+/* ---------- Barre de temps (en haut, comme l'exemple) ---------- */
+
 .notif-progress {
     position: absolute;
+    top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
     height: 3px;
     background: rgba(255, 255, 255, 0.05);
+    z-index: 2;
 }
 
 .notif-progress i {
     display: block;
     height: 100%;
-    background: var(--tone);
+    background: linear-gradient(90deg, #7c4dff, #b596ff);
+    box-shadow: 0 0 8px var(--accent-glow);
     transform-origin: left;
 }
 

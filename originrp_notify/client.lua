@@ -19,7 +19,7 @@ local function notify(data, kind, duration)
 end
 
 RegisterNUICallback('ready', function(_, cb)
-    cb({ position = Config.Position, offset = Config.Offset })
+    cb({ position = Config.Position, offset = Config.Offset, logo = Config.Logo })
 end)
 
 RegisterNetEvent('originrp_notify:send', notify)

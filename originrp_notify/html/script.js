@@ -3,11 +3,12 @@
 const RESOURCE = typeof GetParentResourceName === 'function' ? GetParentResourceName() : null;
 const $ = (id) => document.getElementById(id);
 
+// Petites icônes blanches dans la pastille colorée à côté du titre
 const ICONS = {
-    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4.5M12 8h.01"/></svg>',
-    success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12.3 2.7 2.7L16 9.5"/></svg>',
-    error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/></svg>',
-    warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 2.4 17.5A2 2 0 0 0 4.1 20.5h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4M12 17h.01"/></svg>',
+    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M12 11v7M12 6h.01"/></svg>',
+    success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5.5 12.5 4 4L18.5 7.5"/></svg>',
+    error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"><path d="m7 7 10 10M17 7 7 17"/></svg>',
+    warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M12 5v8.5M12 18.5h.01"/></svg>',
 };
 
 const notif = $('notif');
@@ -21,6 +22,12 @@ let swapTimer = null;
 
 function applyConfig(data) {
     if (!data) return;
+    if (data.logo) {
+        const img = document.createElement('img');
+        img.src = data.logo;
+        img.alt = '';
+        $('notif-logo').replaceChildren(img);
+    }
     if (data.position) notif.dataset.position = data.position;
     const root = document.documentElement.style;
     if (data.offset) {
