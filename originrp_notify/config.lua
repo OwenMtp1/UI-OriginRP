@@ -1,7 +1,7 @@
 Config = {}
 
--- Logo à gauche : nil = logo Origin intégré. Pour une image : la placer dans
--- html/img/ (et l'ajouter dans fxmanifest.lua) puis Config.Logo = 'img/logo.png'
+-- Logo à gauche : nil = logo Origin fourni (html/img/logo.png).
+-- Pour un autre logo : le placer dans html/img/ puis Config.Logo = 'img/autre.png'
 Config.Logo = nil
 
 -- Position : 'top-right', 'top-left', 'bottom-right', 'bottom-left', 'top'

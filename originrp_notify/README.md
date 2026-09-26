@@ -5,7 +5,7 @@ si une nouvelle arrive, l'actuelle sort en glissant et la nouvelle entre.
 Si la même notification est envoyée plusieurs fois, elle reste affichée avec un
 compteur (×2, ×3…) et son temps repart à zéro.
 
-Design violet avec le logo Origin à gauche (remplaçable par une image via `Config.Logo`).
+Design violet avec le logo Origin à gauche (`html/img/logo.png`, remplaçable via `Config.Logo`).
 4 types, repérés par la pastille à côté du titre : `info` (violet), `success` (vert),
 `error` (rouge), `warning` (orange). Une barre violette en haut montre le temps restant.
 
