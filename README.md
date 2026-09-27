@@ -9,7 +9,8 @@
 | `originrp_idcard` | Carte d'identité et permis de conduire Los Santos |
 | `originrp_tablet` | Tablette organisation / entreprise (membres, grades, recrutement) |
 | `originrp_notify` | Notifications (une à la fois, 4 types) |
-| `originrp_shop` | Tablette boutique (Orins, catalogue, historique) |
+| `originrp_shop` | Tablette boutique (Orins, catalogue, historique) + gestion interne |
+| `originrp_garage` | Menu garage |
 
 ## originrp_menu
 
