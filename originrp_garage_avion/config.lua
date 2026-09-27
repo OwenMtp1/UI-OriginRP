@@ -1,11 +1,11 @@
 Config = {}
 
 -- Type de garage : 'car' (voitures, motos, utilitaires), 'boat' (port) ou 'air' (hangar)
-Config.Type = 'car'
+Config.Type = 'air'
 
 -- Position du menu : 'left', 'center' ou 'right'
 Config.Position = 'center'
 
 -- Textes par défaut (remplaçables à chaque ouverture)
-Config.Title = 'Garage'
-Config.Subtitle = 'Récupérez vos véhicules'
+Config.Title = 'Hangar'
+Config.Subtitle = 'Récupérez vos appareils'

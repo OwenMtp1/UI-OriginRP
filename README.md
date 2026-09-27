@@ -10,7 +10,9 @@
 | `originrp_tablet` | Tablette organisation / entreprise (membres, grades, recrutement) |
 | `originrp_notify` | Notifications (une à la fois, 4 types) |
 | `originrp_shop` | Tablette boutique (Orins, catalogue, historique) + gestion interne |
-| `originrp_garage` | Menu garage |
+| `originrp_garage` | Garage voitures (Voitures, Motos, Utilitaires) |
+| `originrp_garage_bateau` | Port / garage bateaux (Bateaux, Jet-skis, Sous-marins) |
+| `originrp_garage_avion` | Hangar / garage avions (Avions, Hélicoptères) |
 
 ## originrp_menu
 

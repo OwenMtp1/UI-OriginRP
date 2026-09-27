@@ -2,8 +2,8 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-name 'originrp_garage'
-description 'OriginRP - Menu garage voitures (NUI)'
+name 'originrp_garage_bateau'
+description 'OriginRP - Menu port / garage bateaux (NUI)'
 version '1.0.0'
 
 client_scripts {
