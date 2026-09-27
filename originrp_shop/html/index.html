@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>OriginRP Boutique</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="tablet" class="tablet hidden">
+        <div class="screen">
+            <!-- En-tête -->
+            <header class="topbar">
+                <div class="org-logo"><img id="logo" src="img/logo.png" alt="Origin"></div>
+                <div class="org-heading">
+                    <h1 id="shop-title"></h1>
+                    <p id="shop-subtitle"></p>
+                </div>
+                <div class="topbar-actions">
+                    <div class="balance-pill">
+                        <span class="coin" id="coin-top"></span>
+                        <span id="balance-top"></span>
+                        <span class="unit" id="unit-top"></span>
+                    </div>
+                    <button id="btn-close" class="icon-btn" type="button" aria-label="Fermer">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+                    </button>
+                </div>
+            </header>
+
+            <div class="layout">
+                <nav id="sidebar" class="sidebar"></nav>
+
+                <main class="content">
+                    <!-- Accueil -->
+                    <section id="panel-home" class="panel active">
+                        <div class="scroll">
+                            <div class="panel-head">
+                                <h2>Accueil</h2>
+                                <p>Ton solde est commun à tous tes personnages.</p>
+                            </div>
+
+                            <div class="stats" style="margin-top: 16px">
+                                <div class="stat">
+                                    <div class="stat-icon"><span class="coin" id="coin-stat"></span></div>
+                                    <div><p class="stat-label">Solde</p><p id="stat-balance" class="stat-value"></p></div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></svg></div>
+                                    <div><p class="stat-label">VIP</p><p id="stat-vip" class="stat-value"></p></div>
+                                </div>
+                                <div class="stat">
+                                    <div class="stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg></div>
+                                    <div><p class="stat-label">Achats</p><p id="stat-purchases" class="stat-value"></p></div>
+                                </div>
+                            </div>
+
+                            <div class="section-head">
+                                <div>
+                                    <h3>Acheter des Orins</h3>
+                                    <p>Paiement sécurisé sur le site de la boutique, crédité en jeu automatiquement.</p>
+                                </div>
+                                <button id="btn-buy-orins" class="btn btn-primary" type="button">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>
+                                    Ouvrir la boutique en ligne
+                                </button>
+                            </div>
+                            <div id="packs" class="packs"></div>
+
+                            <div class="section-head">
+                                <div>
+                                    <h3>À la une</h3>
+                                    <p>Une sélection de nos articles du moment.</p>
+                                </div>
+                            </div>
+                            <div id="featured" class="grid"></div>
+                        </div>
+                    </section>
+
+                    <!-- Catégorie (véhicules, armes…) -->
+                    <section id="panel-category" class="panel">
+                        <div class="panel-head">
+                            <h2 id="cat-title"></h2>
+                            <p id="cat-subtitle"></p>
+                        </div>
+                        <div class="toolbar">
+                            <label class="search">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                                <input id="search" type="text" placeholder="Rechercher…" autocomplete="off">
+                            </label>
+                            <select id="sort" class="sort">
+                                <option value="default">Tri : par défaut</option>
+                                <option value="asc">Prix croissant</option>
+                                <option value="desc">Prix décroissant</option>
+                            </select>
+                        </div>
+                        <div class="scroll"><div id="cat-grid" class="grid"></div></div>
+                    </section>
+
+                    <!-- Historique -->
+                    <section id="panel-history" class="panel">
+                        <div class="panel-head">
+                            <h2>Historique</h2>
+                            <p>Tous tes achats en boutique, du plus récent au plus ancien.</p>
+                        </div>
+                        <div class="scroll" style="margin-top: 16px"><div id="history"></div></div>
+                    </section>
+                </main>
+            </div>
+
+            <!-- Confirmation d'achat -->
+            <div id="modal" class="modal">
+                <div class="modal-card">
+                    <h3>Confirmer l'achat</h3>
+                    <p>Vérifie l'article avant de valider.</p>
+                    <div id="confirm-item" class="confirm-item"></div>
+                    <div id="confirm-lines" class="confirm-lines"></div>
+                    <div class="modal-actions">
+                        <button id="confirm-cancel" class="btn btn-ghost" type="button">Annuler</button>
+                        <button id="confirm-ok" class="btn btn-primary" type="button">Acheter</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="toast" class="toast"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
