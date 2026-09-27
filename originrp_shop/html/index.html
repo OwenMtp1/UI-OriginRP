@@ -127,6 +127,52 @@
         </div>
     </div>
 
+    <!-- ================= Gestion interne (admin) ================= -->
+    <div id="admin" class="tablet hidden">
+        <div class="screen">
+            <header class="topbar">
+                <div class="org-logo"><img class="shop-logo" src="img/logo.png" alt="Origin"></div>
+                <div class="org-heading">
+                    <h1 id="a-title"></h1>
+                    <p>Gestion de la boutique</p>
+                </div>
+                <div class="topbar-actions">
+                    <span class="admin-pill">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        Admin
+                    </span>
+                    <button id="a-close" class="icon-btn" type="button" aria-label="Fermer">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+                    </button>
+                </div>
+            </header>
+
+            <div class="layout">
+                <nav id="a-sidebar" class="sidebar"></nav>
+                <main class="content">
+                    <section id="a-panel" class="panel active"><div id="a-body" class="scroll"></div></section>
+                </main>
+            </div>
+
+            <div id="a-overlay" class="overlay"></div>
+            <aside id="a-drawer" class="drawer"></aside>
+
+            <div id="a-modal" class="modal">
+                <div class="modal-card">
+                    <h3 id="a-modal-title"></h3>
+                    <p id="a-modal-text"></p>
+                    <div class="modal-actions">
+                        <button id="a-modal-cancel" class="btn btn-ghost" type="button">Annuler</button>
+                        <button id="a-modal-ok" class="btn btn-danger" type="button">Confirmer</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="a-toast" class="toast"></div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
+    <script src="admin.js"></script>
 </body>
 </html>

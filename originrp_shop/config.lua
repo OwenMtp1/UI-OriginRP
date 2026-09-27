@@ -10,6 +10,10 @@ Config.Currency = { name = 'Orins', short = 'OR' }
 Config.Command = 'boutique'
 Config.Key = nil            -- ex. 'F1'
 
+-- Gestion interne de la boutique (tablette admin)
+Config.AdminCommand = 'boutiqueadmin'
+Config.AdminAce = 'originrp.shopadmin'   -- server.cfg : add_ace group.admin originrp.shopadmin allow
+
 -- Lien du site où acheter des Orins (Tebex…), ouvert dans le navigateur du joueur
 Config.BuyUrl = 'https://originrp.tebex.io'
 

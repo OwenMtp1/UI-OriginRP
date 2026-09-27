@@ -332,7 +332,7 @@ function preview(name, data) {
     toast(`${item.label} acheté !`, 'success');
 }
 
-if (!RESOURCE) {
+if (!RESOURCE && !location.hash.startsWith('#admin')) {
     openShop(JSON.parse(JSON.stringify(DEMO)));
     const hash = location.hash.slice(1);
     if (hash) setTab(hash === 'history' ? 'history' : `cat:${hash}`);

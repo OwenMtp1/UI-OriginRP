@@ -19,5 +19,6 @@ files {
     'html/index.html',
     'html/style.css',
     'html/script.js',
+    'html/admin.js',
     'html/img/*',
 }

@@ -41,3 +41,60 @@ end
 -- Enregistre un achat dans l'historique (base de données)
 ServerConfig.AddHistory = function(source, item)
 end
+
+
+--[[
+    CATALOGUE MODIFIABLE EN JEU (optionnel)
+
+    Par défaut la boutique utilise Config.Items / Config.OrinPacks (config.lua).
+    Pour que les modifications faites dans la tablette admin soient gardées,
+    stocker le catalogue en base et renvoyer ici les listes (même format que
+    config.lua). nil = utiliser config.lua.
+]]
+ServerConfig.GetItems = function() return nil end
+ServerConfig.GetPacks = function() return nil end
+
+-- Réglages : { title, subtitle, buyUrl, open = true/false,
+--              currencyName, currencyShort }  (nil = config.lua)
+ServerConfig.GetSettings = function() return nil end
+
+--[[
+    GESTION INTERNE (tablette admin)
+
+    GetAdminData(source, context) doit renvoyer :
+    {
+        since = '26/09/2026',                      -- début des statistiques
+        stats = {
+            orinsSold = 0, orders = 0, refunds = 0, pendingAccounts = 0,
+            ingamePurchases = 0, orinsSpent = 0, vipActive = 0, negativeBalances = 0,
+        },
+        breakdown = { vehicles = 0, weapons = 0, packs = 0, vip = 0 },   -- achats par catégorie
+        recentOrders = {   -- commandes du site (Tebex…)
+            { player = 'Malou', label = 'Pack 2 400 OR', amount = 2400, price = '19,99 €', date = '27/09 14:02', status = 'ok' },
+            -- status : 'ok', 'pending' (compte pas encore lié), 'refunded'
+        },
+        recentMoves = {    -- mouvements d'Orins
+            { player = 'Malou', label = 'Achat Karin Sultan RS', amount = -1500, date = '27/09 14:05' },
+        },
+        players = { ... },         -- résultats de recherche pour context.query :
+            -- { id = 'license:xxx', name = 'Malou Malou', balance = 350, vip = 'VIP Gold', purchases = 3, online = true }
+        selectedPlayer = { ... },  -- joueur context.selected (mêmes champs + history = { ... })
+    }
+
+    OnAdminAction(source, action, payload) : appliquer l'action, renvoyer ok, message.
+        'resetStats'    {}
+        'saveSettings'  { title, subtitle, buyUrl, open, currencyName, currencyShort }
+        'saveItem'      { item = { id, category, label, description, price, image, tag, featured, data }, new = true/false }
+        'deleteItem'    { id }
+        'savePack'      { index = n (nil si nouveau), pack = { amount, price, bonus, popular } }
+        'deletePack'    { index }
+        'adjustBalance' { id = identifiant joueur, amount = +/- n, reason = '...' }
+    (La permission admin est déjà vérifiée par server.lua avant l'appel.)
+]]
+ServerConfig.GetAdminData = function(source, context)
+    return {}
+end
+
+ServerConfig.OnAdminAction = function(source, action, payload)
+    return false, "Gestion non configurée (sv_config.lua)."
+end

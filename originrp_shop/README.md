@@ -31,7 +31,32 @@ La tablette n'envoie que l'identifiant de l'article. Le serveur relit le prix da
 automatiquement** si la livraison échoue. Un seul achat à la fois par joueur.
 `RemoveBalance` doit être atomique côté base (ex. `UPDATE ... SET orins = orins - ? WHERE orins >= ?`).
 
+## Gestion interne (tablette admin)
+
+`/boutiqueadmin` — réservé à la permission ACE `originrp.shopadmin`, vérifiée par le
+serveur à l'ouverture **et à chaque action**. Dans `server.cfg` :
+
+```cfg
+add_ace group.admin originrp.shopadmin allow
+```
+
+- **Tableau de bord** : Orins vendus, commandes traitées, remboursements, en attente de
+  compte, achats en jeu, Orins dépensés, VIP actifs, soldes négatifs ; répartition des
+  achats par catégorie ; commandes récentes (Crédité / En attente / Remboursé) ;
+  mouvements récents. Bouton « Réinitialiser les statistiques » (avec confirmation).
+- **Configuration** : ouvrir / fermer la boutique, nom, sous-titre, lien d'achat, monnaie.
+- **Catégories** : ajouter, modifier, supprimer des articles (prix, description, étiquette,
+  image, à la une, données de livraison en JSON).
+- **Packs d'Orins** : ajouter, modifier, supprimer.
+- **Joueurs** : recherche, solde, VIP, historique, ajouter / retirer des Orins avec une raison.
+
+À brancher dans `sv_config.lua` : `GetAdminData` (statistiques, commandes, mouvements,
+recherche de joueurs) et `OnAdminAction` (appliquer les modifications). Pour que les
+articles et packs modifiés en jeu soient gardés, stocker le catalogue en base et le
+renvoyer via `GetItems` / `GetPacks` / `GetSettings` (sinon `config.lua` est utilisé).
+
 ## Aperçu hors jeu
 
-Ouvrir `html/index.html` dans un navigateur (achats simulés).
+Ouvrir `html/index.html` dans un navigateur (achats simulés), ou `index.html#admin` pour la
+gestion interne (`#admin-settings`, `#admin-packs`, `#admin-players`, `#admin-catvehicles`…).
 `index.html#vehicles`, `#weapons`, `#packs`, `#vip` ou `#history` ouvrent directement un onglet.

@@ -1,26 +1,5 @@
 local isOpen = false
 
--- Partie fixe envoyée à la tablette (catalogue, packs, textes)
-local function catalog()
-    local items = {}
-    for i, item in ipairs(Config.Items) do
-        items[i] = {
-            id = item.id, category = item.category, label = item.label,
-            description = item.description, price = item.price,
-            image = item.image, tag = item.tag, featured = item.featured == true,
-        }
-    end
-    return {
-        title = Config.Title,
-        subtitle = Config.Subtitle,
-        currency = Config.Currency,
-        buyUrl = Config.BuyUrl,
-        packs = Config.OrinPacks,
-        categories = Config.Categories,
-        items = items,
-    }
-end
-
 local function closeShop()
     if not isOpen then return end
     isOpen = false
@@ -28,10 +7,21 @@ local function closeShop()
     SendNUIMessage({ action = 'close' })
 end
 
-RegisterNetEvent('originrp_shop:open', function(state)
+RegisterNetEvent('originrp_shop:open', function(catalog, state)
     isOpen = true
     SetNuiFocus(true, true)
-    SendNUIMessage({ action = 'open', catalog = catalog(), state = state })
+    SendNUIMessage({ action = 'open', catalog = catalog, state = state })
+end)
+
+-- Gestion interne (admin)
+RegisterNetEvent('originrp_shop:adminOpen', function(data)
+    isOpen = true
+    SetNuiFocus(true, true)
+    SendNUIMessage({ action = 'adminOpen', data = data })
+end)
+
+RegisterNetEvent('originrp_shop:adminUpdate', function(data)
+    if isOpen then SendNUIMessage({ action = 'adminUpdate', data = data }) end
 end)
 
 RegisterNetEvent('originrp_shop:update', function(state)
@@ -52,6 +42,19 @@ if Config.Command then
         RegisterKeyMapping(Config.Command, 'Ouvrir la boutique', 'keyboard', Config.Key)
     end
 end
+
+if Config.AdminCommand then
+    RegisterCommand(Config.AdminCommand, function()
+        if not isOpen then TriggerServerEvent('originrp_shop:adminRequest') end
+    end, false)
+end
+
+RegisterNUICallback('adminAction', function(data, cb)
+    cb('ok')
+    if isOpen and type(data.action) == 'string' then
+        TriggerServerEvent('originrp_shop:adminAction', data.action, type(data.payload) == 'table' and data.payload or {})
+    end
+end)
 
 RegisterNUICallback('close', function(_, cb)
     closeShop()
