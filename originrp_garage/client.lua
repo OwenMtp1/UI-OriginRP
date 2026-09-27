@@ -11,7 +11,9 @@
                 vehicles = {
                     {
                         label = 'Karin Sultan RS', plate = 'ORG 123',
-                        fuel = 80, engine = 95, body = 70,   -- en % (optionnels)
+                        fuel = 80, engine = 95,              -- en % (optionnels)
+                        model = 'sultanrs',                  -- sert à deviner la catégorie
+                        category = 'car',   -- optionnel : car, bike, truck, boat, air, emergency
                         state = 'garage',   -- 'garage' (disponible), 'out' (déjà sorti), 'impound' (fourrière)
                         -- + tous les champs utiles au script (model, props, id…)
                     },
@@ -29,6 +31,24 @@
     Rappel : le serveur doit revérifier que le véhicule appartient bien au
     joueur et qu'il est au garage avant de le faire sortir.
 ]]
+
+-- Catégorie déduite de la classe GTA du modèle quand le script ne la donne pas
+local CLASS_CATEGORY = {
+    [8] = 'bike', [13] = 'bike',
+    [10] = 'truck', [11] = 'truck', [12] = 'truck', [17] = 'truck', [20] = 'truck',
+    [14] = 'boat',
+    [15] = 'air', [16] = 'air',
+    [18] = 'emergency', [19] = 'emergency',
+}
+
+local function categoryOf(veh)
+    if veh.category then return veh.category end
+    local model = veh.model
+    if not model then return 'car' end
+    local hash = type(model) == 'number' and model or joaat(model)
+    if not IsModelInCdimage(hash) then return 'car' end
+    return CLASS_CATEGORY[GetVehicleClassFromName(hash)] or 'car'
+end
 
 local isOpen = false
 local current = nil -- { data, cb }
@@ -50,7 +70,8 @@ local function display(data)
             vehicles[v] = {
                 label = veh.label or veh.model or 'Véhicule',
                 plate = veh.plate,
-                fuel = veh.fuel, engine = veh.engine, body = veh.body,
+                fuel = veh.fuel, engine = veh.engine,
+                category = categoryOf(veh),
                 state = veh.state or 'garage',
             }
         end
