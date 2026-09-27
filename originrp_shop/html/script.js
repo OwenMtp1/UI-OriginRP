@@ -17,7 +17,7 @@ const ICONS = {
 
 const state = {
     open: false,
-    catalog: { title: '', subtitle: '', currency: { name: 'Orins', short: 'OR' }, packs: [], categories: [], items: [] },
+    catalog: { title: '', subtitle: '', currency: { name: 'Orins', short: 'OR' }, categories: [], items: [] },
     player: { balance: 0, vip: null, history: [], purchases: 0 },
     tab: 'home',
     search: '',
@@ -82,20 +82,6 @@ function renderHeader() {
     $('stat-balance').textContent = `${fmt(player.balance)} ${unit()}`;
     $('stat-vip').textContent = player.vip ? `${player.vip.label}${player.vip.expires ? ` · ${player.vip.expires}` : ''}` : 'Aucun VIP actif';
     $('stat-purchases').textContent = fmt(player.purchases ?? player.history?.length);
-    $('btn-buy-orins').hidden = !catalog.buyUrl;
-}
-
-function renderPacks() {
-    const packs = state.catalog.packs || [];
-    $('packs').className = packs.length ? 'packs' : '';
-    $('packs').innerHTML = packs.length ? packs.map((p) => `
-        <div class="pack${p.popular ? ' popular' : ''}" data-pack>
-            ${p.popular ? '<span class="ribbon">Populaire</span>' : ''}
-            <span class="coin">${escapeHtml(unit().slice(0, 2))}</span>
-            <p class="pack-amount">${fmt(p.amount)}<small>${escapeHtml(unit())}</small></p>
-            <p class="pack-bonus">${escapeHtml(p.bonus || '')}</p>
-            <p class="pack-price">${escapeHtml(p.price || '')}</p>
-        </div>`).join('') : '<div class="empty-box">Aucun pack d\'Orins configuré.</div>';
 }
 
 function cardHtml(item, showCategory) {
@@ -160,7 +146,6 @@ function renderHistory() {
 function renderAll() {
     renderSidebar();
     renderHeader();
-    renderPacks();
     renderFeatured();
     renderCategory();
     renderHistory();
@@ -243,10 +228,15 @@ $('sidebar').addEventListener('click', (event) => {
 document.querySelector('.content').addEventListener('click', (event) => {
     const buy = event.target.closest('[data-buy]');
     if (buy) return askBuy(buy.dataset.buy);
-    if (event.target.closest('[data-pack]')) openUrl(state.catalog.buyUrl);
 });
 
-$('btn-buy-orins').addEventListener('click', () => openUrl(state.catalog.buyUrl));
+// Recharger : ne mène nulle part pour l'instant (voir Config.RechargeUrl / l'événement
+// client originrp_shop:recharge pour le brancher plus tard)
+$('btn-recharge').addEventListener('click', () => {
+    if (state.catalog.rechargeUrl) return openUrl(state.catalog.rechargeUrl);
+    post('recharge');
+    toast('La recharge d\'Orins sera bientôt disponible.');
+});
 $('btn-close').addEventListener('click', closeShop);
 $('search').addEventListener('input', (e) => { state.search = e.target.value; renderCategory(); });
 $('sort').addEventListener('change', (e) => { state.sort = e.target.value; renderCategory(); });
@@ -290,13 +280,6 @@ const DEMO = {
         title: 'Boutique OriginRP',
         subtitle: 'Dépense tes Orins en véhicules, armes, packs et VIP',
         currency: { name: 'Orins', short: 'OR' },
-        buyUrl: 'https://originrp.tebex.io',
-        packs: [
-            { amount: 500, price: '4,99 €' },
-            { amount: 1100, price: '9,99 €', bonus: '+10 %' },
-            { amount: 2400, price: '19,99 €', bonus: '+20 %', popular: true },
-            { amount: 6500, price: '49,99 €', bonus: '+30 %' },
-        ],
         categories: [
             { id: 'vehicles', label: 'Véhicules', icon: 'car' },
             { id: 'weapons', label: 'Armes', icon: 'weapon' },

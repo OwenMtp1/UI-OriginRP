@@ -2,8 +2,10 @@
 
 Tablette boutique dans la DA OriginRP (cadre de tablette, gris dominant, accents violets, logo Origin).
 
-- **Accueil** : solde, VIP actif, nombre d'achats ; packs d'Orins (ouvrent le site de paiement) ;
-  articles « À la une ».
+- **En-tête** : solde et bouton **Recharger** (ne mène nulle part pour l'instant : affiche
+  « bientôt disponible » ; à brancher plus tard via `Config.RechargeUrl` ou l'événement
+  client `originrp_shop:recharge`).
+- **Accueil** : solde, VIP actif, nombre d'achats ; articles « À la une ».
 - **Catégories** (Véhicules, Armes, Packs, VIP… configurables) : cartes avec image, étiquette,
   prix, recherche et tri par prix. Bouton grisé « Solde insuffisant » si le joueur n'a pas assez.
 - **Historique** des achats.
@@ -17,7 +19,7 @@ Tablette boutique dans la DA OriginRP (cadre de tablette, gris dominant, accents
 
 ## Configuration
 
-- `config.lua` : titre, monnaie, lien du site (`Config.BuyUrl`), packs d'Orins, catégories et
+- `config.lua` : titre, monnaie, lien du bouton Recharger (`Config.RechargeUrl`), catégories et
   **articles** (prix, description, image, étiquette, à la une, `data` libre pour la livraison).
   Images : les mettre dans `html/img/` (ex. `image = 'img/sultan.png'`) ou une URL.
 - `sv_config.lua` (**à brancher sur la base**) : `GetBalance`, `RemoveBalance`, `AddBalance`,
@@ -44,19 +46,18 @@ add_ace group.admin originrp.shopadmin allow
   compte, achats en jeu, Orins dépensés, VIP actifs, soldes négatifs ; répartition des
   achats par catégorie ; commandes récentes (Crédité / En attente / Remboursé) ;
   mouvements récents. Bouton « Réinitialiser les statistiques » (avec confirmation).
-- **Configuration** : ouvrir / fermer la boutique, nom, sous-titre, lien d'achat, monnaie.
+- **Configuration** : ouvrir / fermer la boutique, nom, sous-titre, monnaie.
 - **Catégories** : ajouter, modifier, supprimer des articles (prix, description, étiquette,
   image, à la une, données de livraison en JSON).
-- **Packs d'Orins** : ajouter, modifier, supprimer.
 - **Joueurs** : recherche, solde, VIP, historique, ajouter / retirer des Orins avec une raison.
 
 À brancher dans `sv_config.lua` : `GetAdminData` (statistiques, commandes, mouvements,
 recherche de joueurs) et `OnAdminAction` (appliquer les modifications). Pour que les
-articles et packs modifiés en jeu soient gardés, stocker le catalogue en base et le
-renvoyer via `GetItems` / `GetPacks` / `GetSettings` (sinon `config.lua` est utilisé).
+articles modifiés en jeu soient gardés, stocker le catalogue en base et le
+renvoyer via `GetItems` / `GetSettings` (sinon `config.lua` est utilisé).
 
 ## Aperçu hors jeu
 
 Ouvrir `html/index.html` dans un navigateur (achats simulés), ou `index.html#admin` pour la
-gestion interne (`#admin-settings`, `#admin-packs`, `#admin-players`, `#admin-catvehicles`…).
+gestion interne (`#admin-settings`, `#admin-players`, `#admin-catvehicles`…).
 `index.html#vehicles`, `#weapons`, `#packs`, `#vip` ou `#history` ouvrent directement un onglet.

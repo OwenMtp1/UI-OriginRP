@@ -46,15 +46,14 @@ end
 --[[
     CATALOGUE MODIFIABLE EN JEU (optionnel)
 
-    Par défaut la boutique utilise Config.Items / Config.OrinPacks (config.lua).
+    Par défaut la boutique utilise Config.Items (config.lua).
     Pour que les modifications faites dans la tablette admin soient gardées,
-    stocker le catalogue en base et renvoyer ici les listes (même format que
+    stocker le catalogue en base et renvoyer ici la liste (même format que
     config.lua). nil = utiliser config.lua.
 ]]
 ServerConfig.GetItems = function() return nil end
-ServerConfig.GetPacks = function() return nil end
 
--- Réglages : { title, subtitle, buyUrl, open = true/false,
+-- Réglages : { title, subtitle, rechargeUrl, open = true/false,
 --              currencyName, currencyShort }  (nil = config.lua)
 ServerConfig.GetSettings = function() return nil end
 
@@ -83,11 +82,9 @@ ServerConfig.GetSettings = function() return nil end
 
     OnAdminAction(source, action, payload) : appliquer l'action, renvoyer ok, message.
         'resetStats'    {}
-        'saveSettings'  { title, subtitle, buyUrl, open, currencyName, currencyShort }
+        'saveSettings'  { title, subtitle, open, currencyName, currencyShort }
         'saveItem'      { item = { id, category, label, description, price, image, tag, featured, data }, new = true/false }
         'deleteItem'    { id }
-        'savePack'      { index = n (nil si nouveau), pack = { amount, price, bonus, popular } }
-        'deletePack'    { index }
         'adjustBalance' { id = identifiant joueur, amount = +/- n, reason = '...' }
     (La permission admin est déjà vérifiée par server.lua avant l'appel.)
 ]]

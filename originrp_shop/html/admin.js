@@ -29,9 +29,9 @@
 
     const A = {
         open: false,
-        data: { settings: {}, categories: [], items: [], packs: [], stats: {}, breakdown: {}, recentOrders: [], recentMoves: [], players: [] },
+        data: { settings: {}, categories: [], items: [], stats: {}, breakdown: {}, recentOrders: [], recentMoves: [], players: [] },
         tab: 'dashboard',
-        drawer: null,     // { type: 'item', id } | { type: 'newItem', category } | { type: 'pack', index } | { type: 'newPack' } | { type: 'player' }
+        drawer: null,     // { type: 'item', id } | { type: 'newItem', category } | { type: 'player' }
         confirm: null,    // fonction à exécuter si l'admin confirme
         query: '',
     };
@@ -83,7 +83,6 @@
             { id: 'dashboard', label: 'Tableau de bord', icon: I.dashboard },
             { id: 'settings', label: 'Configuration', icon: I.settings },
             ...A.data.categories.map((c) => ({ id: `cat:${c.id}`, label: c.label, icon: I[c.icon] || I.box, count: counts[c.id] || 0 })),
-            { id: 'packs', label: "Packs d'Orins", icon: I.coins, count: A.data.packs.length },
             { id: 'players', label: 'Joueurs', icon: I.users },
         ];
     }
@@ -173,7 +172,6 @@
                     </div>
                     <div><label class="field-label" for="s-title">Nom de la boutique</label><input id="s-title" class="input" value="${esc(s.title)}" maxlength="40"></div>
                     <div><label class="field-label" for="s-subtitle">Sous-titre</label><input id="s-subtitle" class="input" value="${esc(s.subtitle)}" maxlength="80"></div>
-                    <div class="full"><label class="field-label" for="s-url">Lien d'achat des Orins</label><input id="s-url" class="input" value="${esc(s.buyUrl)}" placeholder="https://…"><p class="hint-text">Ouvert dans le navigateur du joueur depuis l'accueil de la boutique.</p></div>
                     <div><label class="field-label" for="s-cname">Nom de la monnaie</label><input id="s-cname" class="input" value="${esc(s.currencyName)}" maxlength="20"></div>
                     <div><label class="field-label" for="s-cshort">Abréviation</label><input id="s-cshort" class="input" value="${esc(s.currencyShort)}" maxlength="4"></div>
                 </div>
@@ -201,27 +199,6 @@
             <div class="panel-top">
                 <div class="panel-head"><h2>${esc(c?.label || '')}</h2><p>${items.length} article${items.length > 1 ? 's' : ''} en vente</p></div>
                 <button class="btn btn-primary" data-act="new-item" data-cat="${esc(id)}" type="button">${I.plus}Ajouter un article</button>
-            </div>
-            <div style="margin-top:16px">${rows}</div>`;
-    }
-
-    /* ---------- Packs d'Orins ---------- */
-
-    function packsPanel() {
-        const rows = A.data.packs.map((p, index) => `
-            <div class="edit-row" data-pack="${index}">
-                <span class="coin" style="width:40px;height:40px;font-size:12px">${esc(unit().slice(0, 2))}</span>
-                <div class="history-main"><p>${fmt(p.amount)} ${esc(unit())}</p><p>${esc(p.price || '')}</p></div>
-                <div class="row-badges">
-                    ${p.popular ? '<span class="mini-chip violet">Populaire</span>' : ''}
-                    ${p.bonus ? `<span class="mini-chip">${esc(p.bonus)}</span>` : ''}
-                </div>
-                ${I.chevron}
-            </div>`).join('') || '<div class="empty-box">Aucun pack configuré.</div>';
-        return `
-            <div class="panel-top">
-                <div class="panel-head"><h2>Packs d'Orins</h2><p>Affichés sur l'accueil de la boutique, achetés sur le site.</p></div>
-                <button class="btn btn-primary" data-act="new-pack" type="button">${I.plus}Ajouter un pack</button>
             </div>
             <div style="margin-top:16px">${rows}</div>`;
     }
@@ -280,22 +257,6 @@
             </div>`;
     }
 
-    function packDrawer(pack) {
-        const isNew = !pack;
-        return `${drawerHead(`<span class="coin">${esc(unit().slice(0, 2))}</span>`, isNew ? 'Nouveau pack' : `${fmt(pack.amount)} ${unit()}`, "Pack d'Orins")}
-            <div class="drawer-body"><div class="form-grid">
-                <div><label class="field-label" for="k-amount">Quantité (${esc(unit())})</label><input id="k-amount" class="input" type="number" min="1" value="${esc(pack?.amount ?? '')}"></div>
-                <div><label class="field-label" for="k-price">Prix affiché</label><input id="k-price" class="input" value="${esc(pack?.price || '')}" placeholder="9,99 €"></div>
-                <div class="full"><label class="field-label" for="k-bonus">Bonus</label><input id="k-bonus" class="input" value="${esc(pack?.bonus || '')}" placeholder="+10 %"></div>
-                <div class="full"><label class="toggle-row"><span>Mis en avant<small>Affiche le bandeau « Populaire ».</small></span>
-                    <input id="k-popular" type="checkbox" ${pack?.popular ? 'checked' : ''}><i class="switch"></i></label></div>
-            </div></div>
-            <div class="drawer-foot">
-                <button class="btn btn-primary" data-act="save-pack" type="button">${isNew ? 'Créer le pack' : 'Enregistrer'}</button>
-                ${isNew ? '' : '<button class="btn btn-danger" data-act="delete-pack" type="button">Supprimer le pack</button>'}
-            </div>`;
-    }
-
     function playerDrawer(p) {
         const history = (p.history || []).map((h) => `
             <div class="mini-row"><div class="mini-main"><p>${esc(h.label)}</p><p>${esc(h.date || '')}</p></div>
@@ -330,11 +291,6 @@
             if (!item) return closeDrawer();
             html = itemDrawer(item);
         } else if (d.type === 'newItem') html = itemDrawer(null, d.category);
-        else if (d.type === 'pack') {
-            const pack = A.data.packs[d.index];
-            if (!pack) return closeDrawer();
-            html = packDrawer(pack);
-        } else if (d.type === 'newPack') html = packDrawer(null);
         else if (d.type === 'player') {
             if (!A.data.selectedPlayer) return;
             html = playerDrawer(A.data.selectedPlayer);
@@ -363,7 +319,6 @@
         let html = '';
         if (A.tab === 'dashboard') html = dashboard();
         else if (A.tab === 'settings') html = settingsPanel();
-        else if (A.tab === 'packs') html = packsPanel();
         else if (A.tab === 'players') html = playersPanel();
         else if (A.tab.startsWith('cat:')) html = categoryPanel(A.tab.slice(4));
         // Ne pas écraser un formulaire en cours de saisie dans Configuration
@@ -408,17 +363,6 @@
         closeDrawer();
     }
 
-    function savePack() {
-        const amount = Number(val('k-amount'));
-        if (!Number.isInteger(amount) || amount < 1) return toast('Quantité invalide.', 'error');
-        if (!val('k-price')) return toast('Indique le prix affiché.', 'error');
-        action('savePack', {
-            index: A.drawer.type === 'pack' ? A.drawer.index + 1 : undefined, // index Lua (1 = premier)
-            pack: { amount, price: val('k-price'), bonus: val('k-bonus') || undefined, popular: $('k-popular').checked },
-        });
-        closeDrawer();
-    }
-
     function adjust(sign) {
         const amount = Number(val('p-amount'));
         if (!Number.isInteger(amount) || amount < 1) return toast('Montant invalide.', 'error');
@@ -442,19 +386,13 @@
                 case 'save-settings':
                     return action('saveSettings', {
                         open: $('s-open').checked, title: val('s-title'), subtitle: val('s-subtitle'),
-                        buyUrl: val('s-url'), currencyName: val('s-cname'), currencyShort: val('s-cshort').toUpperCase(),
+                        currencyName: val('s-cname'), currencyShort: val('s-cshort').toUpperCase(),
                     });
                 case 'new-item': return openDrawer({ type: 'newItem', category: btn.dataset.cat });
-                case 'new-pack': return openDrawer({ type: 'newPack' });
                 case 'save-item': return saveItem();
-                case 'save-pack': return savePack();
                 case 'delete-item': {
                     const item = A.data.items.find((i) => i.id === A.drawer.id);
                     return askConfirm("Supprimer l'article", `« ${item.label} » ne sera plus en vente.`, () => { action('deleteItem', { id: item.id }); closeDrawer(); });
-                }
-                case 'delete-pack': {
-                    const index = A.drawer.index;
-                    return askConfirm('Supprimer le pack', `Le pack de ${fmt(A.data.packs[index].amount)} ${unit()} sera retiré.`, () => { action('deletePack', { index: index + 1 }); closeDrawer(); });
                 }
                 case 'search':
                     A.query = val('p-search');
@@ -466,8 +404,6 @@
 
         const item = t.closest('#a-body [data-item]');
         if (item) return openDrawer({ type: 'item', id: item.dataset.item });
-        const pack = t.closest('#a-body [data-pack]');
-        if (pack) return openDrawer({ type: 'pack', index: Number(pack.dataset.pack) });
         const player = t.closest('#a-body [data-player]');
         if (player) {
             // Volet en « chargement » le temps que le serveur renvoie la fiche
@@ -532,7 +468,7 @@
 
     const DEMO = {
         since: '26/09/2026',
-        settings: { title: 'Boutique OriginRP', subtitle: 'Dépense tes Orins en véhicules, armes, packs et VIP', buyUrl: 'https://originrp.tebex.io', open: true, currencyName: 'Orins', currencyShort: 'OR' },
+        settings: { title: 'Boutique OriginRP', subtitle: 'Dépense tes Orins en véhicules, armes, packs et VIP', open: true, currencyName: 'Orins', currencyShort: 'OR' },
         stats: { orinsSold: 12400, orders: 18, refunds: 1, pendingAccounts: 2, ingamePurchases: 27, orinsSpent: 9650, vipActive: 6, negativeBalances: 0 },
         breakdown: { vehicles: 12, weapons: 5, packs: 4, vip: 6 },
         categories: [
@@ -545,10 +481,6 @@
             { id: 'pistol', category: 'weapons', label: 'Pistolet', description: 'Arme de poing + 50 munitions.', price: 600, data: { weapon: 'WEAPON_PISTOL', ammo: 50 } },
             { id: 'starter', category: 'packs', label: 'Pack Démarrage', description: '25 000 $ + téléphone + kit de soin.', price: 800, featured: true, data: { money: 25000 } },
             { id: 'vip_gold', category: 'vip', label: 'VIP Gold · 30 jours', description: 'Salaire +20 %, garage étendu, tenue exclusive.', price: 1200, tag: 'Populaire', featured: true, data: { vip: 'gold', days: 30 } },
-        ],
-        packs: [
-            { amount: 500, price: '4,99 €' }, { amount: 1100, price: '9,99 €', bonus: '+10 %' },
-            { amount: 2400, price: '19,99 €', bonus: '+20 %', popular: true }, { amount: 6500, price: '49,99 €', bonus: '+30 %' },
         ],
         recentOrders: [
             { player: 'Malou Malou', label: 'Pack 2 400 OR', price: '19,99 €', date: '27/09 14:02', status: 'ok' },
@@ -575,8 +507,6 @@
         else if (name === 'saveSettings') { Object.assign(D.settings, p); msg = 'Configuration enregistrée.'; }
         else if (name === 'saveItem') { const i = D.items.findIndex((x) => x.id === p.item.id); if (i >= 0) D.items[i] = p.item; else D.items.push(p.item); msg = `« ${p.item.label} » enregistré.`; }
         else if (name === 'deleteItem') { D.items = D.items.filter((x) => x.id !== p.id); msg = 'Article supprimé.'; }
-        else if (name === 'savePack') { if (p.index) D.packs[p.index - 1] = p.pack; else D.packs.push(p.pack); msg = 'Pack enregistré.'; }
-        else if (name === 'deletePack') { D.packs.splice(p.index - 1, 1); msg = 'Pack supprimé.'; }
         else if (name === 'searchPlayers') { const q = p.query.toLowerCase(); D.players = DEMO_PLAYERS.filter((x) => !q || x.name.toLowerCase().includes(q) || x.id.includes(q)); msg = null; }
         else if (name === 'selectPlayer') { D.selectedPlayer = DEMO_PLAYERS.find((x) => x.id === p.id); msg = null; }
         else if (name === 'adjustBalance') {

@@ -56,6 +56,12 @@ RegisterNUICallback('adminAction', function(data, cb)
     end
 end)
 
+-- Bouton « Recharger » : rien de branché pour l'instant
+RegisterNUICallback('recharge', function(_, cb)
+    cb('ok')
+    TriggerEvent('originrp_shop:recharge')
+end)
+
 RegisterNUICallback('close', function(_, cb)
     closeShop()
     cb('ok')

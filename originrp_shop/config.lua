@@ -14,16 +14,10 @@ Config.Key = nil            -- ex. 'F1'
 Config.AdminCommand = 'boutiqueadmin'
 Config.AdminAce = 'originrp.shopadmin'   -- server.cfg : add_ace group.admin originrp.shopadmin allow
 
--- Lien du site où acheter des Orins (Tebex…), ouvert dans le navigateur du joueur
-Config.BuyUrl = 'https://originrp.tebex.io'
-
--- Packs d'Orins affichés sur l'accueil (achat sur le site ci-dessus)
-Config.OrinPacks = {
-    { amount = 500,  price = '4,99 €' },
-    { amount = 1100, price = '9,99 €',  bonus = '+10 %' },
-    { amount = 2400, price = '19,99 €', bonus = '+20 %', popular = true },
-    { amount = 6500, price = '49,99 €', bonus = '+30 %' },
-}
+-- Bouton « Recharger » (à côté du solde) : lien à ouvrir plus tard.
+-- nil = le bouton affiche « bientôt disponible » et déclenche l'événement client
+-- 'originrp_shop:recharge' (pour brancher un autre système si besoin).
+Config.RechargeUrl = nil
 
 -- Catégories (onglets). icon : car, weapon, box, crown
 Config.Categories = {

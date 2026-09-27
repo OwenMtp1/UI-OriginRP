@@ -1,13 +1,12 @@
 -- Catalogue : base de données (sv_config.lua) si disponible, sinon config.lua
 local function getItems() return ServerConfig.GetItems() or Config.Items end
-local function getPacks() return ServerConfig.GetPacks() or Config.OrinPacks end
 
 local function getSettings()
     local s = ServerConfig.GetSettings() or {}
     return {
         title = s.title or Config.Title,
         subtitle = s.subtitle or Config.Subtitle,
-        buyUrl = s.buyUrl or Config.BuyUrl,
+        rechargeUrl = s.rechargeUrl or Config.RechargeUrl,
         open = s.open ~= false,
         currencyName = s.currencyName or Config.Currency.name,
         currencyShort = s.currencyShort or Config.Currency.short,
@@ -35,8 +34,7 @@ local function catalog()
         title = settings.title,
         subtitle = settings.subtitle,
         currency = { name = settings.currencyName, short = settings.currencyShort },
-        buyUrl = settings.buyUrl,
-        packs = getPacks(),
+        rechargeUrl = settings.rechargeUrl,
         categories = Config.Categories,
         items = items,
     }
@@ -109,7 +107,7 @@ end)
 
 local ADMIN_ACTIONS = {
     resetStats = true, saveSettings = true, saveItem = true, deleteItem = true,
-    savePack = true, deletePack = true, adjustBalance = true,
+    adjustBalance = true,
     searchPlayers = true, selectPlayer = true,
 }
 
@@ -124,7 +122,6 @@ local function adminPayload(src)
     data.settings = getSettings()
     data.categories = Config.Categories
     data.items = getItems()
-    data.packs = getPacks()
     return data
 end
 
