@@ -58,10 +58,10 @@ const available = (v) => (v.state || 'garage') === 'garage';
 
 /* ---------- Rendu ---------- */
 
-function stat(icon, value) {
+function stat(icon, value, title) {
     if (value == null) return '';
     const pct = Math.max(0, Math.min(100, Math.round(Number(value) || 0)));
-    return `<span class="stat${pct <= 25 ? ' low' : ''}">${ICONS[icon]}<span class="bar"><i style="width:${pct}%"></i></span>${pct}%</span>`;
+    return `<span class="stat${pct <= 25 ? ' low' : ''}" title="${title}">${ICONS[icon]}<span class="bar"><i style="width:${pct}%"></i></span>${pct}%</span>`;
 }
 
 function renderTabs() {
@@ -113,7 +113,7 @@ function renderList(animate) {
                         <span class="veh-name">${esc(v.label)}</span>
                         ${v.plate ? `<span class="plate">${esc(v.plate)}</span>` : ''}
                     </div>
-                    <div class="veh-stats">${stat('fuel', v.fuel)}${stat('engine', v.engine)}</div>
+                    <div class="veh-stats">${stat('fuel', v.fuel, 'Carburant')}${stat('engine', v.condition, 'État (moteur + carrosserie)')}</div>
                 </div>
                 ${status}
             </li>`;
@@ -245,11 +245,11 @@ const DEMO = {
         {
             id: 'perso', label: 'Mes véhicules', icon: 'car',
             vehicles: [
-                { label: 'Karin Sultan RS', plate: 'ORG 123', fuel: 82, engine: 96, category: 'car', state: 'garage' },
-                { label: 'Pfister Comet', plate: '4DK 872', fuel: 18, engine: 88, category: 'car', state: 'garage' },
-                { label: 'Pegassi Bati 801', plate: 'MTO 09', fuel: 45, engine: 100, category: 'bike', state: 'garage' },
-                { label: 'Vapid Speedo', plate: 'LS 5521', fuel: 60, engine: 70, category: 'truck', state: 'out' },
-                { label: 'Shitzu Squalo', plate: 'SEA 77', fuel: 90, engine: 35, category: 'boat', state: 'impound' },
+                { label: 'Karin Sultan RS', plate: 'ORG 123', fuel: 82, condition: 85, category: 'car', state: 'garage' },
+                { label: 'Pfister Comet', plate: '4DK 872', fuel: 18, condition: 90, category: 'car', state: 'garage' },
+                { label: 'Pegassi Bati 801', plate: 'MTO 09', fuel: 45, condition: 100, category: 'bike', state: 'garage' },
+                { label: 'Vapid Speedo', plate: 'LS 5521', fuel: 60, condition: 55, category: 'truck', state: 'out' },
+                { label: 'Shitzu Squalo', plate: 'SEA 77', fuel: 90, condition: 22, category: 'boat', state: 'impound' },
             ],
         },
         { id: 'entreprise', label: 'Entreprise', icon: 'users', vehicles: [] },

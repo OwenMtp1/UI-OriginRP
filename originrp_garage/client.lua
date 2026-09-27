@@ -11,7 +11,9 @@
                 vehicles = {
                     {
                         label = 'Karin Sultan RS', plate = 'ORG 123',
-                        fuel = 80, engine = 95,              -- en % (optionnels)
+                        fuel = 80,                           -- en % (optionnel)
+                        engine = 95, body = 70,              -- en % : la clé à molette affiche
+                                                             -- l'état général (moyenne des deux)
                         model = 'sultanrs',                  -- sert à deviner la catégorie
                         category = 'car',   -- optionnel : car, bike, truck, boat, air, emergency
                         state = 'garage',   -- 'garage' (disponible), 'out' (déjà sorti), 'impound' (fourrière)
@@ -50,6 +52,14 @@ local function categoryOf(veh)
     return CLASS_CATEGORY[GetVehicleClassFromName(hash)] or 'car'
 end
 
+-- État général (clé à molette) : moyenne moteur + carrosserie, ou `condition` si fourni
+local function conditionOf(veh)
+    if veh.condition then return veh.condition end
+    local engine, body = tonumber(veh.engine), tonumber(veh.body)
+    if engine and body then return (engine + body) / 2 end
+    return engine or body
+end
+
 local isOpen = false
 local current = nil -- { data, cb }
 
@@ -70,7 +80,8 @@ local function display(data)
             vehicles[v] = {
                 label = veh.label or veh.model or 'Véhicule',
                 plate = veh.plate,
-                fuel = veh.fuel, engine = veh.engine,
+                fuel = veh.fuel,
+                condition = conditionOf(veh),
                 category = categoryOf(veh),
                 state = veh.state or 'garage',
             }
