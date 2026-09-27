@@ -18,6 +18,10 @@
                 <h1 id="g-title"></h1>
                 <p id="g-subtitle"></p>
             </div>
+            <div id="g-money" class="g-money" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+                <span id="g-money-value"></span>
+            </div>
             <button id="g-close" class="g-key" type="button" aria-label="Fermer"><span>ESC</span></button>
         </header>
 
@@ -28,7 +32,7 @@
 
         <footer class="g-hints">
             <span class="hint"><kbd class="round"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></svg></kbd>Choisir</span>
-            <span class="hint"><kbd class="round"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 5v7a2 2 0 0 1-2 2H7"/><path d="m10 10.5-3.5 3.5 3.5 3.5"/></svg></kbd>Sortir</span>
+            <span class="hint"><kbd class="round"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 5v7a2 2 0 0 1-2 2H7"/><path d="m10 10.5-3.5 3.5 3.5 3.5"/></svg></kbd><span id="hint-action">Sortir</span></span>
             <span id="hint-tabs" class="hint"><kbd>⇆</kbd>Onglet</span>
             <span class="hint end"><kbd>ESC</kbd>Fermer</span>
         </footer>

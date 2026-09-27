@@ -33,6 +33,16 @@
     déclenché avec (vehicle, garageId, tabId).
     icon d'onglet : car, bike, truck, boat, plane, heli, users (entreprise / organisation)
 
+    Fourrière (Config.Type = 'impound') : champs en plus pour chaque véhicule
+        price = 250,                       -- frais à payer
+        reason = 'Stationnement gênant',   -- motif (optionnel)
+        date = '27/09 18:42',              -- date de mise en fourrière (optionnel)
+        locked = true,                     -- saisie police : non récupérable (optionnel)
+    et au niveau du menu : money = 1250   -- argent du joueur (optionnel, grise les
+                                            véhicules trop chers)
+    La fonction de retour est appelée quand le joueur confirme le paiement :
+    le serveur doit vérifier et retirer l'argent avant de rendre le véhicule.
+
     Rappel : le serveur doit revérifier que le véhicule appartient bien au
     joueur et qu'il est au garage avant de le faire sortir.
 ]]
@@ -67,7 +77,10 @@ local CATEGORIZE = {
     end,
 }
 
-local DEFAULT_CATEGORY = { car = 'car', boat = 'boat', air = 'plane' }
+-- Fourrière : mêmes catégories que le garage voitures
+CATEGORIZE.impound = CATEGORIZE.car
+
+local DEFAULT_CATEGORY = { car = 'car', boat = 'boat', air = 'plane', impound = 'car' }
 
 local function categoryOf(veh)
     if veh.category then return veh.category end
@@ -111,6 +124,8 @@ local function display(data)
                 condition = conditionOf(veh),
                 category = categoryOf(veh),
                 state = veh.state or 'garage',
+                price = veh.price, reason = veh.reason, date = veh.date,
+                locked = veh.locked == true,
             }
         end
         tabs[t] = { id = tab.id, label = tab.label, icon = tab.icon, vehicles = vehicles }
@@ -120,6 +135,7 @@ local function display(data)
         subtitle = data.subtitle or Config.Subtitle,
         position = Config.Position,
         type = Config.Type,
+        money = data.money,
         tabs = tabs,
     }
 end
@@ -142,7 +158,12 @@ RegisterNUICallback('takeOut', function(req, cb)
     if not current then return end
     local tab = current.data.tabs and current.data.tabs[(tonumber(req.tab) or -1) + 1]
     local vehicle = tab and tab.vehicles and tab.vehicles[(tonumber(req.index) or -1) + 1]
-    if not vehicle or (vehicle.state or 'garage') ~= 'garage' then return end
+    if not vehicle then return end
+    if Config.Type == 'impound' then
+        if vehicle.locked then return end
+    elseif (vehicle.state or 'garage') ~= 'garage' then
+        return
+    end
 
     local handler, garageId = current.cb, current.data.id
     close()

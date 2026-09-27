@@ -17,6 +17,11 @@ const ICONS = {
     sub: stroke('<path d="M3 13a6 4 0 0 0 6 4h8a4 4 0 0 0 0-8H9a6 4 0 0 0-6 4z"/><path d="M12 9V5h3"/><path d="M21 11v4"/><circle cx="9" cy="13" r="1"/><circle cx="13" cy="13" r="1"/>'),
     heli: stroke('<path d="M3 4h18M12 4v4"/><path d="M5 12a4 4 0 0 1 4-4h4a5 5 0 0 1 5 5v1a2 2 0 0 1-2 2H9a4 4 0 0 1-4-4z"/><path d="M18 12h4M22 10v4"/><path d="M9 16v3M15 16v3M6 19h12"/>'),
     emergency: stroke('<path d="M7 18v-6a5 5 0 0 1 10 0v6"/><path d="M5 21a1 1 0 0 1-1-1v-1a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v1a1 1 0 0 1-1 1z"/><path d="M21 12h1M18.5 4.5 18 5M2 12h1M12 2v1M4.9 4.9l.7.7"/>'),
+    impound: stroke('<rect x="2" y="6" width="20" height="6" rx="1.5"/><path d="M7 6l-3 6M12.5 6l-3 6M18 6l-3 6"/><path d="M5 12v8M19 12v8M3 20h4M17 20h4"/>'),
+    clock: stroke('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', 2.2),
+    alert: stroke('<path d="M10.3 3.9 2.4 17.5A2 2 0 0 0 4.1 20.5h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4M12 17h.01"/>', 2.2),
+    wallet: stroke('<path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>'),
+    lock: stroke('<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>', 2.2),
     all: stroke('<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>'),
     out: stroke('<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5M15 12H3"/>', 2.4),
 };
@@ -37,6 +42,12 @@ const TYPES = {
         empty: 'Aucun bateau amarré ici', emptySub: 'Amarre un bateau à ce port pour le retrouver dans cette liste.',
         emptyCat: 'Aucun bateau dans cette catégorie',
     },
+    impound: {
+        logo: 'impound', tabIcon: 'car', tabLabel: 'Véhicules saisis', impound: true,
+        categories: [{ id: 'car', label: 'Voitures' }, { id: 'bike', label: 'Motos' }, { id: 'truck', label: 'Utilitaires' }],
+        empty: 'Aucun véhicule en fourrière', emptySub: "Bonne nouvelle : aucun de tes véhicules n'a été saisi.",
+        emptyCat: 'Aucun véhicule saisi dans cette catégorie',
+    },
     air: {
         logo: 'plane', tabIcon: 'plane', tabLabel: 'Mes appareils',
         categories: [{ id: 'plane', label: 'Avions' }, { id: 'heli', label: 'Hélicoptères' }],
@@ -47,7 +58,7 @@ const TYPES = {
 
 const type = () => TYPES[state.data?.type] || TYPES.car;
 
-const state = { open: false, data: null, tab: 0, active: 0, filter: 'all' };
+const state = { open: false, data: null, tab: 0, active: 0, filter: 'all', confirming: null };
 
 /* ---------- Utilitaires ---------- */
 
@@ -73,7 +84,11 @@ const categoryOf = (v) => v.category || type().categories[0].id;
 const vehicles = () => tabVehicles()
     .map((v, index) => ({ ...v, index }))
     .filter((v) => state.filter === 'all' || categoryOf(v) === state.filter);
-const available = (v) => (v.state || 'garage') === 'garage';
+const fmtMoney = (n) => `${Number(n || 0).toLocaleString('fr-FR')} $`;
+const affordable = (v) => state.data?.money == null || Number(state.data.money) >= Number(v.price || 0);
+const available = (v) => (type().impound
+    ? !v.locked && affordable(v)
+    : (v.state || 'garage') === 'garage');
 
 /* ---------- Rendu ---------- */
 
@@ -121,9 +136,20 @@ function renderList(animate) {
             </li>`;
     } else {
         $('g-list').innerHTML = list.map((v, i) => {
-            const status = v.state === 'impound' ? '<span class="veh-status impound">Fourrière</span>'
-                : v.state === 'out' ? '<span class="veh-status">Déjà sorti</span>'
-                : `<span class="veh-action">${ICONS.out}Sortir</span>`;
+            let status;
+            if (type().impound) {
+                status = v.locked ? `<span class="veh-status impound">${ICONS.lock}Saisie police</span>`
+                    : !affordable(v) ? `<span class="veh-status" title="Frais : ${fmtMoney(v.price)}">${ICONS.wallet}Il manque ${fmtMoney(v.price - state.data.money)}</span>`
+                    : state.confirming === v.index ? `<span class="veh-action confirm">Confirmer · ${fmtMoney(v.price)}</span>`
+                    : `<span class="veh-action">${ICONS.wallet}Récupérer · ${fmtMoney(v.price)}</span>`;
+            } else {
+                status = v.state === 'impound' ? '<span class="veh-status impound">Fourrière</span>'
+                    : v.state === 'out' ? '<span class="veh-status">Déjà sorti</span>'
+                    : `<span class="veh-action">${ICONS.out}Sortir</span>`;
+            }
+            const details = type().impound
+                ? `<div class="veh-meta">${v.date ? `<span>${ICONS.clock}${esc(v.date)}</span>` : ''}${v.reason ? `<span>${ICONS.alert}${esc(v.reason)}</span>` : ''}</div>`
+                : `<div class="veh-stats">${stat('fuel', v.fuel, 'Carburant')}${stat('engine', v.condition, 'État (moteur + carrosserie)')}</div>`;
             return `
             <li class="veh${available(v) ? '' : ' unavailable'}" data-index="${i}" role="option">
                 <div class="veh-icon">${ICONS[categoryOf(v)] || ICONS[type().tabIcon]}</div>
@@ -132,7 +158,7 @@ function renderList(animate) {
                         <span class="veh-name">${esc(v.label)}</span>
                         ${v.plate ? `<span class="plate">${esc(v.plate)}</span>` : ''}
                     </div>
-                    <div class="veh-stats">${stat('fuel', v.fuel, 'Carburant')}${stat('engine', v.condition, 'État (moteur + carrosserie)')}</div>
+                    ${details}
                 </div>
                 ${status}
             </li>`;
@@ -169,15 +195,29 @@ function render() {
     $('g-subtitle').textContent = d.subtitle || '';
     $('garage').dataset.position = d.position || 'center';
     $('g-logo').innerHTML = ICONS[type().logo] || ICONS.car;
+    $('g-money').hidden = d.money == null;
+    $('g-money-value').textContent = fmtMoney(d.money);
+    $('hint-action').textContent = type().impound ? 'Récupérer' : 'Sortir';
     renderTabs();
     renderList(false);
 }
 
 /* ---------- Actions ---------- */
 
+let confirmTimer = null;
+
 function takeOut(position) {
     const v = vehicles()[position];
     if (!v || !available(v)) return;
+    // Fourrière : un premier clic demande confirmation du paiement
+    if (type().impound && state.confirming !== v.index) {
+        state.confirming = v.index;
+        renderList(false);
+        clearTimeout(confirmTimer);
+        confirmTimer = setTimeout(() => { state.confirming = null; if (state.open) renderList(false); }, 3500);
+        return;
+    }
+    state.confirming = null;
     post('takeOut', { tab: state.tab, index: v.index });
     hide();
 }
@@ -195,6 +235,7 @@ function open(data) {
     state.tab = 0;
     state.active = 0;
     state.filter = 'all';
+    state.confirming = null;
     state.open = true;
     render();
     $('garage').classList.remove('hidden');
@@ -298,6 +339,18 @@ const DEMOS = {
             { id: 'entreprise', label: 'Entreprise', icon: 'users', vehicles: [] },
         ],
     },
+};
+
+DEMOS.impound = {
+    type: 'impound', title: 'Fourrière', subtitle: 'Fourrière de Davis', money: 1250,
+    tabs: [
+        { id: 'perso', label: 'Véhicules saisis', icon: 'car', vehicles: [
+            { label: 'Karin Sultan RS', plate: 'ORG 123', category: 'car', price: 250, reason: 'Stationnement gênant', date: '27/09 18:42' },
+            { label: 'Pegassi Bati 801', plate: 'MTO 09', category: 'bike', price: 150, reason: 'Véhicule abandonné', date: '26/09 23:10' },
+            { label: 'Pfister Comet', plate: '4DK 872', category: 'car', price: 1800, reason: 'Excès de vitesse répété', date: '25/09 14:05' },
+            { label: 'Vapid Speedo', plate: 'LS 5521', category: 'truck', price: 500, reason: 'Saisie judiciaire', date: '24/09 09:30', locked: true },
+        ] },
+    ],
 };
 
 // Aperçu : type lu dans <body data-garage="…"> (ou #boat / #air dans l'adresse)

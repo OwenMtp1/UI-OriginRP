@@ -13,6 +13,7 @@
 | `originrp_garage` | Garage voitures (Voitures, Motos, Utilitaires) |
 | `originrp_garage_bateau` | Port / garage bateaux (Bateaux, Jet-skis, Sous-marins) |
 | `originrp_garage_avion` | Hangar / garage avions (Avions, Hélicoptères) |
+| `originrp_fourriere` | Fourrière (frais, motif, confirmation, saisie police) |
 
 ## originrp_menu
 
