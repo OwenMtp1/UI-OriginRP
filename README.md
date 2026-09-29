@@ -14,6 +14,9 @@
 | `originrp_garage_bateau` | Port / garage bateaux (Bateaux, Jet-skis, Sous-marins) |
 | `originrp_garage_avion` | Hangar / garage avions (Avions, Hélicoptères) |
 | `originrp_fourriere` | Fourrière (frais, motif, confirmation, saisie police) |
+| `originrp_armurerie` | Armurerie (permis de port d'arme, mêlée, armes à feu, munitions) |
+| `originrp_vetements` | Magasin de vêtements (aperçu sur le personnage, couleurs, rotation) |
+| `originrp_tatoueur` | Salon de tatouage (6 zones, recherche, aperçu sur le personnage) |
 
 ## originrp_menu
 
