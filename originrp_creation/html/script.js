@@ -383,7 +383,7 @@ function summaryHtml() {
         </div>
         <div class="check${state.confirmed ? ' on' : ''}" data-confirm>
             <span class="box">${ICONS.check}</span>
-            <span><strong>Je confirme mon personnage.</strong> Je ne pourrai plus changer mon identité ; l'apparence restera modifiable chez le coiffeur, le chirurgien et dans les magasins.</span>
+            <span><strong>Je confirme mon personnage</strong></span>
         </div>`;
 }
 
