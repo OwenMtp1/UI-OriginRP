@@ -177,6 +177,7 @@ local function close()
     destroyCamera()
     FreezeEntityPosition(PlayerPedId(), false)
     DisplayRadar(true)
+    SetStreamedTextureDictAsNoLongerNeeded('char_creator_portraits')
 end
 
 local function open(opts, cb)
@@ -189,6 +190,11 @@ local function open(opts, cb)
     DisplayRadar(false)
     camState = { preset = 'body', zoom = 0.0, height = 0.0 }
     createCamera()
+
+    -- Portraits des parents (affichés dans la NUI via https://nui-img/char_creator_portraits/...)
+    RequestStreamedTextureDict('char_creator_portraits', false)
+    local timeout = GetGameTimer() + 3000
+    while not HasStreamedTextureDictLoaded('char_creator_portraits') and GetGameTimer() < timeout do Wait(0) end
 
     isOpen = true
     SetNuiFocus(true, true)

@@ -42,10 +42,21 @@ const STEPS = [
 // Parents GTA (identifiants du jeu)
 const MOTHERS = ['Hannah', 'Audrey', 'Jasmine', 'Giselle', 'Amelia', 'Isabella', 'Zoe', 'Ava', 'Camila', 'Violet', 'Sophia',
     'Evelyn', 'Nicole', 'Ashley', 'Grace', 'Brianna', 'Natalie', 'Olivia', 'Elizabeth', 'Charlotte', 'Emma']
-    .map((name, i) => ({ id: 21 + i, name })).concat([{ id: 45, name: 'Misty' }]);
+    .map((name, i) => ({ id: 21 + i, name, img: `female_${i}` })).concat([{ id: 45, name: 'Misty', img: 'special_female_0' }]);
 const FATHERS = ['Benjamin', 'Daniel', 'Joshua', 'Noah', 'Andrew', 'Juan', 'Alex', 'Isaac', 'Evan', 'Ethan', 'Vincent',
     'Angel', 'Diego', 'Adrian', 'Gabriel', 'Michael', 'Santiago', 'Kevin', 'Louis', 'Samuel', 'Anthony']
-    .map((name, i) => ({ id: i, name })).concat([{ id: 42, name: 'Claude' }, { id: 43, name: 'Niko' }, { id: 44, name: 'John' }]);
+    .map((name, i) => ({ id: i, name, img: `male_${i}` }))
+    .concat([{ id: 42, name: 'Claude', img: 'special_male_0' }, { id: 43, name: 'Niko', img: 'special_male_1' }, { id: 44, name: 'John', img: 'special_male_2' }]);
+
+// Portraits officiels du créateur GTA Online (texture chargée par client.lua)
+const PORTRAIT_TXD = 'char_creator_portraits';
+const SILHOUETTE = '<svg viewBox="0 0 64 64" fill="currentColor"><circle cx="32" cy="24" r="12"/><path d="M8 62c0-14 11-22 24-22s24 8 24 22z"/></svg>';
+
+function portraitHtml(parent) {
+    const fallback = `<span class="portrait-fallback">${SILHOUETTE}</span>`;
+    if (!RESOURCE) return `<div class="portrait">${fallback}</div>`;
+    return `<div class="portrait">${fallback}<img src="https://nui-img/${PORTRAIT_TXD}/${parent.img}" alt="" onerror="this.remove()"></div>`;
+}
 
 // Traits du visage (index GTA 0-19), regroupés
 const FACE_GROUPS = [
@@ -282,8 +293,8 @@ function heritageHtml() {
     return `
         ${headHtml(STEPS[1], true)}
         <div class="parents">
-            <div class="parent"><div class="avatar">${esc(mother.name[0])}</div><small>Mère</small>${stepperHtml('mother', esc(mother.name))}</div>
-            <div class="parent"><div class="avatar">${esc(father.name[0])}</div><small>Père</small>${stepperHtml('father', esc(father.name))}</div>
+            <div class="parent">${portraitHtml(mother)}<small>Mère</small>${stepperHtml('mother', esc(mother.name))}</div>
+            <div class="parent">${portraitHtml(father)}<small>Père</small>${stepperHtml('father', esc(father.name))}</div>
         </div>
         ${sliderHtml('shape', 'Ressemblance', h.shape, { ends: ['Mère', 'Père'] })}
         ${sliderHtml('skin', 'Teint de peau', h.skin, { ends: ['Mère', 'Père'] })}`;
