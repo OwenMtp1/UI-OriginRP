@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>OriginRP Création de personnage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app" class="app hidden">
+        <!-- Panneau principal -->
+        <aside class="panel">
+            <header class="p-header">
+                <div class="brand">
+                    <img id="logo" src="img/logo.png" alt="Origin">
+                    <div>
+                        <p class="brand-title">Création de personnage</p>
+                        <p class="brand-sub" id="step-label"></p>
+                    </div>
+                </div>
+                <div class="progress"><i id="progress-bar"></i></div>
+                <nav id="steps" class="steps"></nav>
+            </header>
+
+            <div id="content" class="content"></div>
+
+            <footer class="p-footer">
+                <button id="btn-back" class="btn ghost" type="button">Retour</button>
+                <button id="btn-next" class="btn primary" type="button">Continuer</button>
+            </footer>
+        </aside>
+
+        <!-- Caméra -->
+        <div class="camera">
+            <div class="cam-presets" id="cam-presets">
+                <button data-cam="face" type="button">Visage</button>
+                <button data-cam="torso" type="button">Buste</button>
+                <button data-cam="body" type="button">Corps</button>
+            </div>
+            <div class="cam-hints">
+                <span><kbd>Molette</kbd>Zoom</span>
+                <span><kbd>Z</kbd><kbd>S</kbd>Hauteur</span>
+                <span><button data-rotate="-1" type="button">A</button><button data-rotate="1" type="button">E</button>Pivoter</span>
+            </div>
+        </div>
+
+        <div id="toast" class="toast"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

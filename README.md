@@ -17,6 +17,7 @@
 | `originrp_armurerie` | Armurerie (permis de port d'arme, mêlée, armes à feu, munitions) |
 | `originrp_vetements` | Magasin de vêtements (aperçu sur le personnage, couleurs, rotation) |
 | `originrp_tatoueur` | Salon de tatouage (6 zones, recherche, aperçu sur le personnage) |
+| `originrp_creation` | Création de personnage (6 étapes, caméra, aperçu en direct) |
 
 ## originrp_menu
 
