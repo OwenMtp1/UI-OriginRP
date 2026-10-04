@@ -8,7 +8,7 @@ Création de personnage dans la DA OriginRP : panneau latéral lisible, 6 étape
 | **Héritage** | Mère et père parmi les 46 parents GTA avec leur **portrait officiel** (texture `char_creator_portraits` du jeu), ressemblance et teint de peau. |
 | **Visage** | Les 20 traits GTA regroupés : Nez, Sourcils, Pommettes, Yeux, Mâchoire (curseurs −100 / +100). |
 | **Apparence** | Cheveux (coupe, couleur, mèches avec la vraie palette du jeu), Pilosité (barbe, sourcils, torse), Yeux, Maquillage (yeux, blush, rouge à lèvres), Peau (vieillissement, teint, imperfections, soleil, grains de beauté). |
-| **Vêtements** | Tenues prêtes à porter + réglage fin de chaque pièce (modèle / couleur), sans grille de cases vides. |
+| **Vêtements** | Choix parmi quelques tenues de départ définies dans `config.lua` (pas de sélection pièce par pièce). La première est appliquée par défaut. |
 | **Résumé** | Récapitulatif avec liens « Modifier », case de confirmation obligatoire avant « Valider le personnage ». |
 
 - Boutons **Aléatoire** et **Réinitialiser** sur chaque étape d'apparence.
@@ -21,7 +21,7 @@ Création de personnage dans la DA OriginRP : panneau latéral lisible, 6 étape
 
 1. Copier le dossier `originrp_creation` dans `resources/`.
 2. Ajouter `ensure originrp_creation` dans `server.cfg`.
-3. Réglages (âge, taille, caméras, tenues prêtes à porter) dans `config.lua`.
+3. Réglages (âge, taille, caméras, tenues de départ) dans `config.lua`.
    Les tenues fournies sont indicatives : adapter les numéros aux vêtements du serveur.
 
 ## Utilisation

@@ -77,6 +77,19 @@ local function setModel(sex)
     FreezeEntityPosition(ped, true)
 end
 
+-- Les vêtements ne viennent que des tenues de config.lua (index envoyé par l'interface)
+local function outfitClothes(char)
+    local sex = char.identity and char.identity.sex == 'f' and 'f' or 'm'
+    local list = Config.Outfits[sex] or {}
+    local outfit = list[(tonumber(char.outfit) or 0) + 1] or list[1] or {}
+    local clothes = {}
+    for id, c in pairs(Config.Clothes) do clothes[id] = { d = c.prop and -1 or 0, t = 0 } end
+    for id, v in pairs(outfit.clothes or {}) do
+        if Config.Clothes[id] then clothes[id] = { d = v[1] or 0, t = v[2] or 0 } end
+    end
+    return clothes
+end
+
 local function applyChar(char)
     local ped = PlayerPedId()
     local h = char.heritage or {}
@@ -217,6 +230,7 @@ end
 
 RegisterNUICallback('apply', function(data, cb)
     if not isOpen or type(data.char) ~= 'table' then return cb({}) end
+    data.char.clothes = outfitClothes(data.char)
     applyChar(data.char)
     cb({ counts = readCounts(data.char) })
 end)
@@ -256,6 +270,7 @@ RegisterNUICallback('finish', function(data, cb)
     cb('ok')
     local char = data.char
     if not isOpen or type(char) ~= 'table' then return end
+    char.clothes = outfitClothes(char)
     applyChar(char)
     local id = char.identity
     local result = {

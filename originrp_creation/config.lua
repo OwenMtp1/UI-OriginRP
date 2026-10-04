@@ -28,18 +28,19 @@ Config.Clothes = {
     glasses    = { prop = 1 },
 }
 
--- Tenues prêtes à porter : { modèle, couleur } par pièce.
+-- Tenues de départ (seul choix vestimentaire proposé à la création) : { modèle, couleur } par pièce.
+-- La première tenue de chaque liste est appliquée par défaut.
 -- Valeurs indicatives pour les modèles freemode de base : à ajuster selon les
 -- vêtements installés sur le serveur.
 Config.Outfits = {
     m = {
-        { label = 'Décontracté', clothes = { tops = { 0, 0 }, undershirt = { 15, 0 }, arms = { 0, 0 }, pants = { 1, 0 }, shoes = { 1, 0 } } },
-        { label = 'Sportswear',  clothes = { tops = { 7, 0 }, undershirt = { 15, 0 }, arms = { 0, 0 }, pants = { 5, 0 }, shoes = { 31, 0 } } },
-        { label = 'Chic',        clothes = { tops = { 4, 0 }, undershirt = { 31, 0 }, arms = { 4, 0 }, pants = { 10, 0 }, shoes = { 10, 0 } } },
+        { label = 'Décontracté',  desc = 'T-shirt, jean et baskets', clothes = { tops = { 0, 0 }, undershirt = { 15, 0 }, arms = { 0, 0 }, pants = { 1, 0 }, shoes = { 1, 0 } } },
+        { label = 'Sportswear',   desc = 'Survêtement et running', clothes = { tops = { 7, 0 }, undershirt = { 15, 0 }, arms = { 0, 0 }, pants = { 5, 0 }, shoes = { 31, 0 } } },
+        { label = 'Chic',         desc = 'Chemise, pantalon et chaussures de ville', clothes = { tops = { 4, 0 }, undershirt = { 31, 0 }, arms = { 4, 0 }, pants = { 10, 0 }, shoes = { 10, 0 } } },
     },
     f = {
-        { label = 'Décontractée', clothes = { tops = { 0, 0 }, undershirt = { 14, 0 }, arms = { 0, 0 }, pants = { 0, 0 }, shoes = { 1, 0 } } },
-        { label = 'Sportswear',   clothes = { tops = { 10, 0 }, undershirt = { 14, 0 }, arms = { 5, 0 }, pants = { 10, 0 }, shoes = { 10, 0 } } },
-        { label = 'Chic',         clothes = { tops = { 7, 0 }, undershirt = { 14, 0 }, arms = { 5, 0 }, pants = { 6, 0 }, shoes = { 0, 0 } } },
+        { label = 'Décontractée', desc = 'Top, jean et baskets', clothes = { tops = { 0, 0 }, undershirt = { 14, 0 }, arms = { 0, 0 }, pants = { 0, 0 }, shoes = { 1, 0 } } },
+        { label = 'Sportswear',   desc = 'Brassière, legging et running', clothes = { tops = { 10, 0 }, undershirt = { 14, 0 }, arms = { 5, 0 }, pants = { 10, 0 }, shoes = { 10, 0 } } },
+        { label = 'Chic',         desc = 'Chemisier, pantalon et escarpins', clothes = { tops = { 7, 0 }, undershirt = { 14, 0 }, arms = { 5, 0 }, pants = { 6, 0 }, shoes = { 0, 0 } } },
     },
 }

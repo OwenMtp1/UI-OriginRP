@@ -35,7 +35,7 @@ const STEPS = [
     { id: 'heritage', label: 'Héritage', title: 'Héritage', desc: 'Choisis tes parents puis dose la ressemblance et le teint de peau.', cam: 'face' },
     { id: 'face', label: 'Visage', title: 'Traits du visage', desc: 'Affine chaque partie du visage. 0 = trait hérité des parents.', cam: 'face' },
     { id: 'appearance', label: 'Apparence', title: 'Apparence', desc: 'Cheveux, pilosité, yeux, maquillage et peau.', cam: 'face' },
-    { id: 'clothes', label: 'Vêtements', title: 'Tenue de départ', desc: 'Pars d\'une tenue prête à porter puis ajuste chaque pièce.', cam: 'body' },
+    { id: 'clothes', label: 'Vêtements', title: 'Tenue de départ', desc: 'Choisis ta tenue de départ. Tu pourras changer de style plus tard en magasin.', cam: 'body' },
     { id: 'summary', label: 'Résumé', title: 'Récapitulatif', desc: 'Vérifie tout avant d\'entrer en ville.', cam: 'body' },
 ];
 
@@ -185,7 +185,6 @@ function apply() {
 
 const counts = () => state.counts || {};
 const overlayCount = (i) => counts().overlays?.[i] ?? 20;
-const clothCount = (id) => counts().clothes?.[id] || { drawables: 100, textures: 10 };
 
 /* ---------- Identité : validation ---------- */
 
@@ -341,23 +340,26 @@ function appearanceHtml() {
 }
 
 function clothesHtml() {
-    const sex = state.char.identity.sex;
-    const outfits = state.config.outfits?.[sex] || [];
-    const rows = CLOTHES.map((c) => {
-        const v = state.char.clothes[c.id];
-        const n = clothCount(c.id);
-        const model = c.prop && v.d < 0 ? 'Aucun' : `${v.d + 1} <em>/ ${n.drawables}</em>`;
-        const tex = c.prop && v.d < 0 ? '—' : `${v.t + 1} <em>/ ${Math.max(1, n.textures)}</em>`;
-        return `<div class="cloth-row"><span class="name">${ICONS[c.icon]}${esc(c.label)}</span>${stepperHtml(`cloth:${c.id}`, model)}${stepperHtml(`tex:${c.id}`, tex)}</div>`;
-    }).join('');
+    const outfits = state.config.outfits?.[state.char.identity.sex] || [];
+    const cards = outfits.map((o, i) => `
+        <button class="outfit${state.outfit === i ? ' active' : ''}" data-outfit="${i}" type="button">
+            <span class="outfit-icon">${ICONS.outfit}</span>
+            <span class="outfit-text"><strong>${esc(o.label)}</strong>${o.desc ? `<small>${esc(o.desc)}</small>` : ''}</span>
+            <span class="outfit-check">${ICONS.check}</span>
+        </button>`).join('');
     return `
         ${headHtml(STEPS[4], true)}
-        ${outfits.length ? `<div class="label"><span>Tenues prêtes à porter</span></div>
-        <div class="outfits">${outfits.map((o, i) => `<button class="outfit${state.outfit === i ? ' active' : ''}" data-outfit="${i}" type="button">${ICONS.outfit}${esc(o.label)}</button>`).join('')}</div>` : ''}
-        <div class="block">
-            <div class="cloth-head"><span>Pièce</span><span>Modèle</span><span>Couleur</span></div>
-            ${rows}
-        </div>`;
+        <div class="outfits">${cards || '<p class="empty">Aucune tenue configurée.</p>'}</div>`;
+}
+
+// Tenue par défaut : on repart des vêtements de base puis on applique la tenue choisie
+function applyOutfit(index) {
+    const outfits = state.config.outfits?.[state.char.identity.sex] || [];
+    state.char.clothes = defaultChar(state.char.identity.sex).clothes;
+    const o = outfits[index];
+    if (!o) { state.outfit = state.char.outfit = null; return; }
+    Object.entries(o.clothes || {}).forEach(([k, v]) => { state.char.clothes[k] = { d: v[0], t: v[1] || 0 }; });
+    state.outfit = state.char.outfit = index;
 }
 
 function summaryHtml() {
@@ -376,7 +378,7 @@ function summaryHtml() {
                 <div><dt>Naissance ${edit(0)}</dt><dd>${esc(`${String(id.day).padStart(2, '0')}/${String(id.month).padStart(2, '0')}/${id.year}`)}</dd></div>
                 <div><dt>Parents ${edit(1)}</dt><dd>${esc(`${mother} & ${father}`)}</dd></div>
                 <div><dt>Coiffure ${edit(3)}</dt><dd>Coupe ${state.char.hair.style + 1}</dd></div>
-                <div><dt>Tenue ${edit(4)}</dt><dd>${esc(state.outfit != null ? (state.config.outfits?.[id.sex]?.[state.outfit]?.label || 'Personnalisée') : 'Personnalisée')}</dd></div>
+                <div><dt>Tenue ${edit(4)}</dt><dd>${esc(state.config.outfits?.[id.sex]?.[state.outfit]?.label || 'Par défaut')}</dd></div>
             </dl>
         </div>
         <div class="check${state.confirmed ? ' on' : ''}" data-confirm>
@@ -462,8 +464,8 @@ function randomize() {
         if (ch.identity.sex === 'm') ch.overlays[1] = { style: rand(-1, overlayCount(1) - 1), opacity: rand(60, 100), color: ch.hair.color };
         ch.overlays[2] = { style: rand(0, overlayCount(2) - 1), opacity: rand(70, 100), color: ch.hair.color };
     } else if (id === 'clothes') {
-        CLOTHES.filter((c) => !c.prop).forEach((c) => { ch.clothes[c.id] = { d: rand(0, Math.min(40, clothCount(c.id).drawables - 1)), t: 0 }; });
-        state.outfit = null;
+        const n = state.config.outfits?.[ch.identity.sex]?.length || 0;
+        if (n) applyOutfit(rand(0, n - 1));
     }
     apply();
     renderContent(false, true);
@@ -475,7 +477,7 @@ function resetStep() {
     if (id === 'heritage') state.char.heritage = fresh.heritage;
     else if (id === 'face') state.char.face = fresh.face;
     else if (id === 'appearance') Object.assign(state.char, { hair: fresh.hair, eyes: fresh.eyes, overlays: fresh.overlays });
-    else if (id === 'clothes') { state.char.clothes = fresh.clothes; state.outfit = null; }
+    else if (id === 'clothes') applyOutfit(0);
     apply();
     renderContent(false, true);
 }
@@ -500,17 +502,6 @@ function onStep(key, dir) {
     } else if (kind === 'overlay') {
         const o = ch.overlays[arg];
         o.style = cycle(o.style, dir, -1, overlayCount(arg) - 1);
-    } else if (kind === 'cloth') {
-        const c = CLOTHES.find((x) => x.id === arg);
-        const v = ch.clothes[arg];
-        v.d = cycle(v.d, dir, c.prop ? -1 : 0, clothCount(arg).drawables - 1);
-        v.t = 0;
-        state.outfit = null;
-    } else if (kind === 'tex') {
-        const v = ch.clothes[arg];
-        if (v.d < 0) return;
-        v.t = cycle(v.t, dir, 0, Math.max(1, clothCount(arg).textures) - 1);
-        state.outfit = null;
     }
     apply();
     renderContent(false, true);
@@ -585,7 +576,7 @@ document.addEventListener('click', (e) => {
         const keep = state.char.identity;
         state.char = defaultChar(sex.dataset.sex);
         state.char.identity = { ...keep, sex: sex.dataset.sex };
-        state.outfit = null;
+        applyOutfit(0);
         state.counts = null;
         post('sex', { sex: sex.dataset.sex }).then(() => apply());
         return renderContent(false, true);
@@ -594,9 +585,7 @@ document.addEventListener('click', (e) => {
     if (tool) return tool.dataset.tool === 'random' ? randomize() : resetStep();
     const outfit = t.closest('[data-outfit]');
     if (outfit) {
-        const o = state.config.outfits[state.char.identity.sex][Number(outfit.dataset.outfit)];
-        Object.entries(o.clothes || {}).forEach(([k, v]) => { state.char.clothes[k] = { d: v[0], t: v[1] || 0 }; });
-        state.outfit = Number(outfit.dataset.outfit);
+        applyOutfit(Number(outfit.dataset.outfit));
         apply();
         return renderContent(false, true);
     }
@@ -647,7 +636,7 @@ function open(data = {}) {
     state.visited = 0;
     state.confirmed = false;
     state.showErrors = false;
-    state.outfit = null;
+    applyOutfit(0);
     state.open = true;
     renderContent(true);
     setCamera(STEPS[0].cam);
@@ -690,8 +679,8 @@ const DEMO = {
     },
     config: {
         outfits: {
-            m: [{ label: 'Décontracté', clothes: {} }, { label: 'Sportswear', clothes: {} }, { label: 'Chic', clothes: {} }],
-            f: [{ label: 'Décontractée', clothes: {} }, { label: 'Sportswear', clothes: {} }, { label: 'Chic', clothes: {} }],
+            m: [{ label: 'Décontracté', desc: 'T-shirt, jean et baskets', clothes: {} }, { label: 'Sportswear', desc: 'Survêtement et running', clothes: {} }, { label: 'Chic', desc: 'Chemise, pantalon et chaussures de ville', clothes: {} }],
+            f: [{ label: 'Décontractée', desc: 'Top, jean et baskets', clothes: {} }, { label: 'Sportswear', desc: 'Brassière, legging et running', clothes: {} }, { label: 'Chic', desc: 'Chemisier, pantalon et escarpins', clothes: {} }],
         },
     },
 };
