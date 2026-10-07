@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bracelet électronique — Aperçu</title>
+<style>
+:root {
+    --bg: #0b0b10; --panel: #15151c; --panel-2: #1c1c25;
+    --border: rgba(255,255,255,.08); --text: #f4f4f5; --muted: #a1a1aa; --subtle: #6b6b76;
+    --accent: #8b5cf6; --accent-2: #22d3ee; --glow: rgba(139,92,246,.4);
+    --green: #4ade80; --red: #f43f5e;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: radial-gradient(1000px 500px at 10% -10%, #1d1433, transparent 60%),
+                radial-gradient(800px 500px at 110% 110%, #0d2a33, transparent 60%), var(--bg);
+    color: var(--text); font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    padding: 24px 16px 80px; min-height: 100vh;
+}
+.wrap { max-width: 1300px; margin: 0 auto; }
+header { margin-bottom: 18px; }
+h1 { font-size: 22px; letter-spacing: 2px; text-transform: uppercase; }
+h1 span { color: var(--accent); text-shadow: 0 0 18px var(--glow); }
+.sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+.sub code { color: var(--accent-2); }
+
+.grid { display: grid; grid-template-columns: 300px 1fr 330px; gap: 14px; }
+@media (max-width: 1150px) { .grid { grid-template-columns: 1fr; } }
+.card { background: linear-gradient(180deg, var(--panel-2), var(--panel)); border: 1px solid var(--border); border-radius: 16px; padding: 14px; min-width: 0; }
+.card h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+.card h3 em { font-style: normal; color: var(--subtle); text-transform: none; letter-spacing: 0; }
+.note { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+
+/* ─── Item 3D ─── */
+.stage { height: 230px; display: flex; align-items: center; justify-content: center; perspective: 700px; position: relative; }
+.stage::after { content: ''; position: absolute; bottom: 26px; width: 150px; height: 16px; border-radius: 50%; background: radial-gradient(var(--glow), transparent 70%); filter: blur(4px); }
+.spin { width: 200px; animation: spin 10s linear infinite; transition: transform .6s; }
+.spin.inspect { animation-play-state: paused; transform: rotateX(10deg) rotateY(-25deg) scale(1.25); }
+@keyframes spin { from { transform: rotateX(14deg) rotateY(0); } to { transform: rotateX(14deg) rotateY(360deg); } }
+.spin svg { width: 100%; filter: drop-shadow(0 14px 18px rgba(0,0,0,.6)); }
+.led { animation: led 2s infinite; }
+@keyframes led { 0%, 10% { opacity: 1; } 11%, 100% { opacity: .15; } }
+.callouts { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .4s; font-size: 10px; color: var(--accent-2); }
+.callouts.show { opacity: 1; }
+.callouts div { position: absolute; padding: 2px 6px; border: 1px solid rgba(34,211,238,.4); border-radius: 6px; background: rgba(8,20,26,.85); }
+.stats { display: grid; gap: 9px; margin-top: 6px; }
+.stat label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.stat label b { color: var(--text); font-weight: 600; }
+.bar { height: 5px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 99px; transition: width 1.2s cubic-bezier(.2,.8,.2,1); }
+.mini { border: 1px solid var(--border); background: rgba(255,255,255,.06); color: var(--text); font-size: 11px; padding: 5px 10px; border-radius: 8px; cursor: pointer; text-transform: none; letter-spacing: 0; }
+
+/* ─── Scène ─── */
+.scene-wrap { position: relative; border-radius: 12px; overflow: hidden; }
+svg.scene { width: 100%; display: block; }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.btn { border: 1px solid var(--border); background: rgba(255,255,255,.05); color: var(--text); padding: 9px 14px; border-radius: 10px; font-size: 13px; cursor: pointer; transition: .15s; }
+.btn:hover { background: rgba(255,255,255,.1); }
+.btn.primary { background: var(--accent); border-color: transparent; box-shadow: 0 0 18px var(--glow); }
+.btn:disabled { opacity: .35; cursor: not-allowed; }
+.kbd { font-family: monospace; border: 1px solid rgba(255,255,255,.3); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; font-size: 11px; }
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.seg button { border: 0; background: transparent; color: var(--muted); padding: 8px 12px; font-size: 12px; cursor: pointer; }
+.seg button.on { background: rgba(139,92,246,.25); color: var(--text); }
+
+/* Personnages */
+.placer { transition: transform 1s ease-in-out; }
+.stand, .kneel { transition: opacity .25s; }
+.kneel { opacity: 0; }
+.placer.kneeling .stand { opacity: 0; }
+.placer.kneeling .kneel { opacity: 1; }
+.placer.kneeling .hands { animation: work .5s ease-in-out infinite alternate; }
+@keyframes work { to { transform: translate(2px, 3px); } }
+.outline { opacity: 0; transition: opacity .3s; }
+.selecting .outline { opacity: 1; animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .35; } }
+.target-hit { cursor: pointer; }
+
+/* Target ox_target */
+.eye { position: absolute; display: none; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 8px; background: rgba(12,12,18,.92); border: 1px solid rgba(255,255,255,.12); font-size: 12px; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+.eye::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-2); box-shadow: 0 0 8px var(--accent-2); }
+.selecting .eye { display: flex; }
+.eye:hover { border-color: var(--accent); }
+
+/* Barre de progression (ox_lib) */
+.progress { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); width: 260px; display: none; }
+.progress.show { display: block; }
+.progress span { display: block; text-align: center; font-size: 12px; margin-bottom: 6px; text-shadow: 0 1px 3px #000; }
+.progress div { height: 6px; border-radius: 99px; background: rgba(0,0,0,.6); overflow: hidden; }
+.progress i { display: block; height: 100%; width: 0; background: var(--accent); }
+
+/* Zoom cheville */
+.zoom { border-radius: 12px; overflow: hidden; }
+.visible-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; margin-top: 10px; padding: 5px 10px; border-radius: 99px; border: 1px solid var(--border); }
+.visible-tag::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.visible-tag.on { color: var(--green); }
+.visible-tag.off { color: var(--subtle); }
+.pants-long, .pants-short, .boxer { transition: opacity .3s; }
+
+/* Notifications en bas à gauche (style ox_lib) */
+.notifs { position: fixed; left: 16px; bottom: 16px; display: flex; flex-direction: column-reverse; gap: 8px; z-index: 20; max-width: 340px; }
+.notif { display: flex; gap: 10px; padding: 11px 13px; border-radius: 8px; background: #1a1b1e; border: 1px solid #2c2e33; box-shadow: 0 10px 30px rgba(0,0,0,.5); font-size: 13px; animation: slide .3s ease-out; }
+.notif.out { opacity: 0; transform: translateX(-20px); transition: .3s; }
+@keyframes slide { from { opacity: 0; transform: translateX(-30px); } }
+.notif .ico { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; font-size: 14px; }
+.notif b { display: block; font-size: 13px; margin-bottom: 2px; }
+.notif small { display: block; font-size: 10px; color: var(--subtle); margin-top: 3px; text-transform: uppercase; letter-spacing: 1px; }
+.notif span { color: #c1c2c5; }
+.ico.success { background: rgba(74,222,128,.15); color: var(--green); }
+.ico.warning { background: rgba(251,191,36,.15); color: #fbbf24; }
+.ico.inform { background: rgba(34,211,238,.15); color: var(--accent-2); }
+.ico.error { background: rgba(244,63,94,.15); color: var(--red); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+        <linearGradient id="rubber" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2d2f34"/><stop offset=".5" stop-color="#17181b"/><stop offset="1" stop-color="#0a0a0c"/></linearGradient>
+        <linearGradient id="unit" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3c42"/><stop offset=".15" stop-color="#26282c"/><stop offset="1" stop-color="#0d0e10"/></linearGradient>
+        <linearGradient id="clip" x1="0" x2="1"><stop offset="0" stop-color="#555b63"/><stop offset=".5" stop-color="#b8bec6"/><stop offset="1" stop-color="#555b63"/></linearGradient>
+        <linearGradient id="skinL" x1="0" x2="1"><stop offset="0" stop-color="#8e5f45"/><stop offset=".45" stop-color="#b9805f"/><stop offset="1" stop-color="#7d523b"/></linearGradient>
+        <linearGradient id="denim" x1="0" x2="1"><stop offset="0" stop-color="#1c2840"/><stop offset=".5" stop-color="#2c3d60"/><stop offset="1" stop-color="#18223a"/></linearGradient>
+        <linearGradient id="shorts" x1="0" x2="1"><stop offset="0" stop-color="#3a3f2c"/><stop offset=".5" stop-color="#555b3f"/><stop offset="1" stop-color="#33382a"/></linearGradient>
+        <linearGradient id="cop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1f2a44"/><stop offset="1" stop-color="#121a2c"/></linearGradient>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0e0b1c"/><stop offset="1" stop-color="#2a1a3a"/></linearGradient>
+        <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#26262c"/><stop offset="1" stop-color="#121216"/></linearGradient>
+        <radialGradient id="ledG"><stop offset="0" stop-color="#4ade80" stop-opacity=".7"/><stop offset="1" stop-color="#4ade80" stop-opacity="0"/></radialGradient>
+        <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="2" numOctaves="2" seed="3" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .03 0" result="g"/><feComposite in="g" in2="SourceGraphic" operator="in" result="gi"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="gi"/></feMerge></filter>
+
+        <!-- Bracelet électronique de cheville (vue de face) -->
+        <symbol id="monitor" viewBox="0 0 120 80">
+            <!-- sangle caoutchouc -->
+            <path d="M8 44 Q8 26 26 24 L94 24 Q112 26 112 44 Q112 62 94 64 L26 64 Q8 62 8 44 Z" fill="none" stroke="url(#rubber)" stroke-width="9"/>
+            <path d="M14 36 Q20 28 30 28" stroke="#fff" stroke-opacity=".12" stroke-width="1.5" fill="none"/>
+            <!-- rivets de sangle -->
+            <g fill="url(#clip)"><circle cx="20" cy="56" r="2"/><circle cx="100" cy="56" r="2"/></g>
+            <!-- boîtier -->
+            <g filter="url(#grain)">
+                <rect x="32" y="16" width="56" height="44" rx="9" fill="url(#unit)" stroke="#000" stroke-width=".8"/>
+            </g>
+            <rect x="34" y="17" width="52" height="3" rx="1.5" fill="#fff" opacity=".1"/>
+            <path d="M32 50 H88" stroke="#050506" stroke-width="1.2"/>
+            <!-- plaque / étiquette -->
+            <rect x="40" y="25" width="30" height="16" rx="2" fill="#0f1012" stroke="#2c2e33" stroke-width=".4"/>
+            <text x="42.5" y="32" font-family="Arial" font-weight="700" font-size="5" fill="#9aa0a8">ORP-TAG</text>
+            <text x="42.5" y="38" font-family="Arial" font-size="3" fill="#5c6169">DOC-RF · ID 0417</text>
+            <!-- vis -->
+            <g fill="url(#clip)"><circle cx="37" cy="21" r="1.4"/><circle cx="83" cy="21" r="1.4"/><circle cx="37" cy="55" r="1.4"/><circle cx="83" cy="55" r="1.4"/></g>
+            <!-- LED -->
+            <circle cx="78" cy="32" r="3" fill="#050506"/>
+            <circle class="led" cx="78" cy="32" r="7" fill="url(#ledG)"/>
+            <circle class="led" cx="78" cy="32" r="1.5" fill="#4ade80"/>
+        </symbol>
+
+        <!-- Bracelet vu de côté, posé sur une cheville (pour les scènes) -->
+        <symbol id="monitorSide" viewBox="0 0 40 20">
+            <rect x="0" y="6" width="40" height="8" rx="3" fill="url(#rubber)"/>
+            <rect x="9" y="1" width="22" height="18" rx="4" fill="url(#unit)" stroke="#000" stroke-width=".5"/>
+            <rect x="11" y="2" width="18" height="1.5" rx=".7" fill="#fff" opacity=".12"/>
+            <circle class="led" cx="26" cy="7" r=".9" fill="#4ade80"/>
+        </symbol>
+    </defs>
+</svg>
+
+<div class="wrap">
+    <header>
+        <h1>Bracelet <span>électronique</span> // OriginRP</h1>
+        <p class="sub">Item <code>electronic_bracelet</code> — Utiliser → <span class="kbd">ALT</span> sur la personne → pose de 3 s accroupi à la jambe → visible seulement si la jambe est découverte.</p>
+    </header>
+
+    <div class="grid">
+        <!-- ─── Item ─── -->
+        <section class="card">
+            <h3>Item <button class="mini" id="inspect">Inspecter</button></h3>
+            <div class="stage">
+                <div class="spin" id="spin"><svg viewBox="0 0 120 80"><use href="#monitor"/></svg></div>
+                <div class="callouts" id="callouts">
+                    <div style="left:6px;top:28px">Boîtier GPS / RF</div>
+                    <div style="right:2px;top:44px">LED d'état</div>
+                    <div style="left:16px;bottom:46px">Sangle anti-coupure</div>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="stat"><label>Durée de pose <b>3 s</b></label><div class="bar"><i data-w="30"></i></div></div>
+                <div class="stat"><label>Portée ALT <b>2 m</b></label><div class="bar"><i data-w="40"></i></div></div>
+                <div class="stat"><label>Discrétion sous pantalon <b>Totale</b></label><div class="bar"><i data-w="100"></i></div></div>
+                <div class="stat"><label>Poids <b>350 g</b></label><div class="bar"><i data-w="25"></i></div></div>
+                <div class="stat"><label>Retrait <b>Police / Sheriff</b></label><div class="bar"><i data-w="60"></i></div></div>
+            </div>
+            <p class="note">Sauvegardé sur le personnage : le bracelet reste après une déconnexion ou un redémarrage du serveur.</p>
+        </section>
+
+        <!-- ─── Scène ─── -->
+        <section class="card">
+            <h3>En jeu <em id="status">Utilise l'item pour commencer</em></h3>
+            <div class="scene-wrap" id="sceneWrap">
+                <svg class="scene" viewBox="0 0 640 360" id="scene">
+                    <rect width="640" height="360" fill="url(#sky)"/>
+                    <g opacity=".85">
+                        <rect x="0" y="90" width="110" height="220" fill="#151225"/><rect x="120" y="140" width="80" height="170" fill="#1b1730"/>
+                        <rect x="470" y="70" width="170" height="240" fill="#141122"/><rect x="390" y="150" width="70" height="160" fill="#1a1628"/>
+                        <g fill="#f5c26b" opacity=".35"><rect x="20" y="110" width="8" height="6"/><rect x="50" y="140" width="8" height="6"/><rect x="140" y="160" width="8" height="6"/><rect x="500" y="100" width="8" height="6"/><rect x="560" y="150" width="8" height="6"/><rect x="600" y="120" width="8" height="6"/></g>
+                    </g>
+                    <rect y="306" width="640" height="54" fill="url(#floor)"/>
+                    <path d="M0 306 H640" stroke="#8b5cf6" stroke-opacity=".35"/>
+
+                    <!-- Personne qui reçoit le bracelet (de profil, regarde à gauche) -->
+                    <g id="target" transform="translate(400 0)">
+                        <ellipse cx="40" cy="308" rx="38" ry="5" fill="#000" opacity=".5"/>
+                        <!-- contour de sélection ox_target -->
+                        <rect class="outline" x="-6" y="40" width="92" height="272" rx="20" fill="none" stroke="#22d3ee" stroke-width="2" stroke-dasharray="6 5"/>
+                        <!-- jambes : peau dessous -->
+                        <path d="M26 200 L24 296 L38 296 L40 206 Z" fill="url(#skinL)"/>
+                        <path d="M44 200 L46 296 L60 296 L58 206 Z" fill="url(#skinL)"/>
+                        <!-- tenues -->
+                        <g class="pants-long"><path d="M20 196 L22 298 L40 298 L42 214 L44 298 L62 298 L62 196 Z" fill="url(#denim)"/><path d="M42 214 V296" stroke="#0f1626" stroke-width="1.5"/></g>
+                        <g class="pants-short"><path d="M20 196 L20 246 L40 246 L42 214 L44 246 L62 246 L62 196 Z" fill="url(#shorts)"/></g>
+                        <g class="boxer"><path d="M22 196 L22 218 L40 218 L42 210 L44 218 L60 218 L60 196 Z" fill="#e5e7eb"/></g>
+                        <!-- chaussures -->
+                        <path d="M20 296 h20 v8 h-24 q-2 -4 4 -8 z" fill="#0d0d10"/><path d="M42 296 h20 v8 h-24 q-2 -4 4 -8 z" fill="#0d0d10"/>
+                        <!-- bracelet à la cheville gauche -->
+                        <g id="ankle"><use href="#monitorSide" x="20" y="282" width="22" height="11"/></g>
+                        <!-- buste -->
+                        <path d="M16 118 Q16 100 34 96 L50 96 Q66 100 66 118 L64 200 L18 200 Z" fill="#6b2737"/>
+                        <path d="M18 120 Q8 160 14 196" stroke="#5a1f2d" stroke-width="15" stroke-linecap="round" fill="none"/>
+                        <ellipse cx="14" cy="200" rx="7" ry="8" fill="url(#skinL)"/>
+                        <rect x="34" y="78" width="16" height="20" rx="5" fill="url(#skinL)"/>
+                        <ellipse cx="40" cy="62" rx="19" ry="22" fill="url(#skinL)"/>
+                        <path d="M21 58 Q22 36 42 38 Q60 40 60 58 Q52 48 40 50 Q28 50 21 58 Z" fill="#1d1712"/>
+                        <circle cx="27" cy="62" r="1.8" fill="#1a1a1a"/>
+                        <text x="40" y="26" text-anchor="middle" font-size="12" fill="#e5e7eb" font-family="Segoe UI">Marco Rossi</text>
+                        <rect class="target-hit" x="-6" y="40" width="92" height="272" fill="transparent"/>
+                    </g>
+
+                    <!-- Poseur (policier) -->
+                    <g id="placer" class="placer" style="transform: translate(110px, 0)">
+                        <ellipse cx="40" cy="308" rx="38" ry="5" fill="#000" opacity=".5"/>
+                        <g class="stand">
+                            <path d="M22 196 L22 298 L40 298 L42 214 L44 298 L62 298 L62 196 Z" fill="#141a28"/>
+                            <path d="M20 296 h22 v8 h-22 z M42 296 h24 q4 4 0 8 h-24 z" fill="#050507"/>
+                            <path d="M16 118 Q16 100 34 96 L50 96 Q66 100 66 118 L64 200 L18 200 Z" fill="url(#cop)"/>
+                            <rect x="18" y="186" width="46" height="8" fill="#0b0b0d"/>
+                            <path d="M46 112 l6 0 l0 6 l-6 0 z" fill="#d4af37"/>
+                            <path d="M62 122 Q74 160 70 194" stroke="#1a2338" stroke-width="15" stroke-linecap="round" fill="none"/>
+                            <ellipse cx="70" cy="198" rx="7" ry="8" fill="url(#skinL)"/>
+                            <rect x="34" y="78" width="16" height="20" rx="5" fill="url(#skinL)"/>
+                            <ellipse cx="42" cy="62" rx="19" ry="22" fill="url(#skinL)"/>
+                            <path d="M22 54 Q24 34 44 36 Q64 38 62 54 Z" fill="#0f1522"/>
+                            <rect x="40" y="50" width="26" height="6" rx="3" fill="#0f1522"/>
+                            <circle cx="55" cy="63" r="1.8" fill="#1a1a1a"/>
+                        </g>
+                        <!-- accroupi à la jambe -->
+                        <g class="kneel">
+                            <path d="M10 268 L4 300 L30 304 L36 278 Z" fill="#141a28"/>
+                            <path d="M24 250 L64 262 L60 300 L44 300 L46 278 L20 274 Z" fill="#141a28"/>
+                            <path d="M0 298 h26 v7 h-26 z M42 298 h24 q4 4 0 7 h-24 z" fill="#050507"/>
+                            <path d="M8 196 Q8 176 26 172 L44 174 Q60 180 58 198 L52 262 L16 262 Z" fill="url(#cop)" transform="rotate(14 32 220)"/>
+                            <g class="hands">
+                                <path d="M48 200 Q78 230 92 270" stroke="#1a2338" stroke-width="14" stroke-linecap="round" fill="none"/>
+                                <ellipse cx="94" cy="276" rx="7" ry="8" fill="url(#skinL)"/>
+                            </g>
+                            <rect x="36" y="150" width="16" height="20" rx="5" fill="url(#skinL)" transform="rotate(20 44 160)"/>
+                            <ellipse cx="54" cy="140" rx="19" ry="22" fill="url(#skinL)" transform="rotate(25 54 140)"/>
+                            <path d="M36 128 Q44 112 64 118 Q78 126 72 140 Z" fill="#0f1522"/>
+                            <circle cx="66" cy="146" r="1.8" fill="#1a1a1a"/>
+                        </g>
+                        <text x="42" y="26" text-anchor="middle" font-size="12" fill="#a78bfa" font-family="Segoe UI" class="stand">Toi</text>
+                    </g>
+                </svg>
+                <div class="eye" id="eye" style="left:68%;top:30%"><span class="kbd">ALT</span> Mettre le bracelet électronique</div>
+                <div class="progress" id="progress"><span>Pose du bracelet électronique...</span><div><i id="progBar"></i></div></div>
+            </div>
+            <div class="btns">
+                <button class="btn primary" id="use">Utiliser l'item</button>
+                <button class="btn" id="remove"><span class="kbd">ALT</span> Retirer le bracelet (police)</button>
+                <button class="btn" id="reset">Réinitialiser</button>
+            </div>
+        </section>
+
+        <!-- ─── Visibilité ─── -->
+        <section class="card">
+            <h3>Visibilité <em>cheville gauche</em></h3>
+            <div class="seg" id="outfit">
+                <button data-v="long" class="on">Long pantalon</button>
+                <button data-v="short">Short</button>
+                <button data-v="nude">Nu</button>
+            </div>
+            <div class="zoom" style="margin-top:12px">
+                <svg viewBox="0 0 300 260" width="100%">
+                    <rect width="300" height="260" fill="url(#sky)"/>
+                    <rect y="226" width="300" height="34" fill="url(#floor)"/>
+                    <!-- jambe en gros plan -->
+                    <path d="M120 0 L116 196 Q114 214 124 222 L184 224 Q200 222 196 210 L176 200 L172 0 Z" fill="url(#skinL)"/>
+                    <path d="M126 10 Q122 120 128 190" stroke="#000" stroke-opacity=".12" stroke-width="6" fill="none"/>
+                    <g class="pants-long"><path d="M106 0 L102 214 L186 214 L184 0 Z" fill="url(#denim)"/><path d="M104 206 H186" stroke="#0f1626" stroke-width="3"/><path d="M150 0 V210" stroke="#3d5280" stroke-opacity=".5" stroke-dasharray="4 4"/></g>
+                    <g class="pants-short"><path d="M104 0 L104 70 L188 70 L186 0 Z" fill="url(#shorts)"/><path d="M104 64 H188" stroke="#2a2e20" stroke-width="3"/></g>
+                    <!-- chaussure -->
+                    <path d="M108 214 L196 214 Q236 216 240 232 L240 238 L104 238 Q100 224 108 214 Z" fill="#0d0d10"/>
+                    <path d="M110 236 H240" stroke="#fff" stroke-opacity=".15" stroke-width="3"/>
+                    <!-- bracelet en gros plan -->
+                    <g id="zoomBracelet"><use href="#monitorSide" x="104" y="160" width="92" height="46"/></g>
+                </svg>
+            </div>
+            <div class="visible-tag" id="visTag">Bracelet caché</div>
+            <p class="note" id="visNote"></p>
+        </section>
+    </div>
+</div>
+
+<div class="notifs" id="notifs"></div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+let state = { selecting: false, busy: false, fitted: false, outfit: 'long' };
+
+setTimeout(() => document.querySelectorAll('.bar i').forEach((i) => i.style.width = i.dataset.w + '%'), 200);
+
+$('#inspect').onclick = () => {
+    const on = $('#spin').classList.toggle('inspect');
+    $('#callouts').classList.toggle('show', on);
+    $('#inspect').textContent = on ? 'Fermer' : 'Inspecter';
+};
+
+const ICONS = { success: '✓', warning: '!', inform: 'i', error: '✕' };
+function notify(text, type = 'inform', who = 'Toi') {
+    const el = document.createElement('div');
+    el.className = 'notif';
+    el.innerHTML = `<div class="ico ${type}">${ICONS[type]}</div><div><b>Bracelet électronique</b><span>${text}</span><small>Écran de : ${who}</small></div>`;
+    $('#notifs').prepend(el);
+    setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 300); }, 5200);
+}
+
+function render() {
+    $('#sceneWrap').classList.toggle('selecting', state.selecting);
+    const visible = state.fitted && state.outfit !== 'long';
+    $('#ankle').style.display = visible ? '' : 'none';
+    $('#zoomBracelet').style.display = visible ? '' : 'none';
+    document.querySelectorAll('.pants-long').forEach((e) => e.style.opacity = state.outfit === 'long' ? 1 : 0);
+    document.querySelectorAll('.pants-short').forEach((e) => e.style.opacity = state.outfit === 'short' ? 1 : 0);
+    document.querySelectorAll('.boxer').forEach((e) => e.style.opacity = state.outfit === 'nude' ? 1 : 0);
+
+    const tag = $('#visTag');
+    tag.className = 'visible-tag ' + (visible ? 'on' : 'off');
+    tag.textContent = !state.fitted ? 'Aucun bracelet posé' : visible ? 'Bracelet visible' : 'Bracelet caché par le pantalon';
+    $('#visNote').textContent = state.outfit === 'long'
+        ? 'Long pantalon : le bas couvre la cheville, le bracelet n\'est pas affiché (mais il est toujours porté).'
+        : state.outfit === 'short' ? 'Short : la cheville est découverte, le bracelet apparaît.'
+        : 'Sans pantalon : le bracelet apparaît à la cheville.';
+
+    $('#use').disabled = state.busy || state.fitted;
+    $('#remove').disabled = state.busy || !state.fitted;
+    $('#status').textContent = state.busy ? 'Pose en cours…' : state.selecting ? 'Fais ALT sur la personne' : state.fitted ? 'Bracelet posé sur Marco Rossi' : 'Utilise l\'item pour commencer';
+}
+
+$('#outfit').onclick = (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    $('#outfit').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+    state.outfit = b.dataset.v; render();
+};
+
+$('#use').onclick = () => {
+    if (state.selecting) return;
+    state.selecting = true;
+    notify('Faites ALT sur la personne à qui mettre le bracelet.');
+    render();
+};
+
+function runProgress(label, ms) {
+    return new Promise((res) => {
+        $('#progress span').textContent = label;
+        $('#progress').classList.add('show');
+        const bar = $('#progBar');
+        bar.style.transition = 'none'; bar.style.width = '0';
+        requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.transition = `width ${ms}ms linear`; bar.style.width = '100%'; }));
+        setTimeout(() => { $('#progress').classList.remove('show'); res(); }, ms);
+    });
+}
+
+async function kneelAndWork(label) {
+    state.busy = true; render();
+    const placer = $('#placer');
+    placer.style.transform = 'translate(300px, 0)';   // va au niveau de la jambe
+    await new Promise((r) => setTimeout(r, 1000));
+    placer.classList.add('kneeling');
+    await runProgress(label, 3000);
+    placer.classList.remove('kneeling');
+}
+
+async function fit() {
+    if (!state.selecting) return;
+    state.selecting = false;
+    await kneelAndWork('Pose du bracelet électronique...');
+    state.fitted = true; state.busy = false;
+    notify('Vous avez mis un bracelet électronique à Marco Rossi', 'success', 'Toi');
+    setTimeout(() => notify('Un bracelet électronique vous a été mis à la jambe', 'warning', 'Marco Rossi'), 350);
+    render();
+}
+$('#eye').onclick = fit;
+document.querySelector('.target-hit').onclick = fit;
+
+$('#remove').onclick = async () => {
+    await kneelAndWork('Retrait du bracelet électronique...');
+    state.fitted = false; state.busy = false;
+    notify('Vous avez retiré le bracelet électronique de Marco Rossi', 'success', 'Toi');
+    setTimeout(() => notify('Votre bracelet électronique a été retiré', 'inform', 'Marco Rossi'), 350);
+    render();
+};
+
+$('#reset').onclick = () => {
+    state = { ...state, selecting: false, busy: false, fitted: false };
+    $('#placer').style.transform = 'translate(110px, 0)';
+    render();
+};
+
+render();
+</script>
+</body>
+</html>
