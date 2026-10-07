@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>OriginRP - Tablette GPS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="tablet" class="hidden">
+        <div class="frame">
+            <header>
+                <div class="brand">
+                    <span class="pulse"></span>
+                    <div>
+                        <h1>GPS Tracker</h1>
+                        <p>Outil de suivi des traceurs</p>
+                    </div>
+                </div>
+                <button class="icon-btn" data-close title="Fermer">✕</button>
+            </header>
+
+            <nav>
+                <button class="tab active" data-tab="mine">Mes trackers <span class="badge" id="count-mine">0</span></button>
+                <button class="tab" data-tab="pocket">Synchroniser <span class="badge alert" id="count-pocket">0</span></button>
+                <button class="tab" data-tab="log">Journal <span class="badge" id="count-log">0</span></button>
+            </nav>
+
+            <main>
+                <section id="tab-mine" class="panel"></section>
+                <section id="tab-pocket" class="panel hidden"></section>
+                <section id="tab-log" class="panel hidden"></section>
+            </main>
+        </div>
+
+        <div id="modal" class="modal hidden">
+            <div class="modal-box">
+                <h2 id="modal-title"></h2>
+                <p id="modal-text"></p>
+                <input id="modal-input" class="hidden" type="text" spellcheck="false">
+                <div class="modal-actions">
+                    <button class="btn ghost" id="modal-cancel">Annuler</button>
+                    <button class="btn" id="modal-ok">Valider</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="toast" class="toast hidden"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

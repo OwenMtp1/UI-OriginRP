@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Traceur GPS — Aperçu</title>
+<style>
+:root {
+    --bg: #0b0b10;
+    --panel: #14141b;
+    --panel-2: #1b1b24;
+    --border: rgba(255,255,255,.08);
+    --text: #f4f4f5;
+    --muted: #a1a1aa;
+    --subtle: #6b6b76;
+    --accent: #8b5cf6;
+    --accent-2: #22d3ee;
+    --glow: rgba(139,92,246,.45);
+    --red: #ff2d55;
+    --green: #4ade80;
+    --amber: #fbbf24;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: radial-gradient(1200px 600px at 20% -10%, #1d1433 0%, transparent 60%),
+                radial-gradient(900px 500px at 110% 110%, #0d2a33 0%, transparent 60%), var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 24px 16px;
+}
+h1 { font-size: 22px; letter-spacing: 2px; text-transform: uppercase; }
+h1 span { color: var(--accent); text-shadow: 0 0 18px var(--glow); }
+.sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+.top { max-width: 1320px; margin: 0 auto 18px; display: flex; justify-content: space-between; align-items: end; flex-wrap: wrap; gap: 12px; }
+.grid {
+    max-width: 1320px; margin: 0 auto;
+    display: grid; grid-template-columns: 300px 1fr 380px; gap: 16px;
+}
+@media (max-width: 1150px) { .grid { grid-template-columns: 1fr; } }
+
+.card {
+    background: linear-gradient(180deg, var(--panel-2), var(--panel));
+    border: 1px solid var(--border); border-radius: 18px; padding: 16px;
+    box-shadow: 0 20px 50px rgba(0,0,0,.35);
+    min-width: 0;
+}
+.card h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+
+/* ─── Rendu 3D ─── */
+.stage { height: 230px; perspective: 700px; display: flex; align-items: center; justify-content: center; position: relative; }
+.stage::after { content: ''; position: absolute; bottom: 22px; width: 150px; height: 18px; border-radius: 50%; background: radial-gradient(var(--glow), transparent 70%); filter: blur(4px); }
+.device { width: 170px; transform-style: preserve-3d; animation: spin 9s linear infinite; transition: transform .6s; }
+.device.inspect { animation-play-state: paused; transform: rotateX(55deg) rotateZ(-20deg) scale(1.15); }
+@keyframes spin { from { transform: rotateX(18deg) rotateY(0deg); } to { transform: rotateX(18deg) rotateY(360deg); } }
+.device svg { width: 100%; filter: drop-shadow(0 0 14px var(--glow)); }
+.led { animation: led 1s steps(1) infinite; }
+.off .led { animation: none; opacity: .15; }
+@keyframes led { 0%,70% { opacity: .15; } 71%,100% { opacity: 1; } }
+.callouts { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .4s; font-size: 11px; color: var(--accent-2); }
+.callouts.show { opacity: 1; }
+.callouts div { position: absolute; padding: 2px 6px; border: 1px solid rgba(34,211,238,.4); border-radius: 6px; background: rgba(8,20,26,.8); }
+
+.stats { display: grid; gap: 9px; margin-top: 8px; }
+.stat label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.stat label b { color: var(--text); font-weight: 600; }
+.bar { height: 6px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 99px; box-shadow: 0 0 10px var(--glow); width: 0; transition: width 1.2s cubic-bezier(.2,.8,.2,1); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.tag { font-size: 11px; padding: 3px 8px; border-radius: 99px; border: 1px solid var(--border); color: var(--muted); }
+
+/* ─── Scène ─── */
+canvas { width: 100%; display: block; border-radius: 12px; background: #07070b; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+.btn {
+    border: 1px solid var(--border); background: rgba(255,255,255,.05); color: var(--text);
+    padding: 9px 14px; border-radius: 10px; font-size: 13px; cursor: pointer; transition: .15s;
+}
+.btn:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.2); }
+.btn.primary { background: var(--accent); border-color: transparent; box-shadow: 0 0 18px var(--glow); }
+.btn.primary:hover { filter: brightness(1.15); }
+.btn.red { background: rgba(255,45,85,.15); border-color: rgba(255,45,85,.5); color: #ff8aa3; }
+.btn.cyan { background: rgba(34,211,238,.12); border-color: rgba(34,211,238,.45); color: #8beafa; }
+.btn:disabled { opacity: .35; cursor: not-allowed; }
+.seg { display: inline-flex; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.seg button { border: 0; background: transparent; color: var(--muted); padding: 8px 12px; font-size: 12px; cursor: pointer; }
+.seg button.on { background: rgba(139,92,246,.25); color: var(--text); }
+.kbd { font-family: monospace; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; padding: 0 5px; font-size: 11px; }
+.inv { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.slot { width: 74px; height: 74px; border-radius: 12px; border: 1px solid var(--border); background: rgba(255,255,255,.03); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: var(--muted); position: relative; }
+.slot.has { border-color: rgba(139,92,246,.5); color: var(--text); }
+.slot svg { width: 34px; }
+.slot small { position: absolute; top: 4px; right: 6px; font-size: 9px; color: var(--accent-2); }
+.log { margin-top: 12px; font-family: ui-monospace, monospace; font-size: 11px; color: var(--subtle); height: 62px; overflow: hidden; }
+.log div:first-child { color: var(--accent-2); }
+
+/* ─── Tablette ─── */
+.tablet { background: #0a0a0d; border-radius: 26px; padding: 10px; box-shadow: 0 0 0 1px var(--border), 0 0 40px var(--glow); }
+.screen { background: linear-gradient(180deg, #1d1e22, #16171a); border-radius: 18px; overflow: hidden; position: relative; }
+.t-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px 10px; }
+.pulse { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); animation: pulse 1.6s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 var(--glow); } 70%,100% { box-shadow: 0 0 0 10px transparent; } }
+.t-head b { font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
+.t-head span { font-size: 11px; color: var(--muted); display: block; }
+.tabs { display: flex; gap: 4px; padding: 0 12px 10px; border-bottom: 1px solid var(--border); }
+.tabs button { border: 0; background: transparent; color: var(--muted); font-size: 12px; padding: 6px 10px; border-radius: 8px; cursor: pointer; }
+.tabs button.on { background: rgba(255,255,255,.07); color: var(--text); }
+.badge { margin-left: 4px; font-size: 10px; padding: 0 6px; border-radius: 99px; background: rgba(255,255,255,.08); }
+.badge.hot { background: var(--accent); color: #fff; }
+.t-body { padding: 12px; min-height: 230px; display: flex; flex-direction: column; gap: 8px; }
+.row { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid var(--border); animation: in .25s ease-out; }
+@keyframes in { from { opacity: 0; transform: translateY(6px); } }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--subtle); flex-shrink: 0; }
+.dot.on { background: var(--green); box-shadow: 0 0 10px var(--green); animation: blink 1s infinite; }
+.dot.warn { background: var(--amber); }
+@keyframes blink { 50% { opacity: .3; } }
+.row .info { flex: 1; min-width: 0; }
+.row strong { font-size: 13px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row small { font-size: 11px; color: var(--muted); }
+.mini { border: 0; background: rgba(255,255,255,.08); color: var(--text); font-size: 11px; padding: 6px 9px; border-radius: 8px; cursor: pointer; }
+.mini.acc { background: var(--accent); }
+.switch { width: 36px; height: 20px; border-radius: 99px; background: rgba(255,255,255,.08); position: relative; cursor: pointer; flex-shrink: 0; border: 1px solid var(--border); }
+.switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--muted); transition: .2s; }
+.switch.on { background: rgba(139,92,246,.4); border-color: var(--accent); }
+.switch.on::after { left: 18px; background: #fff; }
+.empty { text-align: center; color: var(--subtle); font-size: 12px; padding: 30px 10px; line-height: 1.6; }
+#map { border-radius: 12px; }
+.modal { position: absolute; inset: 0; background: rgba(0,0,0,.55); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.modal-box { background: #1d1e22; border: 1px solid var(--border); border-radius: 14px; padding: 16px; width: 100%; animation: in .2s; }
+.modal-box h3 { font-size: 14px; margin-bottom: 6px; }
+.modal-box p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.modal-box input { width: 100%; margin-top: 10px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,.05); color: var(--text); outline: none; }
+.modal-box input:focus { border-color: var(--accent); }
+.modal-actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 12px; }
+.hidden { display: none !important; }
+.toast { position: fixed; right: 20px; bottom: 20px; max-width: 340px; padding: 12px 14px; border-radius: 12px; background: #17171f; border: 1px solid var(--accent); box-shadow: 0 0 24px var(--glow); font-size: 13px; transform: translateY(150%); transition: transform .3s; z-index: 10; }
+.toast.show { transform: none; }
+.toast.err { border-color: var(--red); box-shadow: 0 0 24px rgba(255,45,85,.35); }
+.toast b { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-2); margin-bottom: 3px; }
+</style>
+</head>
+<body>
+
+<div class="top">
+    <div>
+        <h1>Traceur <span>GPS</span> // OriginRP</h1>
+        <p class="sub">Aperçu interactif de <code>gps_tracker</code> + <code>gps_tablet</code> — lance, colle, retire, détruis et suis tes traceurs.</p>
+    </div>
+    <button class="btn cyan" id="steal">Simuler : un autre joueur force la déconnexion d'un de tes traceurs</button>
+</div>
+
+<div class="grid">
+    <!-- ─── Item ─── -->
+    <section class="card">
+        <h2>Item · gps_tracker <button class="mini" id="inspect">Inspecter</button></h2>
+        <div class="stage">
+            <div class="device" id="device">
+                <svg viewBox="0 0 200 140" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="shell" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0" stop-color="#3a3a46"/><stop offset="1" stop-color="#16161c"/>
+                        </linearGradient>
+                        <linearGradient id="mag" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0" stop-color="#6b7280"/><stop offset=".5" stop-color="#d1d5db"/><stop offset="1" stop-color="#6b7280"/>
+                        </linearGradient>
+                        <radialGradient id="ledg"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="#ff2d55"/><stop offset="1" stop-color="#ff2d5500"/></radialGradient>
+                    </defs>
+                    <rect x="30" y="98" width="140" height="14" rx="5" fill="url(#mag)"/>
+                    <rect x="20" y="40" width="160" height="62" rx="16" fill="url(#shell)" stroke="#8b5cf6" stroke-opacity=".6"/>
+                    <rect x="32" y="50" width="96" height="42" rx="8" fill="#0b0b10" stroke="#22d3ee" stroke-opacity=".35"/>
+                    <g stroke="#22d3ee" stroke-opacity=".5" fill="none">
+                        <path d="M40 80 h20 v-14 h18 v8 h22"/><path d="M40 62 h12 v10 h30"/>
+                    </g>
+                    <text x="80" y="88" text-anchor="middle" font-size="8" fill="#8b5cf6" font-family="monospace">ORP-TRK</text>
+                    <rect x="138" y="54" width="30" height="14" rx="3" fill="#22222b"/>
+                    <path d="M150 40 v-24" stroke="#9ca3af" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="150" cy="14" r="4" fill="#9ca3af"/>
+                    <circle class="led" cx="153" cy="83" r="16" fill="url(#ledg)"/>
+                    <circle class="led" cx="153" cy="83" r="4" fill="#fff"/>
+                </svg>
+            </div>
+            <div class="callouts" id="callouts">
+                <div style="left:4px;top:24px">Antenne GNSS</div>
+                <div style="right:0;top:60px">LED d'état</div>
+                <div style="left:8px;bottom:40px">Base aimantée</div>
+                <div style="right:4px;bottom:58px">N° série</div>
+            </div>
+        </div>
+        <div class="stats">
+            <div class="stat"><label>Portée de lancer <b>~18 m</b></label><div class="bar"><i data-w="72"></i></div></div>
+            <div class="stat"><label>Adhérence (bombe collante) <b>Ped / Véhicule</b></label><div class="bar"><i data-w="90"></i></div></div>
+            <div class="stat"><label>Rafraîchissement GPS <b>2 s</b></label><div class="bar"><i data-w="80"></i></div></div>
+            <div class="stat"><label>Résistance <b>1 balle</b></label><div class="bar"><i data-w="12"></i></div></div>
+            <div class="stat"><label>Poids <b>150 g</b></label><div class="bar"><i data-w="15"></i></div></div>
+        </div>
+        <div class="tags">
+            <span class="tag">Visible</span><span class="tag">LED rouge si actif</span>
+            <span class="tag">ALT → Retirer</span><span class="tag">Sync tablette</span><span class="tag">Destructible</span>
+        </div>
+    </section>
+
+    <!-- ─── Scène ─── -->
+    <section class="card">
+        <h2>Simulation en jeu <span id="hint" style="text-transform:none;letter-spacing:0;color:var(--subtle)"></span></h2>
+        <canvas id="scene" width="760" height="320"></canvas>
+        <div class="controls">
+            <span style="font-size:12px;color:var(--muted)">Viser :</span>
+            <div class="seg" id="aim">
+                <button data-v="car" class="on">Véhicule</button>
+                <button data-v="ped">Personne</button>
+                <button data-v="miss">Raté</button>
+            </div>
+            <div class="seg" id="motion">
+                <button data-v="move" class="on">En mouvement</button>
+                <button data-v="stop">À l'arrêt</button>
+            </div>
+        </div>
+        <div class="controls">
+            <button class="btn primary" id="throw">Lancer le traceur</button>
+            <button class="btn" id="remove"><span class="kbd">ALT</span> Retirer le tracker</button>
+            <button class="btn red" id="shoot">Tirer dessus</button>
+        </div>
+        <h2 style="margin-top:16px">Inventaire (poche)</h2>
+        <div class="inv" id="inv"></div>
+        <div class="log" id="log"></div>
+    </section>
+
+    <!-- ─── Tablette ─── -->
+    <section class="card">
+        <h2>Item · gps_tablet</h2>
+        <div class="tablet">
+            <div class="screen">
+                <div class="t-head"><span class="pulse"></span><div><b>GPS Tracker</b><span>Outil de suivi des traceurs</span></div></div>
+                <div class="tabs" id="tabs">
+                    <button data-t="mine" class="on">Mes trackers <span class="badge" id="b-mine">0</span></button>
+                    <button data-t="pocket">Synchroniser <span class="badge" id="b-pocket">0</span></button>
+                    <button data-t="log">Journal <span class="badge" id="b-log">0</span></button>
+                </div>
+                <div class="t-body" id="tbody"></div>
+                <div class="modal hidden" id="modal">
+                    <div class="modal-box">
+                        <h3 id="m-title"></h3>
+                        <p id="m-text"></p>
+                        <input id="m-input" class="hidden" maxlength="24">
+                        <div class="modal-actions">
+                            <button class="mini" id="m-cancel">Annuler</button>
+                            <button class="mini acc" id="m-ok">Valider</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h2 style="margin-top:16px">Carte GTA <span style="text-transform:none;letter-spacing:0">blips des traceurs actifs</span></h2>
+        <canvas id="map" width="356" height="220"></canvas>
+    </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+
+// ─── État ───────────────────────────────────────────────────────────────
+// owner : 'me' | 'other' | null ; where : 'pocket' | 'car' | 'ped' | 'ground' | 'flying'
+const trackers = [
+    { serial: 'A3F9', owner: null,    name: null, active: false, where: 'pocket' },
+    { serial: '7C21', owner: 'other', name: null, active: true,  where: 'pocket' },
+    { serial: 'E04B', owner: 'me',    name: 'Voiture Vinewood', active: false, where: 'pocket' },
+];
+const messages = [];
+let aim = 'car', moving = true, tab = 'mine', inspect = false;
+
+const label = (t) => t.name ? `Tracker : ${t.name}` : `Tracker #${t.serial}`;
+
+function toast(text, err) {
+    const el = $('#toast');
+    el.innerHTML = `<b>Traceur GPS</b>${text}`;
+    el.className = 'toast show' + (err ? ' err' : '');
+    clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 3200);
+}
+function log(text) {
+    const el = $('#log');
+    const d = document.createElement('div');
+    d.textContent = `> ${text}`;
+    el.prepend(d);
+    while (el.children.length > 4) el.lastChild.remove();
+}
+
+// ─── Rendu 3D / stats ──────────────────────────────────────────────────
+setTimeout(() => document.querySelectorAll('.bar i').forEach((i) => i.style.width = i.dataset.w + '%'), 200);
+$('#inspect').onclick = () => {
+    inspect = !inspect;
+    $('#device').classList.toggle('inspect', inspect);
+    $('#callouts').classList.toggle('show', inspect);
+    $('#inspect').textContent = inspect ? 'Fermer' : 'Inspecter';
+};
+
+document.querySelectorAll('.seg').forEach((seg) => seg.onclick = (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    seg.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+    if (seg.id === 'aim') aim = b.dataset.v; else moving = b.dataset.v === 'move';
+});
+
+// ─── Scène canvas ──────────────────────────────────────────────────────
+const cv = $('#scene'), ctx = cv.getContext('2d');
+const W = cv.width, H = cv.height, GROUND = 262;
+const player = { x: 70 };
+const car = { x: 260, w: 150, speed: 70 };
+const ped = { x: 560, dir: 1 };
+let projectile = null;
+const particles = [];
+let last = performance.now();
+
+function carTop(x) { return GROUND - 56; }
+function targetPoint(kind) {
+    if (kind === 'car') return { x: car.x + 40 + Math.random() * 70, y: GROUND - 30 - Math.random() * 18 };
+    if (kind === 'ped') return { x: ped.x, y: GROUND - 52 };
+    return { x: 380 + Math.random() * 120, y: GROUND - 2 };
+}
+
+function throwTracker() {
+    if (projectile) return;
+    const t = trackers.find((x) => x.where === 'pocket');
+    if (!t) return toast("Tu n'as plus de traceur dans ta poche.", true);
+    t.where = 'flying';
+    const dur = 0.85;
+    // anticipation de la position de la cible pendant le vol
+    let goal = targetPoint(aim);
+    if (aim === 'car' && moving) goal.x += car.speed * dur;
+    if (aim === 'car' && goal.x > W + 40) goal.x -= W + car.w + 80;
+    const start = { x: player.x + 14, y: GROUND - 58 };
+    projectile = { t, start, goal, time: 0, dur, kind: aim };
+    log(`Traceur #${t.serial} lancé (${{ car: 'véhicule', ped: 'personne', miss: 'raté' }[aim]})`);
+    render();
+}
+
+function land(p) {
+    const t = p.t;
+    if (p.kind === 'car') { t.where = 'car'; t.ox = p.goal.x - car.x; t.oy = p.goal.y; }
+    else if (p.kind === 'ped') { t.where = 'ped'; t.ox = 4; t.oy = GROUND - 50; }
+    else { t.where = 'ground'; t.x = p.goal.x; t.y = GROUND - 3; }
+    burst(p.goal.x, p.goal.y, p.kind === 'miss' ? '#9ca3af' : '#8b5cf6', 14);
+    log(p.kind === 'miss' ? `#${t.serial} est tombé par terre` : `#${t.serial} collé sur ${p.kind === 'car' ? 'le véhicule' : 'la personne'}`);
+    projectile = null;
+    render();
+}
+
+function placed() { return trackers.filter((t) => ['car', 'ped', 'ground'].includes(t.where)); }
+function posOf(t) {
+    if (t.where === 'car') return { x: car.x + t.ox, y: t.oy };
+    if (t.where === 'ped') return { x: ped.x + t.ox * ped.dir, y: t.oy };
+    return { x: t.x, y: t.y };
+}
+
+function burst(x, y, color, n, speed = 120) {
+    for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2, s = Math.random() * speed;
+        particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 40, life: 1, color });
+    }
+}
+
+$('#throw').onclick = throwTracker;
+$('#remove').onclick = () => {
+    const t = placed()[0];
+    if (!t) return toast('Aucun traceur posé à proximité.', true);
+    const p = posOf(t);
+    burst(p.x, p.y, '#22d3ee', 10, 60);
+    t.where = 'pocket';
+    log(`ALT → « Retirer le tracker » #${t.serial} → inventaire`);
+    toast(`Traceur #${t.serial} récupéré.`);
+    render();
+};
+$('#shoot').onclick = () => {
+    const t = placed()[0];
+    if (!t) return toast('Aucun traceur à viser.', true);
+    const p = posOf(t);
+    flash = { x: p.x, y: p.y, life: 1 };
+    burst(p.x, p.y, '#fbbf24', 26, 220);
+    burst(p.x, p.y, '#ff2d55', 12, 140);
+    trackers.splice(trackers.indexOf(t), 1);
+    log(`Impact de balle → #${t.serial} détruit`);
+    if (t.owner === 'me') notifyOwner(`${label(t)} a été détruit (signal perdu).`);
+    render();
+};
+let flash = null;
+
+function drawCar(x) {
+    const y = GROUND;
+    ctx.save();
+    ctx.fillStyle = '#1e1b2e';
+    ctx.strokeStyle = '#8b5cf6'; ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x, y - 18); ctx.lineTo(x + 8, y - 36); ctx.lineTo(x + 40, y - 40);
+    ctx.lineTo(x + 58, y - 58); ctx.lineTo(x + 108, y - 58); ctx.lineTo(x + 128, y - 40);
+    ctx.lineTo(x + car.w, y - 34); ctx.lineTo(x + car.w, y - 18); ctx.closePath();
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = 'rgba(34,211,238,.25)';
+    ctx.fillRect(x + 62, y - 54, 40, 14);
+    ctx.fillStyle = '#ffd36b'; ctx.fillRect(x + car.w - 6, y - 32, 6, 5);
+    ctx.fillStyle = '#ff2d55'; ctx.fillRect(x, y - 32, 4, 5);
+    for (const wx of [x + 32, x + 118]) {
+        ctx.fillStyle = '#0a0a0f'; ctx.beginPath(); ctx.arc(wx, y - 12, 13, 0, 7); ctx.fill();
+        ctx.strokeStyle = '#555'; ctx.stroke();
+    }
+    ctx.restore();
+}
+function drawPerson(x, y, color, dir = 1) {
+    ctx.save(); ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 4; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.arc(x, y - 66, 8, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x, y - 56); ctx.lineTo(x, y - 26);
+    const s = Math.sin(performance.now() / 160) * (color === '#a1a1aa' ? 7 : 0);
+    ctx.moveTo(x, y - 26); ctx.lineTo(x - 7 + s, y); ctx.moveTo(x, y - 26); ctx.lineTo(x + 7 - s, y);
+    ctx.moveTo(x, y - 50); ctx.lineTo(x + 12 * dir, y - 36);
+    ctx.stroke(); ctx.restore();
+}
+function drawTracker(x, y, t, flying) {
+    ctx.save();
+    ctx.fillStyle = '#2a2a35'; ctx.strokeStyle = '#8b5cf6'; ctx.lineWidth = 1;
+    ctx.fillRect(x - 6, y - 4, 12, 8); ctx.strokeRect(x - 6, y - 4, 12, 8);
+    const on = t.active && t.owner && (performance.now() % 900) < 260;
+    if (on || flying) {
+        const g = ctx.createRadialGradient(x, y, 0, x, y, 18);
+        g.addColorStop(0, 'rgba(255,45,85,.9)'); g.addColorStop(1, 'rgba(255,45,85,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 18, 0, 7); ctx.fill();
+    }
+    ctx.fillStyle = on ? '#fff' : '#ff2d55'; ctx.fillRect(x + 2, y - 2, 3, 3);
+    ctx.restore();
+}
+
+function step(now) {
+    const dt = Math.min((now - last) / 1000, 0.05); last = now;
+    if (moving) { car.x += car.speed * dt; if (car.x > W + 40) car.x = -car.w - 40; }
+    ped.x += ped.dir * 18 * dt; if (ped.x > 640 || ped.x < 520) ped.dir *= -1;
+
+    // fond
+    ctx.clearRect(0, 0, W, H);
+    const sky = ctx.createLinearGradient(0, 0, 0, GROUND);
+    sky.addColorStop(0, '#0d0b1a'); sky.addColorStop(1, '#1a1030');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, W, GROUND);
+    for (let i = 0; i < 12; i++) {
+        const bx = (i * 73) % W, bh = 60 + ((i * 47) % 120);
+        ctx.fillStyle = '#120f22'; ctx.fillRect(bx, GROUND - bh - 30, 54, bh);
+        ctx.fillStyle = i % 3 ? 'rgba(139,92,246,.25)' : 'rgba(34,211,238,.2)';
+        for (let w = 0; w < bh - 20; w += 16) ctx.fillRect(bx + 8 + (w % 32), GROUND - bh - 20 + w, 6, 4);
+    }
+    ctx.fillStyle = '#0c0c12'; ctx.fillRect(0, GROUND, W, H - GROUND);
+    ctx.strokeStyle = 'rgba(139,92,246,.6)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(0, GROUND); ctx.lineTo(W, GROUND); ctx.stroke();
+    ctx.setLineDash([24, 18]); ctx.strokeStyle = 'rgba(255,255,255,.12)';
+    ctx.beginPath(); ctx.moveTo(0, GROUND + 30); ctx.lineTo(W, GROUND + 30); ctx.stroke(); ctx.setLineDash([]);
+
+    drawCar(car.x);
+    drawPerson(ped.x, GROUND, '#a1a1aa', ped.dir);
+    drawPerson(player.x, GROUND, '#8b5cf6');
+    ctx.fillStyle = '#8b5cf6'; ctx.font = '11px monospace'; ctx.fillText('TOI', player.x - 10, GROUND - 82);
+
+    // prévisualisation de trajectoire
+    if (!projectile && trackers.some((t) => t.where === 'pocket')) {
+        let g = targetPoint(aim); if (aim === 'car') g = { x: car.x + 75 + (moving ? car.speed * .85 : 0), y: GROUND - 38 };
+        if (aim === 'miss') g = { x: 440, y: GROUND - 2 };
+        ctx.fillStyle = 'rgba(139,92,246,.55)';
+        for (let i = 1; i < 18; i++) {
+            const k = i / 18, x = player.x + 14 + (g.x - player.x - 14) * k;
+            const y = (GROUND - 58) + (g.y - GROUND + 58) * k - Math.sin(Math.PI * k) * 70;
+            ctx.beginPath(); ctx.arc(x, y, 1.6, 0, 7); ctx.fill();
+        }
+    }
+
+    // traceurs posés
+    for (const t of placed()) { const p = posOf(t); drawTracker(p.x, p.y, t); }
+
+    // projectile
+    if (projectile) {
+        const p = projectile; p.time += dt;
+        const k = Math.min(p.time / p.dur, 1);
+        const x = p.start.x + (p.goal.x - p.start.x) * k;
+        const y = p.start.y + (p.goal.y - p.start.y) * k - Math.sin(Math.PI * k) * 70;
+        drawTracker(x, y, p.t, true);
+        if (k >= 1) land(p);
+    }
+
+    // particules / impact
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const q = particles[i];
+        q.vy += 300 * dt; q.x += q.vx * dt; q.y += q.vy * dt; q.life -= dt * 1.4;
+        if (q.life <= 0) { particles.splice(i, 1); continue; }
+        ctx.globalAlpha = q.life; ctx.fillStyle = q.color; ctx.fillRect(q.x, q.y, 2.5, 2.5);
+    }
+    ctx.globalAlpha = 1;
+    if (flash) {
+        flash.life -= dt * 2.5;
+        if (flash.life <= 0) flash = null;
+        else { ctx.fillStyle = `rgba(255,220,120,${flash.life * .8})`; ctx.beginPath(); ctx.arc(flash.x, flash.y, 30 * (1.4 - flash.life), 0, 7); ctx.fill(); }
+    }
+
+    $('#hint').textContent = projectile ? 'traceur en vol…' : `${placed().length} traceur(s) dans le monde`;
+    drawMap(now);
+    requestAnimationFrame(step);
+}
+
+// ─── Carte GTA ─────────────────────────────────────────────────────────
+const mc = $('#map'), mx = mc.getContext('2d');
+function mapPos(t) {
+    if (t.where === 'pocket' || t.where === 'flying') return { x: 70, y: 150 };   // porteur = toi
+    const p = posOf(t);
+    return { x: 40 + (p.x / W) * 280, y: 70 + (p.y / H) * 40 };
+}
+function drawMap(now) {
+    mx.fillStyle = '#0f1a24'; mx.fillRect(0, 0, mc.width, mc.height);
+    mx.fillStyle = '#132535'; mx.beginPath(); mx.ellipse(300, 200, 120, 60, 0, 0, 7); mx.fill();
+    mx.strokeStyle = '#26384a'; mx.lineWidth = 6;
+    [[0, 90, 356, 90], [0, 150, 356, 160], [120, 0, 110, 220], [250, 0, 270, 220]].forEach(([a, b, c, d]) => { mx.beginPath(); mx.moveTo(a, b); mx.lineTo(c, d); mx.stroke(); });
+    mx.lineWidth = 2; mx.strokeStyle = '#1c2b3a';
+    for (let i = 0; i < 356; i += 30) { mx.beginPath(); mx.moveTo(i, 0); mx.lineTo(i + 20, 220); mx.stroke(); }
+
+    mx.fillStyle = '#fff'; mx.beginPath(); mx.moveTo(70, 143); mx.lineTo(76, 156); mx.lineTo(64, 156); mx.fill();
+
+    const active = trackers.filter((t) => t.owner === 'me' && t.active);
+    for (const t of active) {
+        const p = mapPos(t);
+        const r = 6 + ((now / 80) % 14);
+        mx.strokeStyle = `rgba(139,92,246,${1 - r / 20})`; mx.lineWidth = 2;
+        mx.beginPath(); mx.arc(p.x, p.y, r, 0, 7); mx.stroke();
+        mx.fillStyle = '#a78bfa'; mx.beginPath(); mx.arc(p.x, p.y, 5, 0, 7); mx.fill();
+        const txt = label(t);
+        mx.font = '11px Segoe UI, sans-serif';
+        const w = mx.measureText(txt).width + 10;
+        mx.fillStyle = 'rgba(0,0,0,.75)'; mx.fillRect(p.x + 8, p.y - 22, w, 16);
+        mx.fillStyle = '#fff'; mx.fillText(txt, p.x + 13, p.y - 10);
+    }
+    if (!active.length) { mx.fillStyle = '#4b5563'; mx.font = '12px Segoe UI'; mx.fillText('Aucun traceur actif', 12, 20); }
+}
+
+// ─── Tablette ──────────────────────────────────────────────────────────
+function modal({ title, text, input, ok = 'Valider' }) {
+    return new Promise((res) => {
+        $('#m-title').textContent = title; $('#m-text').textContent = text;
+        const f = $('#m-input'); f.classList.toggle('hidden', input === undefined); f.value = input ?? '';
+        $('#m-ok').textContent = ok;
+        $('#modal').classList.remove('hidden');
+        if (input !== undefined) setTimeout(() => f.focus(), 20);
+        const done = (v) => { $('#modal').classList.add('hidden'); res(v); };
+        $('#m-ok').onclick = () => done(input !== undefined ? f.value : true);
+        $('#m-cancel').onclick = () => done(null);
+        f.onkeydown = (e) => e.key === 'Enter' && $('#m-ok').onclick();
+    });
+}
+
+function notifyOwner(text) {
+    messages.unshift({ text, time: new Date() });
+    toast(text, true);
+    render();
+}
+
+function render() {
+    const mine = trackers.filter((t) => t.owner === 'me');
+    const pocket = trackers.filter((t) => t.where === 'pocket' && t.owner !== 'me');
+    $('#b-mine').textContent = mine.length;
+    $('#b-pocket').textContent = pocket.length;
+    $('#b-pocket').classList.toggle('hot', pocket.length > 0);
+    $('#b-log').textContent = messages.length;
+    document.querySelectorAll('#tabs button').forEach((b) => b.classList.toggle('on', b.dataset.t === tab));
+
+    const where = { pocket: 'Dans ta poche', car: 'Collé sur un véhicule', ped: 'Collé sur une personne', ground: 'Au sol', flying: 'En vol' };
+    const body = $('#tbody');
+    if (tab === 'mine') {
+        body.innerHTML = mine.length ? mine.map((t) => `
+            <div class="row">
+                <span class="dot ${t.active ? 'on' : ''}"></span>
+                <div class="info"><strong>${label(t).replace(/</g, '&lt;')}</strong><small>#${t.serial} · ${t.active ? 'Actif' : 'Désactivé'} · ${where[t.where]}</small></div>
+                <button class="mini" data-rename="${t.serial}">Renommer</button>
+                <div class="switch ${t.active ? 'on' : ''}" data-toggle="${t.serial}"></div>
+            </div>`).join('') : `<div class="empty">Aucun traceur synchronisé.<br>Mets-en un dans ta poche et va dans « Synchroniser ».</div>`;
+    } else if (tab === 'pocket') {
+        body.innerHTML = pocket.length ? pocket.map((t) => `
+            <div class="row">
+                <span class="dot ${t.owner && t.active ? 'warn' : ''}"></span>
+                <div class="info"><strong>Traceur #${t.serial}</strong><small>${!t.owner ? 'Nouveau traceur détecté dans ta poche' : t.active ? 'Déjà actif sur un autre appareil' : 'Lié à un autre appareil'}</small></div>
+                <button class="mini acc" data-sync="${t.serial}">Synchroniser</button>
+            </div>`).join('') : `<div class="empty">Aucun traceur non synchronisé détecté dans ta poche.</div>`;
+    } else {
+        body.innerHTML = messages.length ? messages.map((m) => `
+            <div class="row"><div class="info"><small>${m.time.toLocaleTimeString('fr-FR')}</small><strong style="white-space:normal">${m.text}</strong></div></div>`).join('')
+            : `<div class="empty">Aucune notification.</div>`;
+    }
+
+    $('#inv').innerHTML = [0, 1, 2, 3].map((i) => {
+        const t = trackers.filter((x) => x.where === 'pocket')[i];
+        return t ? `<div class="slot has"><small>#${t.serial}</small><svg viewBox="0 0 40 30"><rect x="4" y="8" width="32" height="16" rx="4" fill="#2a2a35" stroke="#8b5cf6"/><circle cx="30" cy="16" r="2.5" fill="#ff2d55"/><path d="M30 8V2" stroke="#9ca3af" stroke-width="2"/></svg>Traceur GPS</div>`
+                 : `<div class="slot"></div>`;
+    }).join('');
+    $('#throw').disabled = !trackers.some((t) => t.where === 'pocket');
+    $('#remove').disabled = $('#shoot').disabled = placed().length === 0;
+    $('#device').classList.toggle('off', !trackers.some((t) => t.owner === 'me' && t.active));
+}
+
+$('#tabs').onclick = (e) => { const b = e.target.closest('button'); if (b) { tab = b.dataset.t; render(); } };
+
+$('#tbody').onclick = async (e) => {
+    const el = e.target.closest('[data-toggle],[data-rename],[data-sync]'); if (!el) return;
+    if (el.dataset.toggle) {
+        const t = trackers.find((x) => x.serial === el.dataset.toggle);
+        t.active = !t.active;
+        log(`${label(t)} ${t.active ? 'activé → point sur la carte' : 'désactivé'}`);
+    } else if (el.dataset.rename) {
+        const t = trackers.find((x) => x.serial === el.dataset.rename);
+        const name = await modal({ title: 'Renommer le traceur', text: 'Il apparaîtra sur la carte sous « Tracker : nom ».', input: t.name || '' });
+        if (name !== null) { t.name = name.trim().slice(0, 24) || null; log(`Renommé → ${label(t)}`); }
+    } else if (el.dataset.sync) {
+        const t = trackers.find((x) => x.serial === el.dataset.sync);
+        if (t.owner && t.active) {
+            const yes = await modal({ title: 'Traceur déjà actif', text: 'Ce tracker est déjà actif. Voulez-vous forcer la déconnexion ?', ok: 'Oui, forcer' });
+            if (!yes) return;
+            log(`Ancien propriétaire notifié : Tracker #${t.serial} déconnecté de force`);
+            toast(`L'ancien appareil a été notifié de la déconnexion de #${t.serial}.`);
+        }
+        Object.assign(t, { owner: 'me', active: false, name: null });
+        toast(`Traceur #${t.serial} synchronisé.`);
+        tab = 'mine';
+    }
+    render();
+};
+
+$('#steal').onclick = () => {
+    const t = trackers.find((x) => x.owner === 'me');
+    if (!t) return toast("Tu n'as aucun traceur synchronisé.", true);
+    const old = label(t);
+    Object.assign(t, { owner: 'other', active: true });
+    notifyOwner(`Tracker ${t.name || '#' + t.serial} a été déconnecté de force pour être synchronisé sur un autre appareil.`);
+    log(`${old} → volé et resynchronisé ailleurs`);
+    tab = 'log'; render();
+};
+
+render();
+requestAnimationFrame(step);
+</script>
+</body>
+</html>
