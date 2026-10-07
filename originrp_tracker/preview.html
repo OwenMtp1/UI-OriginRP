@@ -419,11 +419,11 @@ function drawTracker(x, y, t, flying) {
     ctx.fillRect(x - 6, y - 4, 12, 8); ctx.strokeRect(x - 6, y - 4, 12, 8);
     const on = t.active && t.owner && (performance.now() % 900) < 260;
     if (on || flying) {
-        const g = ctx.createRadialGradient(x, y, 0, x, y, 18);
+        const g = ctx.createRadialGradient(x, y, 0, x + 3, y, 5);
         g.addColorStop(0, 'rgba(255,45,85,.9)'); g.addColorStop(1, 'rgba(255,45,85,0)');
-        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 18, 0, 7); ctx.fill();
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x + 3, y, 5, 0, 7); ctx.fill();
     }
-    ctx.fillStyle = on ? '#fff' : '#ff2d55'; ctx.fillRect(x + 2, y - 2, 3, 3);
+    ctx.fillStyle = on ? '#fff' : '#ff2d55'; ctx.fillRect(x + 3, y - 1, 1.5, 1.5);
     ctx.restore();
 }
 

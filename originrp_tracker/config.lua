@@ -35,5 +35,6 @@ Config.RenamedName = 'Tracker : %s'     -- %s = nom choisi
 -- Longueur max du nom d'un tracker
 Config.MaxNameLength = 24
 
--- Lumière clignotante d'un tracker actif
-Config.Light = { r = 255, g = 30, b = 60, range = 1.2, intensity = 6.0, period = 900 }
+-- Petit point rouge discret d'un tracker actif (visible de près, surtout la nuit)
+-- dot = taille du point, range / intensity = halo très faible autour, period = clignotement (ms)
+Config.Light = { r = 255, g = 20, b = 40, dot = 0.012, range = 0.25, intensity = 1.5, period = 1600, onRatio = 0.12, maxDistance = 25.0 }

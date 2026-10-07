@@ -188,13 +188,19 @@ CreateThread(function()
         local sleep = 500
         if #trackerObjects > 0 then
             sleep = 0
-            local blinkOn = GetGameTimer() % L.period < L.period * 0.25
+            local blinkOn = GetGameTimer() % L.period < L.period * L.onRatio
             local ped = PlayerPedId()
+            local myCoords = GetEntityCoords(ped)
 
             for _, t in ipairs(trackerObjects) do
                 if t.active and blinkOn and DoesEntityExist(t.entity) then
-                    local p = GetEntityCoords(t.entity)
-                    DrawLightWithRange(p.x, p.y, p.z + 0.05, L.r, L.g, L.b, L.range, L.intensity)
+                    local p = GetOffsetFromEntityInWorldCoords(t.entity, 0.03, 0.0, 0.03)
+                    if #(myCoords - p) <= L.maxDistance then
+                        -- petit point rouge (LED) + halo très léger
+                        DrawMarker(28, p.x, p.y, p.z, 0, 0, 0, 0, 0, 0, L.dot, L.dot, L.dot,
+                            L.r, L.g, L.b, 230, false, false, 2, false, nil, nil, false)
+                        DrawLightWithRange(p.x, p.y, p.z, L.r, L.g, L.b, L.range, L.intensity)
+                    end
                 end
             end
 

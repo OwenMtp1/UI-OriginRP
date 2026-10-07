@@ -42,4 +42,6 @@ Dépendances : `ox_lib`, `ox_inventory`, `ox_target` (OneSync activé).
 Réglages dans `config.lua` (prop, puissance du lancer, rayon de tir, blip, lumière).
 Branchement inventaire / identité dans `sv_config.lua`. Les propriétaires et noms sont sauvegardés en KVP.
 
-Aperçu interactif : ouvrir `preview.html` dans un navigateur.
+Icônes d'inventaire : copier `images/gps_tracker.png` et `images/gps_tablet.png` dans `ox_inventory/web/images/`.
+
+Aperçus : `items.html` (visuels des items : inventaire, en main, sur une personne / une voiture) et `preview.html` (simulation interactive).
