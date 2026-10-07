@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar de vitesse — OriginRP</title>
+<style>
+:root {
+    --bg: #0b0b10; --panel: #15151c; --panel-2: #1c1c25;
+    --border: rgba(255,255,255,.08); --text: #f4f4f5; --muted: #a1a1aa; --subtle: #6b6b76;
+    --accent: #8b5cf6; --accent-2: #22d3ee; --glow: rgba(139,92,246,.4);
+    --green: #4ade80; --red: #f43f5e; --amber: #fbbf24;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: radial-gradient(1000px 500px at 10% -10%, #1d1433, transparent 60%),
+                radial-gradient(800px 500px at 110% 110%, #0d2a33, transparent 60%), var(--bg);
+    color: var(--text); font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    padding: 24px 16px 60px; min-height: 100vh;
+}
+.wrap { max-width: 1320px; margin: 0 auto; }
+header { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+h1 { font-size: 22px; letter-spacing: 2px; text-transform: uppercase; }
+h1 span { color: var(--accent); text-shadow: 0 0 18px var(--glow); }
+.sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+.tabs { display: inline-flex; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.tabs button { border: 0; background: transparent; color: var(--muted); padding: 10px 18px; font-size: 13px; cursor: pointer; }
+.tabs button.on { background: rgba(139,92,246,.25); color: var(--text); }
+.view { display: none; }
+.view.on { display: block; }
+
+.grid { display: grid; grid-template-columns: 290px 1fr 320px; gap: 14px; }
+@media (max-width: 1150px) { .grid { grid-template-columns: 1fr; } }
+.card { background: linear-gradient(180deg, var(--panel-2), var(--panel)); border: 1px solid var(--border); border-radius: 16px; padding: 14px; min-width: 0; }
+.card h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.card h3 em { font-style: normal; color: var(--subtle); text-transform: none; letter-spacing: 0; }
+.note { font-size: 12px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+
+/* Radar 3D */
+.stage { height: 270px; display: flex; align-items: center; justify-content: center; perspective: 800px; position: relative; }
+.stage::after { content: ''; position: absolute; bottom: 10px; width: 120px; height: 14px; border-radius: 50%; background: radial-gradient(var(--glow), transparent 70%); filter: blur(4px); }
+.spin { height: 260px; animation: spin 6s ease-in-out infinite alternate; transition: transform .6s; }
+.spin.inspect { animation-play-state: paused; transform: rotateY(-25deg) scale(1.2) translateY(30px); }
+@keyframes spin { from { transform: rotateY(-35deg); } to { transform: rotateY(35deg); } }
+.spin svg { height: 100%; filter: drop-shadow(0 14px 18px rgba(0,0,0,.6)); }
+.rec { animation: rec 1.4s infinite; }
+@keyframes rec { 50% { opacity: .2; } }
+.mini { border: 1px solid var(--border); background: rgba(255,255,255,.06); color: var(--text); font-size: 11px; padding: 5px 10px; border-radius: 8px; cursor: pointer; text-transform: none; letter-spacing: 0; }
+.stats { display: grid; gap: 9px; margin-top: 6px; }
+.stat label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.stat label b { color: var(--text); font-weight: 600; }
+.bar { height: 5px; background: rgba(255,255,255,.06); border-radius: 99px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 1.2s cubic-bezier(.2,.8,.2,1); }
+.hp i { background: linear-gradient(90deg, var(--green), #a3e635); }
+.hp.dead i { background: var(--red); }
+
+/* Scène */
+canvas { width: 100%; display: block; border-radius: 12px; background: #07070b; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+.btn { border: 1px solid var(--border); background: rgba(255,255,255,.05); color: var(--text); padding: 9px 14px; border-radius: 10px; font-size: 13px; cursor: pointer; transition: .15s; }
+.btn:hover { background: rgba(255,255,255,.1); }
+.btn.primary { background: var(--accent); border-color: transparent; box-shadow: 0 0 18px var(--glow); }
+.btn.red { background: rgba(244,63,94,.12); border-color: rgba(244,63,94,.45); color: #fda4af; }
+.btn.amber { background: rgba(251,191,36,.1); border-color: rgba(251,191,36,.4); color: #fde68a; }
+.btn:disabled { opacity: .35; cursor: not-allowed; }
+.speed { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); flex: 1; min-width: 240px; }
+.speed input { flex: 1; accent-color: var(--accent); }
+.speed b { color: var(--text); min-width: 76px; font-variant-numeric: tabular-nums; }
+
+/* Barème */
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+td, th { padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--border); }
+th { color: var(--subtle); font-weight: 500; }
+td:last-child, th:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+tr.hit td { background: rgba(244,63,94,.12); color: #fff; }
+tr.hit td:first-child { box-shadow: inset 3px 0 0 var(--red); }
+.log { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow: auto; }
+.log div { font-size: 12px; padding: 8px 10px; border-radius: 8px; background: rgba(255,255,255,.04); border: 1px solid var(--border); display: flex; justify-content: space-between; gap: 8px; }
+.log b { color: var(--red); }
+.totals { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.totals div { padding: 10px; border-radius: 10px; background: rgba(255,255,255,.04); border: 1px solid var(--border); }
+.totals small { display: block; font-size: 11px; color: var(--subtle); }
+.totals strong { font-size: 18px; font-variant-numeric: tabular-nums; }
+
+/* Notification ox_lib (haut droite) */
+.notifs { position: fixed; right: 16px; top: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 30; max-width: 360px; }
+.notif { display: flex; gap: 10px; padding: 11px 13px; border-radius: 8px; background: #1a1b1e; border: 1px solid #2c2e33; box-shadow: 0 10px 30px rgba(0,0,0,.5); font-size: 13px; animation: slide .3s ease-out; }
+.notif.out { opacity: 0; transform: translateX(20px); transition: .3s; }
+@keyframes slide { from { opacity: 0; transform: translateX(30px); } }
+.notif .ico { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; background: rgba(244,63,94,.15); color: var(--red); font-weight: 700; }
+.notif.info .ico { background: rgba(34,211,238,.15); color: var(--accent-2); }
+.notif b { display: block; margin-bottom: 2px; }
+.notif span { color: #c1c2c5; }
+.notif small { display: block; color: var(--subtle); margin-top: 3px; font-size: 11px; }
+.flash { position: fixed; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 25; }
+
+/* Code */
+.files { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.files button { border: 1px solid var(--border); background: rgba(255,255,255,.04); color: var(--muted); padding: 7px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: ui-monospace, monospace; }
+.files button.on { color: var(--text); border-color: var(--accent); background: rgba(139,92,246,.15); }
+pre { background: #0a0a0e; border: 1px solid var(--border); border-radius: 12px; padding: 16px; overflow: auto; max-height: 70vh; font-size: 12.5px; line-height: 1.55; font-family: ui-monospace, 'Cascadia Code', monospace; color: #d4d4d8; tab-size: 4; }
+.tok-c { color: #6b7280; font-style: italic; }
+.tok-s { color: #86efac; }
+.tok-k { color: #c4b5fd; }
+.tok-n { color: #fbbf24; }
+.code-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<div class="flash" id="flash"></div>
+<div class="notifs" id="notifs"></div>
+
+<div class="wrap">
+    <header>
+        <div>
+            <h1>Radar de <span>vitesse</span> // OriginRP</h1>
+            <p class="sub">Ressource <code>originrp_radar</code> — limite de base 70 km/h, amende de 100 à 1 500 $ prélevée sur le compte bancaire.</p>
+        </div>
+        <div class="tabs" id="mainTabs">
+            <button data-v="preview" class="on">Aperçu</button>
+            <button data-v="code">Script Lua</button>
+        </div>
+    </header>
+
+    <!-- ═════════ APERÇU ═════════ -->
+    <section class="view on" id="view-preview">
+        <div class="grid">
+            <div class="card">
+                <h3>Radar <button class="mini" id="inspect">Inspecter</button></h3>
+                <div class="stage">
+                    <div class="spin" id="spin">
+                        <svg viewBox="0 0 120 260" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="pole" x1="0" x2="1"><stop offset="0" stop-color="#4b5058"/><stop offset=".45" stop-color="#9aa1aa"/><stop offset="1" stop-color="#3a3e45"/></linearGradient>
+                                <linearGradient id="box" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3e5e8"/><stop offset=".5" stop-color="#b9bdc3"/><stop offset="1" stop-color="#8b9097"/></linearGradient>
+                                <linearGradient id="yellow" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#facc15"/><stop offset="1" stop-color="#ca8a04"/></linearGradient>
+                                <radialGradient id="lens"><stop offset="0" stop-color="#3b82f6"/><stop offset=".35" stop-color="#0b1730"/><stop offset="1" stop-color="#020409"/></radialGradient>
+                            </defs>
+                            <rect x="54" y="90" width="12" height="160" fill="url(#pole)"/>
+                            <rect x="44" y="244" width="32" height="10" rx="2" fill="#3a3e45"/>
+                            <!-- boîtier -->
+                            <rect x="14" y="20" width="92" height="76" rx="6" fill="url(#box)" stroke="#6b7078"/>
+                            <rect x="14" y="20" width="92" height="10" rx="5" fill="#f1f2f4"/>
+                            <rect x="14" y="78" width="92" height="12" fill="url(#yellow)"/>
+                            <g fill="#1a1a1a"><path d="M20 78 l8 12 h6 l-8 -12 z"/><path d="M40 78 l8 12 h6 l-8 -12 z"/><path d="M60 78 l8 12 h6 l-8 -12 z"/><path d="M80 78 l8 12 h6 l-8 -12 z"/></g>
+                            <!-- objectif -->
+                            <rect x="24" y="36" width="44" height="36" rx="4" fill="#111318"/>
+                            <circle cx="46" cy="54" r="14" fill="url(#lens)" stroke="#2b2f36" stroke-width="2"/>
+                            <circle cx="41" cy="49" r="3" fill="#fff" opacity=".5"/>
+                            <!-- flash -->
+                            <rect x="74" y="36" width="24" height="16" rx="2" fill="#f8fafc" stroke="#9ca3af"/>
+                            <path d="M76 40 h20 M76 44 h20 M76 48 h20" stroke="#cbd5e1" stroke-width=".8"/>
+                            <circle class="rec" cx="86" cy="62" r="2.5" fill="#ef4444"/>
+                            <!-- panneau limite -->
+                            <circle cx="60" cy="130" r="24" fill="#fff" stroke="#dc2626" stroke-width="6"/>
+                            <text x="60" y="139" text-anchor="middle" font-family="Arial" font-weight="800" font-size="24" fill="#111">70</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="stats">
+                    <div class="stat"><label>Limite par défaut <b>70 km/h</b></label><div class="bar"><i data-w="35"></i></div></div>
+                    <div class="stat"><label>Zone de détection <b>25 m · 70°</b></label><div class="bar"><i data-w="55"></i></div></div>
+                    <div class="stat"><label>Amende <b>100 → 1 500 $</b></label><div class="bar"><i data-w="100"></i></div></div>
+                    <div class="stat hp" id="hpStat"><label>Intégrité <b id="hpTxt">Indestructible</b></label><div class="bar"><i data-w="100" id="hpBar"></i></div></div>
+                </div>
+                <p class="note">Insensible aux balles, aux chocs et au feu. Seules une <b>bombe collante</b> ou une <b>roquette</b> le détruisent ; il est réinstallé 30 min plus tard.</p>
+            </div>
+
+            <div class="card">
+                <h3>Simulation <em id="status">Radar opérationnel</em></h3>
+                <canvas id="scene" width="820" height="340"></canvas>
+                <div class="row">
+                    <label class="speed">Vitesse <input type="range" id="spd" min="40" max="220" value="112"><b id="spdTxt">112 km/h</b></label>
+                    <button class="btn primary" id="drive">Passer devant le radar</button>
+                </div>
+                <div class="row">
+                    <button class="btn" id="shoot">Tirer dessus (arme)</button>
+                    <button class="btn" id="ram">Le percuter</button>
+                    <button class="btn amber" id="sticky">Bombe collante</button>
+                    <button class="btn red" id="rpg">Lance-missile</button>
+                    <button class="btn" id="repair" disabled>Avancer de 30 min</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Barème <em>écart au-dessus de la limite</em></h3>
+                <table id="fines"><thead><tr><th>Écart</th><th>Amende</th></tr></thead><tbody></tbody></table>
+                <div class="totals">
+                    <div><small>Amendes</small><strong id="count">0</strong></div>
+                    <div><small>Prélevé (banque)</small><strong id="sum">0 $</strong></div>
+                </div>
+                <div class="totals" style="grid-template-columns:1fr"><div><small>Compte bancaire du joueur</small><strong id="bank">12 500 $</strong></div></div>
+                <div class="log" id="log"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═════════ SCRIPT ═════════ -->
+    <section class="view" id="view-code">
+        <div class="card">
+            <div class="code-head">
+                <div class="files" id="files"></div>
+                <div style="display:flex;gap:8px">
+                    <button class="btn" id="copy">Copier</button>
+                    <button class="btn" id="dl">Télécharger ce fichier</button>
+                    <button class="btn primary" id="dlAll">Télécharger tous les fichiers</button>
+                </div>
+            </div>
+            <pre id="code"></pre>
+            <p class="note">Crée un dossier <code>originrp_radar</code> dans <code>resources/</code>, mets-y ces fichiers puis ajoute <code>ensure originrp_radar</code> dans <code>server.cfg</code>. Dépendance : <code>ox_lib</code> ; argent prélevé via ESX ou QBCore (détecté automatiquement).</p>
+        </div>
+    </section>
+</div>
+
+<script>
+const FILES = {"fxmanifest.lua": "fx_version 'cerulean'\ngame 'gta5'\nlua54 'yes'\n\nname 'originrp_radar'\ndescription 'OriginRP - Radars de vitesse automatiques (amendes 100 à 1500 $)'\nversion '1.0.0'\n\ndependency 'ox_lib'\n\nshared_scripts {\n    '@ox_lib/init.lua',\n    'config.lua',\n}\n\nclient_script 'client.lua'\n\nserver_scripts {\n    'sv_config.lua',\n    'server.lua',\n}\n", "config.lua": "Config = {}\n\n-- Vitesse de base (km/h) quand un radar n'a pas de limite propre\nConfig.DefaultLimit = 70\n\n-- Tolérance avant flash (km/h) : 0 = flashé dès 71 km/h\nConfig.Tolerance = 0\n\n-- Barème : amende selon l'écart au-dessus de la limite (km/h). De 100 $ à 1500 $.\nConfig.Fines = {\n    { over = 10,       amount = 100 },   --  1 à 10 km/h\n    { over = 20,       amount = 250 },   -- 11 à 20\n    { over = 30,       amount = 400 },   -- 21 à 30\n    { over = 40,       amount = 600 },   -- 31 à 40\n    { over = 50,       amount = 800 },   -- 41 à 50\n    { over = 60,       amount = 1000 },  -- 51 à 60\n    { over = 80,       amount = 1250 },  -- 61 à 80\n    { over = math.huge, amount = 1500 }, -- plus de 80 km/h\n}\n\nConfig.Message = 'Une amende pour vitesse excessive de %s $ vous a été distribuée'\nConfig.NotifyPosition = 'top-right'\n\n-- Un même véhicule n'est pas reflashé par le même radar avant ce délai (s)\nConfig.Cooldown = 30\n\n-- Zone de détection : distance au radar (m) et angle du cône devant la caméra (degrés)\nConfig.DetectRadius = 25.0\nConfig.DetectAngle = 70.0\n\n-- Classes de véhicules exemptées (18 = urgences : police, ambulance...)\nConfig.ExemptClasses = { [18] = true }\n\n-- Prop du radar (caméra sur poteau)\nConfig.Model = `prop_cctv_pole_01a`\nConfig.Blip = { enabled = true, sprite = 184, color = 1, scale = 0.6, label = 'Radar de vitesse' }\n\n-- Indestructible SAUF par ces explosions (types GTA) :\n--  2 = bombe collante, 4 = roquette (lance-missile / lance-missile guidé)\nConfig.DestroyExplosions = { [2] = true, [4] = true }\nConfig.DestroyRadius = 4.0\n-- Temps avant que le radar soit réinstallé (min)\nConfig.RespawnMinutes = 30\n\n-- Radars fixes. heading = direction dans laquelle la caméra regarde (vers les véhicules qui arrivent).\nConfig.Radars = {\n    { coords = vector3(239.8, -1020.5, 29.2), heading = 340.0, limit = 70 },\n    { coords = vector3(-542.1, -846.3, 29.4), heading = 90.0 },\n    { coords = vector3(1056.2, -393.9, 67.1), heading = 220.0, limit = 90 },\n}\n\n-- Commande admin pour poser un radar à sa position (sauvegardé) : /radar add [limite] | /radar remove\nConfig.AdminAce = 'command.radar'\n", "client.lua": "local props = {}   -- id -> objet\nlocal blips = {}   -- id -> blip\nlocal lastLocal = {}\n\nlocal function radarList() return GlobalState.radarList or {} end\nlocal function isDown(id) return (GlobalState.radarDown or {})[id] ~= nil end\n\n-- ─── Props indestructibles ─────────────────────────────────────────────────\n\nlocal function spawnProp(r)\n    lib.requestModel(Config.Model)\n    local obj = CreateObject(Config.Model, r.x, r.y, r.z, false, false, false)\n    SetEntityHeading(obj, r.h)\n    FreezeEntityPosition(obj, true)\n    SetEntityInvincible(obj, true)\n    SetEntityProofs(obj, true, true, true, true, true, true, true, true)\n    SetEntityCanBeDamaged(obj, false)\n    SetDisableFragDamage(obj, true)\n    return obj\nend\n\nlocal function clear(id)\n    if props[id] and DoesEntityExist(props[id]) then DeleteEntity(props[id]) end\n    props[id] = nil\nend\n\nlocal function refresh()\n    local seen = {}\n    for _, r in ipairs(radarList()) do\n        seen[r.id] = true\n        if isDown(r.id) then\n            clear(r.id)\n        elseif not props[r.id] or not DoesEntityExist(props[r.id]) then\n            props[r.id] = spawnProp(r)\n        end\n\n        if Config.Blip.enabled and not blips[r.id] then\n            local b = AddBlipForCoord(r.x, r.y, r.z)\n            SetBlipSprite(b, Config.Blip.sprite)\n            SetBlipColour(b, Config.Blip.color)\n            SetBlipScale(b, Config.Blip.scale)\n            SetBlipAsShortRange(b, true)\n            BeginTextCommandSetBlipName('STRING')\n            AddTextComponentSubstringPlayerName(('%s (%d km/h)'):format(Config.Blip.label, r.limit))\n            EndTextCommandSetBlipName(b)\n            blips[r.id] = b\n        end\n    end\n    for id in pairs(props) do if not seen[id] then clear(id) end end\n    for id, b in pairs(blips) do\n        if not seen[id] then RemoveBlip(b) blips[id] = nil end\n    end\nend\n\nAddStateBagChangeHandler('radarList', 'global', function() SetTimeout(0, refresh) end)\nAddStateBagChangeHandler('radarDown', 'global', function() SetTimeout(0, refresh) end)\nCreateThread(function() Wait(1000) refresh() end)\n\nRegisterNetEvent('originrp_radar:destroyed', function(id)\n    for _, r in ipairs(radarList()) do\n        if r.id == id and #(GetEntityCoords(PlayerPedId()) - vector3(r.x, r.y, r.z)) < 150.0 then\n            lib.requestNamedPtfxAsset('core')\n            UseParticleFxAsset('core')\n            StartParticleFxNonLoopedAtCoord('ent_sht_electrical_box', r.x, r.y, r.z + 3.0, 0.0, 0.0, 0.0, 2.0, false, false, false)\n            UseParticleFxAsset('core')\n            StartParticleFxNonLoopedAtCoord('exp_grd_bzgas_smoke', r.x, r.y, r.z + 1.0, 0.0, 0.0, 0.0, 1.5, false, false, false)\n        end\n    end\n    clear(id)\nend)\n\n-- ─── Détection de vitesse ──────────────────────────────────────────────────\n\nlocal function inCone(r, pos)\n    local h = math.rad(r.h)\n    local fx, fy = -math.sin(h), math.cos(h)\n    local dx, dy = pos.x - r.x, pos.y - r.y\n    local len = math.sqrt(dx * dx + dy * dy)\n    if len < 0.5 then return true end\n    local cos = (fx * dx + fy * dy) / len\n    return cos >= math.cos(math.rad(Config.DetectAngle / 2))\nend\n\nCreateThread(function()\n    while true do\n        local sleep = 1000\n        local ped = PlayerPedId()\n        local veh = GetVehiclePedIsIn(ped, false)\n\n        if veh ~= 0 and GetPedInVehicleSeat(veh, -1) == ped and not Config.ExemptClasses[GetVehicleClass(veh)] then\n            sleep = 100\n            local pos = GetEntityCoords(veh)\n            local speed = GetEntitySpeed(veh) * 3.6\n            local now = GetGameTimer()\n\n            for _, r in ipairs(radarList()) do\n                if not isDown(r.id)\n                    and speed > r.limit + Config.Tolerance\n                    and #(pos - vector3(r.x, r.y, r.z)) <= Config.DetectRadius\n                    and inCone(r, pos)\n                    and (not lastLocal[r.id] or now - lastLocal[r.id] > Config.Cooldown * 1000) then\n                    lastLocal[r.id] = now\n                    TriggerServerEvent('originrp_radar:flash', r.id)\n                end\n            end\n        end\n        Wait(sleep)\n    end\nend)\n\n-- ─── Flash + notification ──────────────────────────────────────────────────\n\nRegisterNetEvent('originrp_radar:flashed', function(data)\n    PlaySoundFrontend(-1, 'Camera_Shoot', 'Phone_Soundset_Franklin', true)\n    CreateThread(function()\n        local start = GetGameTimer()\n        while GetGameTimer() - start < 350 do\n            local a = math.floor(255 * (1 - (GetGameTimer() - start) / 350))\n            DrawRect(0.5, 0.5, 1.0, 1.0, 255, 255, 255, a)\n            Wait(0)\n        end\n    end)\n    lib.notify({\n        title = 'Radar automatique',\n        description = Config.Message:format(data.amount) .. ('\\n%d km/h (limite %d km/h) · %s'):format(data.speed, data.limit, data.plate or ''),\n        type = 'error',\n        icon = 'gauge-high',\n        position = Config.NotifyPosition,\n        duration = 8000,\n    })\nend)\n\nAddEventHandler('onResourceStop', function(res)\n    if res ~= GetCurrentResourceName() then return end\n    for id in pairs(props) do clear(id) end\n    for _, b in pairs(blips) do RemoveBlip(b) end\nend)\n", "server.lua": "local KVP_KEY = 'originrp_radar:custom'\nlocal Radars = {}     -- id -> { id, x, y, z, h, limit, custom }\nlocal Down = {}       -- id -> timestamp de réinstallation\nlocal LastFlash = {}  -- 'source:id' -> os.time()\n\n-- ─── Liste des radars ──────────────────────────────────────────────────────\n\nlocal function publish()\n    local list = {}\n    for _, r in pairs(Radars) do list[#list + 1] = r end\n    table.sort(list, function(a, b) return a.id < b.id end)\n    GlobalState.radarList = list\n    GlobalState.radarDown = Down\nend\n\nlocal function saveCustom()\n    local custom = {}\n    for _, r in pairs(Radars) do\n        if r.custom then custom[#custom + 1] = r end\n    end\n    SetResourceKvp(KVP_KEY, json.encode(custom))\nend\n\nCreateThread(function()\n    for i, r in ipairs(Config.Radars) do\n        local id = 'cfg' .. i\n        Radars[id] = { id = id, x = r.coords.x, y = r.coords.y, z = r.coords.z, h = r.heading, limit = r.limit or Config.DefaultLimit }\n    end\n    local raw = GetResourceKvpString(KVP_KEY)\n    for _, r in ipairs(raw and json.decode(raw) or {}) do Radars[r.id] = r end\n    publish()\nend)\n\n-- ─── Amendes ───────────────────────────────────────────────────────────────\n\nlocal function fineFor(over)\n    for _, tier in ipairs(Config.Fines) do\n        if over <= tier.over then return tier.amount end\n    end\n    return Config.Fines[#Config.Fines].amount\nend\n\nRegisterNetEvent('originrp_radar:flash', function(id)\n    local src = source\n    local radar = Radars[id]\n    if not radar or Down[id] then return end\n\n    local ped = GetPlayerPed(src)\n    local veh = GetVehiclePedIsIn(ped, false)\n    if veh == 0 or GetPedInVehicleSeat(veh, -1) ~= ped then return end\n\n    local pos = GetEntityCoords(veh)\n    if #(pos - vector3(radar.x, radar.y, radar.z)) > Config.DetectRadius + 15.0 then return end\n\n    -- vitesse mesurée côté serveur (le client ne peut pas tricher sur le montant)\n    local speed = math.floor(#GetEntityVelocity(veh) * 3.6 + 0.5)\n    local over = speed - radar.limit\n    if over <= Config.Tolerance then return end\n\n    local key = src .. ':' .. id\n    local now = os.time()\n    if LastFlash[key] and now - LastFlash[key] < Config.Cooldown then return end\n    LastFlash[key] = now\n\n    local amount = fineFor(over)\n    ServerConfig.RemoveBankMoney(src, amount)\n    ServerConfig.OnFine(src, amount, speed, radar.limit, id)\n\n    TriggerClientEvent('originrp_radar:flashed', src, {\n        speed = speed, limit = radar.limit, amount = amount, plate = GetVehicleNumberPlateText(veh),\n    })\nend)\n\nAddEventHandler('playerDropped', function()\n    local prefix = source .. ':'\n    for key in pairs(LastFlash) do\n        if key:sub(1, #prefix) == prefix then LastFlash[key] = nil end\n    end\nend)\n\n-- ─── Destruction : uniquement bombe collante / roquette ────────────────────\n\nAddEventHandler('explosionEvent', function(_, ev)\n    if not Config.DestroyExplosions[ev.explosionType] then return end\n    local pos = vector3(ev.posX, ev.posY, ev.posZ)\n    local changed = false\n    for id, r in pairs(Radars) do\n        if not Down[id] and #(pos - vector3(r.x, r.y, r.z)) <= Config.DestroyRadius then\n            Down[id] = os.time() + Config.RespawnMinutes * 60\n            changed = true\n            TriggerClientEvent('originrp_radar:destroyed', -1, id)\n        end\n    end\n    if changed then publish() end\nend)\n\nCreateThread(function()\n    while true do\n        Wait(30000)\n        local now, changed = os.time(), false\n        for id, t in pairs(Down) do\n            if now >= t then Down[id] = nil changed = true end\n        end\n        if changed then publish() end\n    end\nend)\n\n-- ─── Commande admin ────────────────────────────────────────────────────────\n\nRegisterCommand('radar', function(src, args)\n    if src == 0 then return end\n    local ped = GetPlayerPed(src)\n    local c = GetEntityCoords(ped)\n\n    if args[1] == 'add' then\n        local id = ('c%d'):format(os.time())\n        Radars[id] = {\n            id = id, x = c.x, y = c.y, z = c.z - 1.0, h = GetEntityHeading(ped),\n            limit = tonumber(args[2]) or Config.DefaultLimit, custom = true,\n        }\n        saveCustom(); publish()\n        TriggerClientEvent('ox_lib:notify', src, { description = ('Radar posé (%d km/h).'):format(Radars[id].limit), type = 'success' })\n    elseif args[1] == 'remove' then\n        local best, dist\n        for id, r in pairs(Radars) do\n            local d = #(c - vector3(r.x, r.y, r.z))\n            if r.custom and d < 10.0 and (not dist or d < dist) then best, dist = id, d end\n        end\n        if best then\n            Radars[best] = nil\n            saveCustom(); publish()\n            TriggerClientEvent('ox_lib:notify', src, { description = 'Radar supprimé.', type = 'success' })\n        end\n    end\nend, true)\n", "sv_config.lua": "--[[\n    Adaptateur argent : retire l'amende du COMPTE BANCAIRE du joueur.\n    Détecte ESX ou QBCore / Qbox automatiquement.\n]]\nServerConfig = {}\n\nlocal ESX, QBCore\nif GetResourceState('es_extended') == 'started' then\n    ESX = exports.es_extended:getSharedObject()\nelseif GetResourceState('qb-core') == 'started' then\n    QBCore = exports['qb-core']:GetCoreObject()\nend\n\n-- Retire `amount` du compte bancaire. Le solde peut passer en négatif : une amende est toujours appliquée.\nfunction ServerConfig.RemoveBankMoney(src, amount)\n    if ESX then\n        local xPlayer = ESX.GetPlayerFromId(src)\n        if not xPlayer then return false end\n        xPlayer.removeAccountMoney('bank', amount, 'Amende radar')\n        return true\n    elseif QBCore then\n        local player = QBCore.Functions.GetPlayer(src)\n        if not player then return false end\n        -- QBCore refuse un solde négatif : on force le retrait si le compte est insuffisant\n        if not player.Functions.RemoveMoney('bank', amount, 'amende-radar') then\n            local money = player.PlayerData.money\n            money.bank = money.bank - amount\n            player.Functions.SetPlayerData('money', money)\n        end\n        return true\n    end\n    print(('[originrp_radar] Aucun framework détecté : amende de %d $ non prélevée (joueur %d)'):format(amount, src))\n    return false\nend\n\n-- Optionnel : envoyer l'argent à la société de police (ESX addon_account / qb-management...)\nfunction ServerConfig.OnFine(src, amount, speed, limit, radarId)\nend\n"};
+const FINES = [[10, 100], [20, 250], [30, 400], [40, 600], [50, 800], [60, 1000], [80, 1250], [Infinity, 1500]];
+const LIMIT = 70;
+const $ = (s) => document.querySelector(s);
+
+// ─── Onglets ──────────────────────────────────────────────────────────
+$('#mainTabs').onclick = (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    $('#mainTabs').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+    document.querySelectorAll('.view').forEach((v) => v.classList.toggle('on', v.id === 'view-' + b.dataset.v));
+};
+setTimeout(() => document.querySelectorAll('.bar i').forEach((i) => i.style.width = i.dataset.w + '%'), 200);
+$('#inspect').onclick = () => { const on = $('#spin').classList.toggle('inspect'); $('#inspect').textContent = on ? 'Fermer' : 'Inspecter'; };
+
+// ─── Barème ───────────────────────────────────────────────────────────
+let prev = 0;
+$('#fines tbody').innerHTML = FINES.map(([over, amount], i) => {
+    const label = over === Infinity ? `+ ${prev + 1} km/h et plus` : `+${prev + 1} à +${over} km/h`;
+    prev = over;
+    return `<tr data-i="${i}"><td>${label}</td><td>${amount.toLocaleString('fr-FR')} $</td></tr>`;
+}).join('');
+const fineFor = (over) => FINES.find(([o]) => over <= o)[1];
+
+// ─── Notifications ────────────────────────────────────────────────────
+function notify(title, text, extra, info) {
+    const el = document.createElement('div');
+    el.className = 'notif' + (info ? ' info' : '');
+    el.innerHTML = `<div class="ico">${info ? 'i' : '$'}</div><div><b>${title}</b><span>${text}</span>${extra ? `<small>${extra}</small>` : ''}</div>`;
+    $('#notifs').prepend(el);
+    setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 300); }, 6000);
+}
+
+// ─── Scène ────────────────────────────────────────────────────────────
+const cv = $('#scene'), ctx = cv.getContext('2d');
+const W = cv.width, H = cv.height, ROAD = 250, RX = 600;
+const state = { car: null, down: false, hp: 100, count: 0, sum: 0, bank: 12500, particles: [], fx: [], measured: null, sticky: null, rocket: null, flashT: 0 };
+$('#spd').oninput = () => $('#spdTxt').textContent = $('#spd').value + ' km/h';
+
+function burst(x, y, colors, n, sp = 200) {
+    for (let i = 0; i < n; i++) {
+        const a = Math.random() * Math.PI * 2, s = Math.random() * sp;
+        state.particles.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 60, life: 1, c: colors[i % colors.length], r: 1.5 + Math.random() * 2.5 });
+    }
+}
+
+function drawRadar() {
+    const x = RX, y = ROAD - 10;
+    ctx.save();
+    if (state.down) {
+        // poteau tordu + boîtier au sol
+        ctx.fillStyle = '#3a3e45';
+        ctx.save(); ctx.translate(x, y); ctx.rotate(.5); ctx.fillRect(-5, -90, 10, 90); ctx.restore();
+        ctx.fillStyle = '#5b5f66'; ctx.fillRect(x + 30, ROAD - 26, 50, 22);
+        ctx.fillStyle = '#111'; ctx.fillRect(x + 36, ROAD - 22, 16, 14);
+        ctx.restore(); return;
+    }
+    const pg = ctx.createLinearGradient(x - 5, 0, x + 5, 0);
+    pg.addColorStop(0, '#4b5058'); pg.addColorStop(.5, '#9aa1aa'); pg.addColorStop(1, '#3a3e45');
+    ctx.fillStyle = pg; ctx.fillRect(x - 5, y - 150, 10, 150);
+    const bg = ctx.createLinearGradient(0, y - 200, 0, y - 140);
+    bg.addColorStop(0, '#e3e5e8'); bg.addColorStop(1, '#8b9097');
+    ctx.fillStyle = bg; ctx.fillRect(x - 40, y - 200, 64, 52);
+    ctx.fillStyle = '#facc15'; ctx.fillRect(x - 40, y - 156, 64, 8);
+    ctx.fillStyle = '#111318'; ctx.fillRect(x - 36, y - 192, 26, 24);
+    const lg = ctx.createRadialGradient(x - 23, y - 180, 1, x - 23, y - 180, 10);
+    lg.addColorStop(0, '#3b82f6'); lg.addColorStop(1, '#020409');
+    ctx.fillStyle = lg; ctx.beginPath(); ctx.arc(x - 23, y - 180, 9, 0, 7); ctx.fill();
+    ctx.fillStyle = state.flashT > 0 ? '#fff' : '#f1f5f9'; ctx.fillRect(x - 6, y - 194, 24, 12);
+    // panneau 70
+    ctx.fillStyle = '#fff'; ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.arc(x, y - 110, 18, 0, 7); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#111'; ctx.font = 'bold 17px Arial'; ctx.textAlign = 'center'; ctx.fillText(String(LIMIT), x, y - 104);
+    // écran de mesure
+    ctx.fillStyle = '#05070a'; ctx.fillRect(x + 12, y - 80, 58, 26);
+    ctx.fillStyle = state.measured && state.measured > LIMIT ? '#f43f5e' : '#4ade80';
+    ctx.font = 'bold 18px ui-monospace, monospace'; ctx.fillText(state.measured ? String(state.measured) : '---', x + 41, y - 60);
+    // cône de détection
+    ctx.fillStyle = 'rgba(34,211,238,.06)';
+    ctx.beginPath(); ctx.moveTo(x - 30, y - 180); ctx.lineTo(x - 300, ROAD + 10); ctx.lineTo(x - 60, ROAD + 10); ctx.closePath(); ctx.fill();
+    // flash
+    if (state.flashT > 0) {
+        const g = ctx.createRadialGradient(x + 6, y - 188, 0, x + 6, y - 188, 260 * state.flashT);
+        g.addColorStop(0, `rgba(255,255,255,${state.flashT})`); g.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    }
+    ctx.restore();
+}
+
+function drawCar(c) {
+    const x = c.x, y = ROAD + 34;
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.beginPath(); ctx.ellipse(x + 70, y + 2, 75, 6, 0, 0, 7); ctx.fill();
+    const g = ctx.createLinearGradient(0, y - 50, 0, y);
+    g.addColorStop(0, '#b91c1c'); g.addColorStop(1, '#450a0a');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.moveTo(x, y - 14); ctx.lineTo(x + 4, y - 30); ctx.lineTo(x + 40, y - 34); ctx.lineTo(x + 62, y - 52);
+    ctx.lineTo(x + 104, y - 52); ctx.lineTo(x + 124, y - 34); ctx.lineTo(x + 144, y - 28); ctx.lineTo(x + 144, y - 12); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(148,163,184,.55)'; ctx.fillRect(x + 66, y - 48, 34, 13);
+    ctx.fillStyle = '#fde68a'; ctx.fillRect(x + 138, y - 26, 6, 5);
+    ctx.fillStyle = '#0a0a0c';
+    [x + 30, x + 116].forEach((wx) => { ctx.beginPath(); ctx.arc(wx, y - 8, 12, 0, 7); ctx.fill(); });
+    // traînée de vitesse
+    if (c.kmh > 100) { ctx.strokeStyle = 'rgba(255,255,255,.12)'; for (let i = 0; i < 3; i++) { ctx.beginPath(); ctx.moveTo(x - 10, y - 40 + i * 10); ctx.lineTo(x - 10 - c.kmh / 3, y - 40 + i * 10); ctx.stroke(); } }
+    ctx.fillStyle = '#e5e7eb'; ctx.font = '11px ui-monospace, monospace'; ctx.textAlign = 'center';
+    ctx.fillText(`${c.kmh} km/h`, x + 72, y - 62);
+    ctx.restore();
+}
+
+let last = performance.now();
+function frame(now) {
+    const dt = Math.min((now - last) / 1000, .05); last = now;
+    ctx.clearRect(0, 0, W, H);
+    const sky = ctx.createLinearGradient(0, 0, 0, ROAD);
+    sky.addColorStop(0, '#0d0b1a'); sky.addColorStop(1, '#22163a');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, W, ROAD);
+    for (let i = 0; i < 11; i++) {
+        const bx = i * 80 - 10, bh = 60 + (i * 53) % 110;
+        ctx.fillStyle = '#120f22'; ctx.fillRect(bx, ROAD - bh - 20, 60, bh + 20);
+        ctx.fillStyle = 'rgba(245,194,107,.18)';
+        for (let w = 10; w < bh; w += 18) ctx.fillRect(bx + 10 + (w % 30), ROAD - bh - 10 + w, 6, 4);
+    }
+    ctx.fillStyle = '#18181d'; ctx.fillRect(0, ROAD, W, H - ROAD);
+    ctx.fillStyle = '#26262d'; ctx.fillRect(0, ROAD, W, 8);
+    ctx.setLineDash([30, 22]); ctx.strokeStyle = 'rgba(255,255,255,.25)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(0, ROAD + 62); ctx.lineTo(W, ROAD + 62); ctx.stroke(); ctx.setLineDash([]);
+
+    drawRadar();
+
+    // véhicule
+    const c = state.car;
+    if (c) {
+        c.x += c.kmh * 2.2 * dt;
+        if (!c.checked && c.x + 140 >= RX - 140) {
+            c.checked = true;
+            if (!state.down) {
+                state.measured = c.kmh;
+                if (c.kmh > LIMIT) flashCar(c.kmh);
+            }
+        }
+        drawCar(c);
+        if (c.x > W + 40) { state.car = null; $('#drive').disabled = false; }
+    }
+
+    // bombe collante
+    if (state.sticky) {
+        const s = state.sticky; s.t += dt;
+        const k = Math.min(s.t / .7, 1);
+        const x = 80 + (RX - 80) * k, y = (ROAD - 20) + (-60) * k - Math.sin(Math.PI * k) * 120;
+        const px = k < 1 ? x : RX, py = k < 1 ? y : ROAD - 80;
+        ctx.fillStyle = '#2b2b2b'; ctx.fillRect(px - 6, py - 4, 12, 8);
+        if (k >= 1) { ctx.fillStyle = (now % 300) < 150 ? '#ef4444' : '#450a0a'; ctx.fillRect(px - 2, py - 2, 4, 4); }
+        if (s.t > 1.9) { state.sticky = null; explode(RX, ROAD - 80, 'Bombe collante'); }
+    }
+    // roquette
+    if (state.rocket) {
+        const r = state.rocket; r.x += 700 * dt;
+        ctx.fillStyle = '#9ca3af'; ctx.fillRect(r.x - 18, r.y - 3, 22, 6);
+        ctx.fillStyle = '#f97316'; ctx.beginPath(); ctx.moveTo(r.x - 18, r.y - 4); ctx.lineTo(r.x - 34 - Math.random() * 10, r.y); ctx.lineTo(r.x - 18, r.y + 4); ctx.fill();
+        state.particles.push({ x: r.x - 30, y: r.y, vx: -20, vy: -10, life: .8, c: 'rgba(160,160,170,.6)', r: 4 });
+        if (r.x >= RX - 20) { state.rocket = null; explode(RX, r.y, 'Roquette'); }
+    }
+
+    // particules
+    for (let i = state.particles.length - 1; i >= 0; i--) {
+        const p = state.particles[i];
+        p.vy += 260 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt * 1.2;
+        if (p.life <= 0) { state.particles.splice(i, 1); continue; }
+        ctx.globalAlpha = Math.max(p.life, 0); ctx.fillStyle = p.c;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    for (let i = state.fx.length - 1; i >= 0; i--) {
+        const f = state.fx[i]; f.t += dt;
+        if (f.t > f.d) { state.fx.splice(i, 1); continue; }
+        const k = f.t / f.d;
+        if (f.type === 'boom') {
+            const g = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, 140 * k + 20);
+            g.addColorStop(0, `rgba(255,240,180,${1 - k})`); g.addColorStop(.4, `rgba(249,115,22,${.8 * (1 - k)})`); g.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+        } else {
+            ctx.fillStyle = `rgba(255,255,255,${1 - k})`; ctx.font = 'bold 14px Segoe UI'; ctx.textAlign = 'center';
+            ctx.fillText(f.text, f.x, f.y - 30 * k);
+        }
+    }
+    if (state.flashT > 0) state.flashT = Math.max(0, state.flashT - dt * 3);
+    requestAnimationFrame(frame);
+}
+
+function flashCar(kmh) {
+    const over = kmh - LIMIT, amount = fineFor(over);
+    state.flashT = 1;
+    const f = $('#flash'); f.style.transition = 'none'; f.style.opacity = .85;
+    requestAnimationFrame(() => { f.style.transition = 'opacity .4s'; f.style.opacity = 0; });
+    state.count++; state.sum += amount; state.bank -= amount;
+    $('#count').textContent = state.count;
+    $('#sum').textContent = state.sum.toLocaleString('fr-FR') + ' $';
+    $('#bank').textContent = state.bank.toLocaleString('fr-FR') + ' $';
+    document.querySelectorAll('#fines tr').forEach((tr) => tr.classList.toggle('hit', tr.dataset.i == FINES.findIndex(([o]) => over <= o)));
+    notify('Radar automatique', `Une amende pour vitesse excessive de ${amount.toLocaleString('fr-FR')} $ vous a été distribuée`, `${kmh} km/h (limite ${LIMIT} km/h) · 46ORP123`);
+    const row = document.createElement('div');
+    row.innerHTML = `<span>${kmh} km/h · +${over}</span><b>-${amount.toLocaleString('fr-FR')} $</b>`;
+    $('#log').prepend(row);
+}
+
+function explode(x, y, what) {
+    state.fx.push({ type: 'boom', x, y, t: 0, d: .9 });
+    burst(x, y, ['#fde68a', '#f97316', '#ef4444', '#6b7280'], 80, 320);
+    if (state.down) return;
+    state.down = true; state.measured = null;
+    $('#hpTxt').textContent = 'Détruit';
+    $('#hpBar').style.width = '0';
+    $('#hpStat').classList.add('dead');
+    $('#status').textContent = `Détruit (${what}) — réinstallation dans 30 min`;
+    $('#repair').disabled = false;
+    notify('Radar détruit', `${what} : le radar est hors service.`, 'Réinstallation automatique dans 30 minutes', true);
+}
+
+$('#drive').onclick = () => {
+    if (state.car) return;
+    state.car = { x: -160, kmh: Number($('#spd').value), checked: false };
+    state.measured = null;
+    $('#drive').disabled = true;
+};
+$('#shoot').onclick = () => {
+    if (state.down) return;
+    for (let i = 0; i < 5; i++) setTimeout(() => {
+        burst(RX - 10 + Math.random() * 30, ROAD - 190 + Math.random() * 40, ['#fde68a', '#fff'], 8, 120);
+        state.fx.push({ type: 'txt', text: 'Aucun dégât', x: RX, y: ROAD - 210, t: 0, d: .8 });
+    }, i * 140);
+};
+$('#ram').onclick = () => {
+    if (state.down) return;
+    burst(RX, ROAD - 20, ['#9ca3af', '#fde68a'], 24, 160);
+    state.fx.push({ type: 'txt', text: 'Le véhicule rebondit — aucun dégât', x: RX, y: ROAD - 40, t: 0, d: 1.2 });
+};
+$('#sticky').onclick = () => { if (!state.down && !state.sticky) state.sticky = { t: 0 }; };
+$('#rpg').onclick = () => { if (!state.down && !state.rocket) state.rocket = { x: -20, y: ROAD - 170 }; };
+$('#repair').onclick = () => {
+    state.down = false;
+    $('#hpTxt').textContent = 'Indestructible';
+    $('#hpBar').style.width = '100%';
+    $('#hpStat').classList.remove('dead');
+    $('#status').textContent = 'Radar réinstallé';
+    $('#repair').disabled = true;
+    notify('Radar réinstallé', 'Le radar est de nouveau opérationnel.', '', true);
+};
+requestAnimationFrame(frame);
+
+// ─── Script Lua ───────────────────────────────────────────────────────
+const names = Object.keys(FILES);
+let current = names[0];
+function highlight(src) {
+    const esc = src.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return esc.replace(/(--\[\[[\s\S]*?\]\]|--[^\n]*)|('(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`[^`\n]*`)|\b(local|function|end|if|then|else|elseif|for|in|do|while|return|not|and|or|nil|true|false|repeat|until|break)\b|\b(\d+(?:\.\d+)?)\b/g,
+        (m, c, s, k, n) => c ? `<span class="tok-c">${c}</span>` : s ? `<span class="tok-s">${s}</span>` : k ? `<span class="tok-k">${k}</span>` : `<span class="tok-n">${n}</span>`);
+}
+function showFile(name) {
+    current = name;
+    $('#files').innerHTML = names.map((n) => `<button data-f="${n}" class="${n === name ? 'on' : ''}">${n}</button>`).join('');
+    $('#code').innerHTML = highlight(FILES[name]);
+}
+$('#files').onclick = (e) => { const b = e.target.closest('button'); if (b) showFile(b.dataset.f); };
+function download(name) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([FILES[name]], { type: 'text/plain' }));
+    a.download = name; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+$('#copy').onclick = async () => {
+    try { await navigator.clipboard.writeText(FILES[current]); $('#copy').textContent = 'Copié ✓'; }
+    catch { $('#copy').textContent = 'Copie impossible'; }
+    setTimeout(() => $('#copy').textContent = 'Copier', 1500);
+};
+$('#dl').onclick = () => download(current);
+$('#dlAll').onclick = () => names.forEach((n, i) => setTimeout(() => download(n), i * 250));
+showFile(current);
+</script>
+</body>
+</html>
