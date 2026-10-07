@@ -97,19 +97,56 @@ svg.scene { width: 100%; height: auto; display: block; border-radius: 12px; }
         <linearGradient id="jacket" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2e3440"/><stop offset="1" stop-color="#1c2028"/></linearGradient>
         <linearGradient id="carPaint" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a4a6b"/><stop offset=".55" stop-color="#1e2840"/><stop offset="1" stop-color="#121826"/></linearGradient>
 
-        <!-- Traceur : petit boîtier noir aimanté, LED rouge minuscule -->
+        <!-- Traceur : boîtier ABS noir mat type « GT-210 », vis Torx, joint, base magnétique -->
+        <filter id="grain" x="0" y="0" width="100%" height="100%">
+            <feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="4" result="n"/>
+            <feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .03 0" result="g"/>
+            <feComposite in="g" in2="SourceGraphic" operator="in" result="gi"/>
+            <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="gi"/></feMerge>
+        </filter>
+        <linearGradient id="abs" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#34363b"/><stop offset=".08" stop-color="#25272b"/>
+            <stop offset=".6" stop-color="#16171a"/><stop offset="1" stop-color="#0b0c0e"/>
+        </linearGradient>
+        <linearGradient id="absSide" x1="0" x2="1">
+            <stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset=".12" stop-color="#000" stop-opacity="0"/>
+            <stop offset=".88" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".5"/>
+        </linearGradient>
+        <linearGradient id="brushed" x1="0" x2="1">
+            <stop offset="0" stop-color="#3d4148"/><stop offset=".2" stop-color="#8d939c"/><stop offset=".45" stop-color="#5d626a"/>
+            <stop offset=".7" stop-color="#a6acb4"/><stop offset="1" stop-color="#3d4148"/>
+        </linearGradient>
+        <radialGradient id="screw"><stop offset="0" stop-color="#6b7078"/><stop offset=".7" stop-color="#2a2c30"/><stop offset="1" stop-color="#111"/></radialGradient>
         <symbol id="tracker" viewBox="0 0 60 36">
-            <rect x="8" y="27" width="44" height="6" rx="2" fill="url(#trkMag)"/>
-            <rect x="4" y="6" width="52" height="23" rx="6" fill="url(#trkShell)" stroke="#000" stroke-width=".8"/>
-            <rect x="6" y="7.5" width="48" height="3" rx="1.5" fill="#fff" opacity=".08"/>
-            <path d="M12 21 h18" stroke="#2a2a33" stroke-width="2" stroke-linecap="round"/>
-            <path d="M12 16 h12" stroke="#2a2a33" stroke-width="2" stroke-linecap="round"/>
-            <circle cx="46" cy="17" r="1.6" fill="#3a0a10"/>
+            <ellipse cx="30" cy="34.2" rx="24" ry="1.4" fill="#000" opacity=".45"/>
+            <!-- base magnétique en acier brossé -->
+            <path d="M9 27 H51 L50 32.6 Q50 33.4 49 33.4 H11 Q10 33.4 10 32.6 Z" fill="url(#brushed)"/>
+            <path d="M10 30.2 H50" stroke="#000" stroke-opacity=".35" stroke-width=".4"/>
+            <!-- boîtier -->
+            <path d="M7 9 Q7 5.5 10.5 5.5 H49.5 Q53 5.5 53 9 V25.5 Q53 28.5 50 28.5 H10 Q7 28.5 7 25.5 Z" fill="url(#abs)" filter="url(#grain)"/>
+            <path d="M7 9 Q7 5.5 10.5 5.5 H49.5 Q53 5.5 53 9 V25.5 Q53 28.5 50 28.5 H10 Q7 28.5 7 25.5 Z" fill="url(#absSide)"/>
+            <path d="M10.5 5.9 H49.5" stroke="#fff" stroke-opacity=".22" stroke-width=".5"/>
+            <!-- joint d'étanchéité -->
+            <path d="M7.2 23 H52.8" stroke="#050506" stroke-width="1.1"/>
+            <path d="M7.2 23.8 H52.8" stroke="#fff" stroke-opacity=".07" stroke-width=".4"/>
+            <!-- vis Torx -->
+            <g fill="url(#screw)"><circle cx="10.6" cy="9" r="1.25"/><circle cx="49.4" cy="9" r="1.25"/><circle cx="10.6" cy="25.6" r="1.1"/><circle cx="49.4" cy="25.6" r="1.1"/></g>
+            <g stroke="#0a0a0a" stroke-width=".35"><path d="M10 9h1.2M10.6 8.4v1.2"/><path d="M48.8 9h1.2M49.4 8.4v1.2"/></g>
+            <!-- étiquette sérigraphiée -->
+            <rect x="14" y="9.3" width="21" height="9.6" rx=".8" fill="#0f1012" stroke="#2c2e33" stroke-width=".3"/>
+            <text x="15.3" y="13.5" font-family="Arial, sans-serif" font-weight="700" font-size="3.4" fill="#9aa0a8" letter-spacing=".2">GT-210</text>
+            <text x="15.3" y="17.4" font-family="Arial, sans-serif" font-size="1.9" fill="#5c6169" letter-spacing=".15">GNSS · LTE-M · IP67</text>
+            <!-- grille d'antenne -->
+            <g stroke="#060607" stroke-width=".7" stroke-linecap="round"><path d="M38 11v7"/><path d="M40 11v7"/><path d="M42 11v7"/></g>
+            <!-- logement de la LED -->
+            <circle cx="46" cy="17" r="2.3" fill="#050506"/>
+            <circle cx="46" cy="17" r="2.3" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width=".3"/>
+            <circle cx="46" cy="17" r="1.2" fill="#2a0408"/>
         </symbol>
         <!-- LED du traceur, alignée sur le symbole (cx 46 / cy 17 en unités 60×36) -->
         <symbol id="trackerLed" viewBox="0 0 60 36">
             <circle class="halo" cx="46" cy="17" r="9" fill="url(#ledHalo)"/>
-            <circle class="led" cx="46" cy="17" r="1.6" fill="#ff1f3d"/>
+            <circle class="led" cx="46" cy="17" r="1.1" fill="#ff1f3d"/>
         </symbol>
 
         <!-- Tablette durcie -->

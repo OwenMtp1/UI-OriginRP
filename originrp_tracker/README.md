@@ -44,4 +44,4 @@ Branchement inventaire / identité dans `sv_config.lua`. Les propriétaires et n
 
 Icônes d'inventaire : copier `images/gps_tracker.png` et `images/gps_tablet.png` dans `ox_inventory/web/images/`.
 
-Aperçus : `items.html` (visuels des items : inventaire, en main, sur une personne / une voiture) et `preview.html` (simulation interactive).
+Aperçus : `tablet-preview.html` (interface de la tablette, jouable), `items.html` (visuels des items : inventaire, en main, sur une personne / une voiture) et `preview.html` (simulation interactive).
