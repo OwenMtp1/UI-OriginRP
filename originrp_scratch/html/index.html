@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>SA Lottery</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ─── Écran de la borne ─── -->
+    <div id="shop" class="hidden">
+        <div class="kiosk">
+            <div class="kiosk-head">
+                <div class="logo"><span class="star">★</span> SA LOTTERY</div>
+                <div class="tag">GRATTE &amp; GAGNE</div>
+                <button class="x" data-close>✕</button>
+            </div>
+
+            <div class="kiosk-body">
+                <div class="preview-ticket">
+                    <div class="mini-ticket">
+                        <b>CASH<br>ROYALE</b>
+                        <i></i><i></i><i></i>
+                        <small>Jusqu'à 1 500 $</small>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="line"><span>Prix d'un ticket</span><b id="price">500 $</b></div>
+
+                    <div class="qty">
+                        <button class="step" data-step="-1">−</button>
+                        <div class="qty-num"><b id="qty">1</b><span>ticket(s)</span></div>
+                        <button class="step" data-step="1">+</button>
+                    </div>
+                    <input type="range" id="slider" min="1" max="40" value="1">
+                    <div class="chips" id="chips">
+                        <button data-q="1">1</button><button data-q="5">5</button>
+                        <button data-q="10">10</button><button data-q="20">20</button>
+                        <button data-q="max">MAX</button>
+                    </div>
+
+                    <div class="total"><span>Total</span><b id="total">500 $</b></div>
+                    <div class="line small"><span>Restant aujourd'hui</span><b id="remaining">40 / 40</b></div>
+                    <div class="line small"><span>Liquide sur toi</span><b id="money">0 $</b></div>
+
+                    <button class="buy" id="buy">ACHETER</button>
+                    <p class="msg" id="msg"></p>
+                </div>
+            </div>
+            <div class="slot"><div class="printed" id="printed"></div></div>
+            <p class="legal">Jeu interdit aux mineurs · Limite de 40 tickets par jour · San Andreas Lottery Commission</p>
+        </div>
+    </div>
+
+    <!-- ─── Ticket à gratter ─── -->
+    <div id="ticket" class="hidden">
+        <div class="ticket">
+            <div class="burst"></div>
+            <div class="t-top">
+                <div class="brand">SAN ANDREAS LOTTERY</div>
+                <div class="t-price">500 $</div>
+            </div>
+            <h1 class="title">CASH <span>ROYALE</span></h1>
+            <p class="rule">Grattez les 3 cases. Chaque montant découvert est gagné !</p>
+
+            <div class="cases" id="cases">
+                <div class="case"><div class="value"></div><canvas></canvas></div>
+                <div class="case"><div class="value"></div><canvas></canvas></div>
+                <div class="case"><div class="value"></div><canvas></canvas></div>
+            </div>
+
+            <div class="t-bottom">
+                <div class="gains">GAINS : 50 $ · 100 $ · 200 $ · 500 $</div>
+                <div class="barcode" id="barcode"></div>
+            </div>
+            <div class="result hidden" id="result"></div>
+        </div>
+        <div class="ticket-actions">
+            <button id="scratchAll">Tout gratter</button>
+            <button id="closeTicket" data-close>Fermer</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
