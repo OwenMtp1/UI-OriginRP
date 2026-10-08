@@ -61,6 +61,18 @@ end
 
 -- ─── Tirage ────────────────────────────────────────────────────────────────
 
+-- Montant d'une case gagnante, selon les chances de Config.Amounts
+local function pickAmount()
+    local sum = 0
+    for _, a in ipairs(Config.Amounts) do sum = sum + a.chance end
+    local r = math.random() * sum
+    for _, a in ipairs(Config.Amounts) do
+        r = r - a.chance
+        if r <= 0 then return a.amount end
+    end
+    return Config.Amounts[#Config.Amounts].amount
+end
+
 local function roll()
     local cases = { 0, 0, 0 }
     if math.random(1, 100) > Config.WinChance then return cases, 0 end
@@ -80,7 +92,7 @@ local function roll()
 
     local total = 0
     for i = 1, count do
-        local amount = Config.Amounts[math.random(1, #Config.Amounts)]
+        local amount = pickAmount()
         cases[slots[i]] = amount
         total = total + amount
     end

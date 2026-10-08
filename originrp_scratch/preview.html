@@ -209,12 +209,17 @@ table.odds td:last-child, table.odds th:last-child { text-align:right; font-vari
         <tr><td>1 case gagnante (60 % × 50 %)</td><td>30 %</td></tr>
         <tr><td>2 cases gagnantes (60 % × 30 %)</td><td>18 %</td></tr>
         <tr><td>3 cases gagnantes (60 % × 20 %)</td><td>12 %</td></tr>
-        <tr><td>Montant d'une case gagnante : 50 / 100 / 200 / 500 $</td><td>25 % chacun</td></tr>
+        <tr><th>Montant d'une case gagnante</th><th>Chance</th></tr>
+        <tr><td>100 $</td><td>45 %</td></tr>
+        <tr><td>200 $</td><td>26 %</td></tr>
+        <tr><td>500 $</td><td>20 %</td></tr>
+        <tr><td>1 000 $</td><td>8 %</td></tr>
+        <tr><td>2 500 $</td><td>1 %</td></tr>
       </table>
       <div class="kpis">
-        <div><small>Gain moyen par ticket</small><b>216,75 $</b></div>
-        <div><small>Redistribué</small><b>43,4 %</b></div>
-        <div><small>Gain max</small><b>1 500 $</b></div>
+        <div><small>Gain moyen par ticket</small><b>≈ 308 $</b></div>
+        <div><small>Redistribué</small><b>≈ 62 %</b></div>
+        <div><small>Gain max</small><b>7 500 $</b></div>
       </div>
       <div class="row"><button class="btn gold" id="simulate">Simuler 10 000 tickets</button><span id="simTxt" class="note" style="margin:0"></span></div>
       <div class="bars" id="bars"></div>
@@ -237,7 +242,7 @@ table.odds td:last-child, table.odds th:last-child { text-align:right; font-vari
                     <div class="mini-ticket">
                         <b>CASH<br>ROYALE</b>
                         <i></i><i></i><i></i>
-                        <small>Jusqu'à 1 500 $</small>
+                        <small>Jusqu'à 7 500 $</small>
                     </div>
                 </div>
 
@@ -287,7 +292,7 @@ table.odds td:last-child, table.odds th:last-child { text-align:right; font-vari
             </div>
 
             <div class="t-bottom">
-                <div class="gains">GAINS : 50 $ · 100 $ · 200 $ · 500 $</div>
+                <div class="gains">GAINS : 100 $ · 200 $ · 500 $ · 1 000 $ · 2 500 $</div>
                 <div class="barcode" id="barcode"></div>
             </div>
             <div class="result hidden" id="result"></div>
@@ -314,14 +319,15 @@ table.odds td:last-child, table.odds th:last-child { text-align:right; font-vari
 // ─── Serveur simulé (mêmes règles que server.lua) ───
 window.GetParentResourceName = () => 'originrp_scratch';
 const SIM = { price: 500, limit: 40, money: 50000, bought: 0, tickets: 0, owed: 0, won: 0 };
-const AMOUNTS = [50, 100, 200, 500];
+const AMOUNTS = [[100, 45], [200, 26], [500, 20], [1000, 8], [2500, 1]];
+function pickAmount() { let r = Math.random() * 100; for (const [a, c] of AMOUNTS) { r -= c; if (r <= 0) return a; } return 2500; }
 function roll() {
     const cases = [0, 0, 0];
     if (Math.random() * 100 >= 60) return cases;
     const r = Math.random() * 100;
     const n = r < 50 ? 1 : r < 80 ? 2 : 3;
     const slots = [0, 1, 2].sort(() => Math.random() - .5);
-    for (let i = 0; i < n; i++) cases[slots[i]] = AMOUNTS[Math.floor(Math.random() * 4)];
+    for (let i = 0; i < n; i++) cases[slots[i]] = pickAmount();
     return cases;
 }
 const nui = (msg) => window.dispatchEvent(new MessageEvent('message', { data: msg }));
@@ -611,7 +617,7 @@ window.addEventListener('message', ({ data }) => {
         g.strokeStyle = '#fff'; g.lineWidth = 10;
         g.strokeText('CASH', w / 2, h * .38); g.fillText('CASH', w / 2, h * .38);
         g.strokeText('ROYALE', w / 2, h * .5); g.fillText('ROYALE', w / 2, h * .5);
-        g.fillStyle = '#1f6b3a'; g.font = '900 54px Arial'; g.fillText('JUSQU\'À 1 500 $', w / 2, h * .6);
+        g.fillStyle = '#1f6b3a'; g.font = '900 54px Arial'; g.fillText('JUSQU\'À 7 500 $', w / 2, h * .6);
         g.fillStyle = '#1f6b3a'; g.fillRect(0, h * .8, w, h * .2);
         speckle(g, w, h, 20000, .07); grime(g, w, h);
     });
@@ -884,11 +890,11 @@ document.querySelectorAll('[data-tod]').forEach((b) => b.onclick = () => kiosk3d
 document.getElementById('pause').onclick = (e) => { e.target.textContent = kiosk3d.toggleAuto() ? 'Pause rotation' : 'Reprendre la rotation'; };
 document.getElementById('resetDay').onclick = () => { SIM.bought = 0; renderInv(); };
 document.getElementById('simulate').onclick = () => {
-    const N = 10000, buckets = [['0 $', 0], ['50 – 200 $', 0], ['250 – 500 $', 0], ['550 – 1 000 $', 0], ['1 050 – 1 500 $', 0]];
+    const N = 10000, buckets = [['0 $', 0], ['100 – 400 $', 0], ['500 $ (remboursé)', 0], ['600 – 2 000 $', 0], ['2 100 – 7 500 $', 0]];
     let sum = 0, wins = 0;
     for (let i = 0; i < N; i++) {
         const t = roll().reduce((a, b) => a + b, 0); sum += t; if (t > 0) wins++;
-        const b = t === 0 ? 0 : t <= 200 ? 1 : t <= 500 ? 2 : t <= 1000 ? 3 : 4; buckets[b][1]++;
+        const b = t === 0 ? 0 : t < 500 ? 1 : t === 500 ? 2 : t <= 2000 ? 3 : 4; buckets[b][1]++;
     }
     document.getElementById('simTxt').textContent = `${(wins / N * 100).toFixed(1)} % gagnants · gain moyen ${Math.round(sum / N)} $ · mise ${fmtP(N * 500)} → gains ${fmtP(sum)}`;
     document.getElementById('bars').innerHTML = buckets.map(([l, c]) => `<div class="bar"><span>${l}</span><i style="width:0" data-w="${c / N * 100}"></i><span>${(c / N * 100).toFixed(1)} %</span></div>`).join('');

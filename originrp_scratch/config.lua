@@ -11,8 +11,15 @@ Config.WinningCases = {        -- parmi les tickets gagnants : nombre de cases g
     { cases = 2, chance = 30 },
     { cases = 3, chance = 20 },
 }
--- Montant d'une case gagnante : chaque montant a la même chance
-Config.Amounts = { 50, 100, 200, 500 }
+-- Montant d'une case gagnante et sa chance (en %, total = 100).
+-- Redistribution moyenne : environ 62 % de la mise (308 $ pour un ticket à 500 $).
+Config.Amounts = {
+    { amount = 100,  chance = 45 },
+    { amount = 200,  chance = 26 },
+    { amount = 500,  chance = 20 },
+    { amount = 1000, chance = 8 },
+    { amount = 2500, chance = 1 },
+}
 
 -- Bornes : coords = position au sol, w = orientation (la face avant regarde dans cette direction)
 -- Positions d'exemple devant des supérettes : ajuste-les sur ton serveur.
