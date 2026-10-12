@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<CMapTypes>
+  <archetypes>
+    <Item type="CBaseArchetypeDef">
+      <lodDist value="80" />
+      <flags value="0" />
+      <specialAttribute value="0" />
+      <bbMin x="-0.29500002" y="-0.19" z="-0.0020000022" />
+      <bbMax x="0.29500002" y="0.209" z="0.40399998" />
+      <bsCentre x="0.0" y="0.009500004" z="0.20099999" />
+      <bsRadius value="0.40991983" />
+      <hdTextureDist value="100" />
+      <name>orp_medbag_closed</name>
+      <textureDictionary>orp_medbag_closed</textureDictionary>
+      <physicsDictionary>orp_medbag_closed</physicsDictionary>
+      <assetType>ASSET_TYPE_DRAWABLE</assetType>
+      <assetName>orp_medbag_closed</assetName>
+    </Item>
+    <Item type="CBaseArchetypeDef">
+      <lodDist value="80" />
+      <flags value="0" />
+      <specialAttribute value="0" />
+      <bbMin x="-0.29500002" y="-0.27319634" z="-0.04292479" />
+      <bbMax x="0.29500002" y="0.209" z="0.4" />
+      <bsCentre x="0.0" y="-0.032098167" z="0.1785376" />
+      <bsRadius value="0.4406801" />
+      <hdTextureDist value="100" />
+      <name>orp_medbag_open</name>
+      <textureDictionary>orp_medbag_open</textureDictionary>
+      <physicsDictionary>orp_medbag_open</physicsDictionary>
+      <assetType>ASSET_TYPE_DRAWABLE</assetType>
+      <assetName>orp_medbag_open</assetName>
+    </Item>
+  </archetypes>
+  <name>orp_medbag</name>
+</CMapTypes>

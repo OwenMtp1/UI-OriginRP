@@ -19,3 +19,6 @@ server_scripts {
     'sv_config.lua',
     'server.lua',
 }
+
+-- Sac d'intervention personnalisé (orp_medbag_closed / orp_medbag_open)
+data_file 'DLC_ITYP_REQUEST' 'stream/orp_medbag.ytyp'

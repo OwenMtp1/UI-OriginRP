@@ -25,10 +25,18 @@ Config.MedicOffset = vector3(-0.6, 0.05, 0.0)
 -- Position du sac médical posé au sol
 Config.BagOffset = vector3(-0.55, -0.55, 0.0)
 
--- Accessoires. Vérifie les noms de modèles sur ton serveur (un modèle inconnu est simplement ignoré).
+-- Accessoires. Sac d'intervention personnalisé (dossier stream/) : version fermée et ouverte.
+-- Si les modèles ne sont pas installés, le sac GTA de secours est utilisé.
 Config.Props = {
-    bag = { model = `xm_prop_x17_bag_med_01a`, fallback = `prop_ld_health_pack` },
+    bag = {
+        closed = `orp_medbag_closed`,
+        open = `orp_medbag_open`,
+        fallback = `xm_prop_x17_bag_med_01a`,
+        openAt = 0.3,   -- moment (0-1) de l'étape « check » où la main ouvre le sac
+    },
+    -- position du sac dans la main droite (sac GTA de secours / sac personnalisé : poignée en haut, origine au fond)
     hand = { bone = 57005, offset = vector3(0.36, 0.0, -0.04), rotation = vector3(-90.0, 0.0, 90.0) },
+    handCustom = { bone = 57005, offset = vector3(0.42, 0.0, 0.0), rotation = vector3(0.0, 280.0, 53.0) },  -- à affiner en jeu
 }
 
 -- Animations GTA

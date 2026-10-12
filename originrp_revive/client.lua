@@ -51,10 +51,8 @@ end
 
 -- ─── Sac médical ───────────────────────────────────────────────────────────
 
-local function bagModel()
-    local p = Config.Props.bag
-    if IsModelInCdimage(p.model) then return p.model end
-    return p.fallback
+local function custom()
+    return IsModelInCdimage(Config.Props.bag.closed) and IsModelInCdimage(Config.Props.bag.open)
 end
 
 local function deleteBag()
@@ -62,24 +60,48 @@ local function deleteBag()
     bag = nil
 end
 
-local function spawnBagInHand(ped)
-    local model = bagModel()
-    if not lib.requestModel(model, 3000) then return end
-    bag = CreateObject(model, 0.0, 0.0, 0.0, true, true, false)
-    SetModelAsNoLongerNeeded(model)
-    local h = Config.Props.hand
-    AttachEntityToEntity(bag, ped, GetPedBoneIndex(ped, h.bone), h.offset.x, h.offset.y, h.offset.z,
+local function attachToHand(ped, obj)
+    local h = custom() and Config.Props.handCustom or Config.Props.hand
+    AttachEntityToEntity(obj, ped, GetPedBoneIndex(ped, h.bone), h.offset.x, h.offset.y, h.offset.z,
         h.rotation.x, h.rotation.y, h.rotation.z, true, true, false, true, 1, true)
 end
 
-local function placeBag(patient)
+local function createBag(model, coords)
+    if not lib.requestModel(model, 3000) then return nil end
+    local obj = CreateObject(model, coords.x, coords.y, coords.z, true, true, false)
+    SetModelAsNoLongerNeeded(model)
+    return obj
+end
+
+local function spawnBagInHand(ped)
+    local model = custom() and Config.Props.bag.closed or Config.Props.bag.fallback
+    bag = createBag(model, GetEntityCoords(ped))
+    if bag then attachToHand(ped, bag) end
+end
+
+-- Le sac est posé à côté de la victime, la face avant (poche, fermeture) tournée vers le secouriste
+local function placeBag(patient, medic)
     if not bag then return end
     DetachEntity(bag, true, false)
     local p = GetOffsetFromEntityInWorldCoords(patient, Config.BagOffset.x, Config.BagOffset.y, Config.BagOffset.z)
+    local m = GetEntityCoords(medic)
     SetEntityCoords(bag, p.x, p.y, p.z, false, false, false, false)
-    SetEntityHeading(bag, GetEntityHeading(patient) + 90.0)
+    SetEntityHeading(bag, GetHeadingFromVector_2d(m.x - p.x, m.y - p.y))
     PlaceObjectOnGroundProperly(bag)
     FreezeEntityPosition(bag, true)
+end
+
+-- Remplace le sac posé par une autre version (fermé ↔ ouvert) au même endroit
+local function swapBag(model)
+    if not bag or not custom() then return end
+    local c, h = GetEntityCoords(bag), GetEntityHeading(bag)
+    local obj = createBag(model, c)
+    if not obj then return end
+    SetEntityCoords(obj, c.x, c.y, c.z, false, false, false, false)
+    SetEntityHeading(obj, h)
+    FreezeEntityPosition(obj, true)
+    DeleteEntity(bag)
+    bag = obj
 end
 
 -- ─── Déroulé côté secouriste ───────────────────────────────────────────────
@@ -146,14 +168,17 @@ local function revive(patient)
     step('kneel')
     local placed = false
     if not waitStep(S.kneel, function(k)
-        if not placed and k > 0.55 then placed = true placeBag(patient) end
+        if not placed and k > 0.55 then placed = true placeBag(patient, ped) end
     end) then return abort(ped) end
-    if not placed then placeBag(patient) end
+    if not placed then placeBag(patient, ped) end
 
-    -- 3. ouvrir le sac et prendre le pouls
+    -- 3. ouvrir le sac (quand la main l'atteint) et prendre le pouls
     playAnim(ped, A.check, 1)
     step('check')
-    if not waitStep(S.check) then return abort(ped) end
+    local opened = false
+    if not waitStep(S.check, function(k)
+        if not opened and k > Config.Props.bag.openAt then opened = true swapBag(Config.Props.bag.open) end
+    end) then return abort(ped) end
 
     -- 4. mains en position, puis massage cardiaque
     playAnim(ped, A.medicIntro, 0)
@@ -172,8 +197,14 @@ local function revive(patient)
     TriggerServerEvent('originrp_revive:finish')
     lib.hideTextUI()
     stopCam()
+    -- le secouriste referme et reprend son sac en se relevant
+    if custom() and bag then
+        swapBag(Config.Props.bag.closed)
+        FreezeEntityPosition(bag, false)
+        attachToHand(ped, bag)
+    end
     playAnim(ped, A.kneelExit, 0, 1200)
-    SetTimeout(700, deleteBag)
+    SetTimeout(1200, deleteBag)
     running = false
 end
 
