@@ -374,9 +374,9 @@ code { color:var(--cyan); }
         relief: pose({ pos: [.56, .5, KZ], rot: [0, FACE, 0], spine: [-.25, 0, 0], neck: [.2, 0, 0], lSh: [-.4, 0, .15], lEl: [-.7, 0, 0], rSh: [-.75, 0, -.1], rEl: [-.2, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
         support: pose({ pos: [.56, .5, KZ], rot: [0, FACE, 0], spine: [-.3, .2, 0], neck: [.25, -.1, 0], lSh: [-.4, 0, .15], lEl: [-.7, 0, 0], rSh: [-1.0, 0, -.35], rEl: [-.35, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
         // patient
-        lying: pose({ pos: [0, .12, 0], rot: [-PI / 2, PI, 0], neck: [0, .5, 0], lSh: [0, 0, .28], lEl: [-.2, 0, 0], rSh: [0, 0, -.22], rEl: [-.1, 0, 0], lHip: [0, 0, .08], rHip: [-.05, 0, -.1], rKn: [.1, 0, 0] }),
-        lyingAwake: pose({ pos: [0, .12, 0], rot: [-PI / 2, PI, 0], neck: [-.25, .2, 0], lSh: [0, 0, .28], lEl: [-.4, 0, 0], rSh: [-.2, 0, -.3], rEl: [-.6, 0, 0], lHip: [-.15, 0, .08], lKn: [.3, 0, 0], rHip: [-.05, 0, -.1], rKn: [.1, 0, 0] }),
-        sitting: pose({ pos: [0, .15, .02], rot: [-.35, PI, 0], spine: [.15, 0, 0], neck: [-.1, .35, 0], lSh: [.55, 0, .25], lEl: [0, 0, 0], rSh: [.5, 0, -.25], rEl: [0, 0, 0], lHip: [-1.25, 0, .1], lKn: [.6, 0, 0], rHip: [-1.3, 0, -.12], rKn: [.25, 0, 0] }),
+        lying: pose({ pos: [0, .12, 0], rot: [-PI / 2, 0, 0], neck: [0, .5, 0], lSh: [0, 0, .28], lEl: [-.2, 0, 0], rSh: [0, 0, -.22], rEl: [-.1, 0, 0], lHip: [0, 0, .08], rHip: [-.05, 0, -.1], rKn: [.1, 0, 0] }),
+        lyingAwake: pose({ pos: [0, .12, 0], rot: [-PI / 2, 0, 0], neck: [-.25, .2, 0], lSh: [0, 0, .28], lEl: [-.4, 0, 0], rSh: [-.2, 0, -.3], rEl: [-.6, 0, 0], lHip: [-.15, 0, .08], lKn: [.3, 0, 0], rHip: [-.05, 0, -.1], rKn: [.1, 0, 0] }),
+        sitting: pose({ pos: [0, .15, .02], rot: [-.35, 0, 0], spine: [.15, 0, 0], neck: [-.1, .35, 0], lSh: [.55, 0, .25], lEl: [0, 0, 0], rSh: [.5, 0, -.25], rEl: [0, 0, 0], lHip: [-1.25, 0, .1], lKn: [.6, 0, 0], rHip: [-1.3, 0, -.12], rKn: [.25, 0, 0] }),
     };
 
     const MEDIC = [
@@ -401,7 +401,7 @@ code { color:var(--cyan); }
 
     const host = document.getElementById('viewer');
     const renderer = makeRenderer(host);
-    renderer.toneMappingExposure = .95;
+    renderer.toneMappingExposure = 1.0;
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0a0b14);
     scene.fog = new THREE.FogExp2(0x0a0b14, .045);
@@ -415,7 +415,7 @@ code { color:var(--cyan); }
     scene.add(curb);
 
     // ambulance en arrière-plan
-    const amb = new THREE.Group(); amb.position.set(-3.6, 0, -1.2); amb.rotation.y = .35; scene.add(amb);
+    const amb = new THREE.Group(); amb.position.set(-5.4, 0, -2.8); amb.rotation.y = .35; scene.add(amb);
     const white = new THREE.MeshStandardMaterial({ color: 0xf2f2ee, roughness: .45, metalness: .2 });
     const ambSide = new THREE.MeshStandardMaterial({ map: ambTex(), roughness: .45, metalness: .15 });
     const box = mesh(new THREE.BoxGeometry(2.2, 2.1, 3.4), [ambSide, ambSide, white, white, white, white], 0, 1.45, -.6, amb);
@@ -448,12 +448,12 @@ code { color:var(--cyan); }
     moon.position.set(-4, 8, 5); moon.castShadow = true; moon.shadow.mapSize.set(2048, 2048);
     Object.assign(moon.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5 });
     scene.add(moon);
-    const street = new THREE.SpotLight(0xffb46b, 18, 14, .75, .55, 1.4);
+    const street = new THREE.SpotLight(0xffb46b, 2.6, 14, .75, .55, 1.4);
     street.position.set(1.6, 6, 1.2); street.target.position.set(.2, 0, -.3); street.castShadow = true; street.shadow.mapSize.set(1024, 1024);
     scene.add(street, street.target);
     const fill = new THREE.PointLight(0xffe6c8, 1.0, 6, 2); fill.position.set(-1.2, 1.6, 1.2); scene.add(fill);
-    const strobeR = new THREE.PointLight(0xff2020, 0, 10, 1.6); strobeR.position.set(-3.1, 2.7, .2); scene.add(strobeR);
-    const strobeB = new THREE.PointLight(0x2050ff, 0, 10, 1.6); strobeB.position.set(-2.4, 2.7, .5); scene.add(strobeB);
+    const strobeR = new THREE.PointLight(0xff2020, 0, 10, 1.6); strobeR.position.set(-4.9, 2.7, -1.4); scene.add(strobeR);
+    const strobeB = new THREE.PointLight(0x2050ff, 0, 10, 1.6); strobeB.position.set(-4.2, 2.7, -1.1); scene.add(strobeB);
     const heartLight = new THREE.PointLight(0x4ade80, 0, 2.2, 2); heartLight.position.set(0, .5, KZ); scene.add(heartLight);
 
     // caméra : plans cinéma + mode libre
@@ -544,7 +544,7 @@ code { color:var(--cyan); }
 
         // lumières
         const s = Math.floor(performance.now() / 110) % 4;
-        strobeR.intensity = s === 0 || s === 1 ? 7 : 0; strobeB.intensity = s === 2 || s === 3 ? 7 : 0;
+        strobeR.intensity = s === 0 || s === 1 ? 2.2 : 0; strobeB.intensity = s === 2 || s === 3 ? 2.2 : 0;
         red.emissiveIntensity = strobeR.intensity ? 3 : .2; blue.emissiveIntensity = strobeB.intensity ? 3 : .2;
         heartLight.intensity = t > 8.4 ? 1.2 * Math.max(0, Math.sin((t - 8.4) * PI * 2.4)) : 0;
     }
