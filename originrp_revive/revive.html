@@ -287,7 +287,7 @@ code { color:var(--cyan); }
     function makeBag() {
         const weave = weaveTex();
         const M = {
-            nylon: new THREE.MeshStandardMaterial({ map: nylonTex('#c0261f'), bumpMap: weave, bumpScale: .0025, roughness: .88 }),
+            nylon: new THREE.MeshStandardMaterial({ map: nylonTex('#a3191a'), bumpMap: weave, bumpScale: .0025, roughness: .88 }),
             black: new THREE.MeshStandardMaterial({ color: 0x141416, bumpMap: weave, bumpScale: .002, roughness: .8 }),
             piping: new THREE.MeshStandardMaterial({ color: 0x0d0d0f, roughness: .55 }),
             zip: new THREE.MeshStandardMaterial({ color: 0x1b1b1d, metalness: .6, roughness: .45 }),
@@ -485,10 +485,10 @@ code { color:var(--cyan); }
         walkA: pose({ pos: [2.6, .95, KZ], rot: [0, FACE, 0], lSh: [-.05, 0, .12], rSh: [.35, 0, 0], rEl: [-.3, 0, 0], lHip: [-.45, 0, 0], lKn: [.25, 0, 0], rHip: [.35, 0, 0], rKn: [.45, 0, 0] }),
         walkB: pose({ pos: [1.75, .95, KZ], rot: [0, FACE, 0], lSh: [-.05, 0, .12], rSh: [-.35, 0, 0], rEl: [-.3, 0, 0], lHip: [.35, 0, 0], lKn: [.45, 0, 0], rHip: [-.45, 0, 0], rKn: [.25, 0, 0] }),
         walkC: pose({ pos: [1.0, .95, KZ], rot: [0, FACE, 0], lSh: [-.05, 0, .12], rSh: [.2, 0, 0], rEl: [-.2, 0, 0], lHip: [-.2, 0, 0], lKn: [.1, 0, 0], rHip: [.1, 0, 0], rKn: [.15, 0, 0] }),
-        kneel1: pose({ pos: [.56, .56, KZ], rot: [0, FACE, 0], spine: [.2, 0, 0], lSh: [-.4, 0, .25], lEl: [-.2, 0, 0], rSh: [-.4, 0, -.1], rEl: [-.4, 0, 0], lHip: [-1.45, 0, .05], lKn: [1.5, 0, 0], rHip: [.05, 0, -.05], rKn: [1.55, 0, 0] }),
-        putdown: pose({ pos: [.6, .5, KZ], rot: [0, FACE, 0], spine: [.62, .55, .05], neck: [.3, .35, 0], lSh: [-.85, 0, .3], lEl: [-.2, 0, 0], rSh: [-.75, 0, -.1], rEl: [-.5, 0, 0], lHip: [-1.3, 0, .1], lKn: [1.45, 0, 0], rHip: [.05, 0, -.05], rKn: [1.55, 0, 0] }),
+        kneel1: pose({ pos: [.7, .56, KZ], rot: [0, FACE, 0], spine: [.2, 0, 0], lSh: [-.4, 0, .25], lEl: [-.2, 0, 0], rSh: [-.4, 0, -.1], rEl: [-.4, 0, 0], lHip: [-1.45, 0, .05], lKn: [1.5, 0, 0], rHip: [.05, 0, -.05], rKn: [1.55, 0, 0] }),
+        putdown: pose({ pos: [.75, .5, KZ], rot: [0, FACE, 0], spine: [.5, 1.3, 0], neck: [.3, .2, 0], lSh: [-.7, 0, .15], lEl: [-.2, 0, 0], rSh: [-.75, 0, -.1], rEl: [-.5, 0, 0], lHip: [-1.3, 0, .1], lKn: [1.45, 0, 0], rHip: [.05, 0, -.05], rKn: [1.55, 0, 0] }),
         kneel2: pose({ pos: [.52, .5, KZ], rot: [0, FACE, 0], spine: [.3, 0, 0], neck: [.2, 0, 0], lSh: [-.7, 0, .1], lEl: [-.6, 0, 0], rSh: [-.7, 0, -.1], rEl: [-.6, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
-        openBag: pose({ pos: [.56, .5, KZ], rot: [0, FACE, 0], spine: [.6, .6, 0], neck: [.4, .3, 0], lSh: [-1.0, 0, .15], lEl: [-.3, 0, 0], rSh: [-1.05, 0, -.05], rEl: [-.5, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
+        openBag: pose({ pos: [.6, .5, KZ], rot: [0, FACE, 0], spine: [.6, 1.1, 0], neck: [.4, .1, 0], lSh: [-.95, 0, .1], lEl: [-.3, 0, 0], rSh: [-1.0, 0, -.1], rEl: [-.5, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
         gloveOn: pose({ pos: [.54, .5, KZ], rot: [0, FACE, 0], spine: [.15, 0, 0], neck: [.35, 0, 0], lSh: [-1.0, 0, -.35], lEl: [-1.3, 0, 0], rSh: [-1.0, 0, .35], rEl: [-1.3, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
         pulse: pose({ pos: [.5, .5, KZ], rot: [0, FACE, 0], spine: [.6, .35, 0], neck: [.45, -.25, 0], lSh: [-1.0, 0, .1], lEl: [-.9, 0, 0], rSh: [-1.35, 0, -.55], rEl: [-.35, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
         cpr: pose({ pos: [.48, .5, KZ], rot: [0, FACE, 0], spine: [.78, 0, 0], neck: [.45, 0, 0], lSh: [-1.02, 0, -.33], lEl: [0, 0, 0], rSh: [-1.02, 0, .33], rEl: [0, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
@@ -497,7 +497,7 @@ code { color:var(--cyan); }
         // patient
         lying: pose({ pos: [0, .12, 0], rot: [-PI / 2, 0, 0], neck: [0, .5, 0], lSh: [0, 0, .28], lEl: [-.2, 0, 0], rSh: [0, 0, -.22], rEl: [-.1, 0, 0], lHip: [0, 0, .08], rHip: [-.05, 0, -.1], rKn: [.1, 0, 0] }),
         lyingTilt: pose({ pos: [0, .12, 0], rot: [-PI / 2, 0, 0], neck: [-.45, 0, 0], lSh: [0, 0, .28], lEl: [-.2, 0, 0], rSh: [0, 0, -.22], rEl: [-.1, 0, 0], lHip: [0, 0, .08], rHip: [-.05, 0, -.1], rKn: [.1, 0, 0] }),
-        lyingAwake: pose({ pos: [0, .12, 0], rot: [-PI / 2, 0, 0], spine: [.15, 0, 0], neck: [.2, .55, 0], lSh: [0, 0, .35], lEl: [-.4, 0, 0], rSh: [-1.05, 0, .25], rEl: [-1.5, 0, 0], lHip: [-.15, 0, .08], lKn: [.3, 0, 0], rHip: [-.05, 0, -.1], rKn: [.1, 0, 0] }),
+        lyingAwake: pose({ pos: [0, .12, 0], rot: [-PI / 2, 0, 0], spine: [.15, 0, 0], neck: [.2, .55, 0], lSh: [0, 0, .35], lEl: [-.4, 0, 0], rSh: [-.35, 0, -.25], rEl: [-.5, 0, 0], lHip: [-.15, 0, .08], lKn: [.3, 0, 0], rHip: [-.05, 0, -.1], rKn: [.1, 0, 0] }),
         sitting: pose({ pos: [0, .15, .02], rot: [-.35, 0, 0], spine: [.15, 0, 0], neck: [-.1, .35, 0], lSh: [.55, 0, .25], lEl: [0, 0, 0], rSh: [.5, 0, -.25], rEl: [0, 0, 0], lHip: [-1.25, 0, .1], lKn: [.6, 0, 0], rHip: [-1.3, 0, -.12], rKn: [.25, 0, 0] }),
     };
 
@@ -620,7 +620,7 @@ code { color:var(--cyan); }
     const state = { t: 0, playing: true, speed: 1 };
     const tmp = new THREE.Vector3();
     const PLACE_T = 2.2;
-    const gauss = (t, c, w) => Math.exp(-((t - c) / w) ** 2);
+    const gauss = (t, c, w) => Math.exp(-(((t - c) / w) ** 2));
     // position exacte de la main au moment où le sac touche le sol
     apply(medic, sample(MEDIC, PLACE_T)); medic.root.updateMatrixWorld(true);
     const BAG_GROUND = medic.lHand.getWorldPosition(new THREE.Vector3());
@@ -629,7 +629,7 @@ code { color:var(--cyan); }
     // gants que le secouriste sort de la boîte puis enfile
     const handGloves = [bag.userData.makeGlove(), bag.userData.makeGlove()];
     medic.lHand.add(handGloves[0]); medic.rHand.add(handGloves[1]);
-    handGloves.forEach((g) => { g.position.set(0, -.05, .02); g.rotation.set(0, 0, 0); g.visible = false; });
+    handGloves.forEach((g, i) => { g.position.set(0, -.1, .01); g.rotation.set(-Math.PI / 2, 0, i ? .2 : -.2); g.visible = false; });
 
     function update(t) {
         // secouriste
@@ -684,11 +684,11 @@ code { color:var(--cyan); }
             medic.lHand.getWorldPosition(tmp);
             bag.position.set(tmp.x, Math.max(0, tmp.y - bag.userData.HANG), tmp.z);
             const swing = t < 1.0 ? .05 * Math.sin(t * 9) : 0;
-            bag.rotation.set(swing * .5, 0, swing);
+            bag.rotation.set(swing * .5, (PI / 2) * smooth(clamp((t - 1.4) / .8, 0, 1)), swing);
         } else {
             const k = smooth(clamp((t - PLACE_T) / .15, 0, 1));
             bag.position.set(BAG_GROUND.x, Math.max(0, PLACE_Y) * (1 - k), BAG_GROUND.z);
-            bag.rotation.set(0, 0, 0);
+            bag.rotation.set(0, PI / 2, 0);
         }
         // couvercle : ouvert par le secouriste à 2,6 s, refermé à 9,1 s
         const open = smooth(clamp((t - 2.6) / .35, 0, 1)) * (1 - smooth(clamp((t - 9.1) / .45, 0, 1)));
@@ -710,7 +710,7 @@ code { color:var(--cyan); }
     const cam2 = new THREE.PerspectiveCamera(32, 1, .01, 50);
     s2.add(new THREE.HemisphereLight(0xffffff, 0x222233, .7));
     const key = new THREE.DirectionalLight(0xffffff, 2.2); key.position.set(1.5, 2.5, 2); key.castShadow = true; key.shadow.mapSize.set(1024, 1024); s2.add(key);
-    const rim = new THREE.DirectionalLight(0x8b5cf6, 1.2); rim.position.set(-2, 1.2, -2); s2.add(rim);
+    const rim = new THREE.DirectionalLight(0xdfe6ff, .9); rim.position.set(-2, 1.2, -2); s2.add(rim);
     const ped2 = mesh(new THREE.CylinderGeometry(.42, .46, .06, 48), new THREE.MeshStandardMaterial({ color: 0x1c1d26, metalness: .5, roughness: .4 }));
     ped2.position.y = -.03; s2.add(ped2);
     const bag2 = makeBag(); s2.add(bag2);
@@ -749,8 +749,8 @@ code { color:var(--cyan); }
         renderer.render(scene, camera);
 
         if (!drag2) a2 += dt * .35;
-        cam2.position.set(Math.sin(a2) * 1.15, .62, Math.cos(a2) * 1.15);
-        cam2.lookAt(0, .1, 0);
+        cam2.position.set(Math.sin(a2) * 1.25, .95, Math.cos(a2) * 1.25);
+        cam2.lookAt(0, .14, 0);
         bag2.userData.lid.rotation.x += ((lidOpen ? -1.9 : 0) - bag2.userData.lid.rotation.x) * Math.min(1, dt * 6);
         r2.render(s2, cam2);
 
