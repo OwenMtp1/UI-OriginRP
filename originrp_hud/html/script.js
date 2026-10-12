@@ -22,7 +22,7 @@ const config = {
     scale: 1,
     gap: 14,
     barWidth: 170,
-    showValues: true,
+    showValues: false,
     lowThreshold: 20,
     hideArmorWhenEmpty: false,
 };

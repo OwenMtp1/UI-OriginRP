@@ -15,7 +15,7 @@ Config.Bars = { 'armor', 'health' }
 Config.BarWidth = 170
 
 -- Afficher la valeur (0 à 100) au bout des barres
-Config.ShowValues = true
+Config.ShowValues = false
 
 -- Taille générale (1.0 = jauges de 44 px en 1080p)
 Config.Scale = 1.0
