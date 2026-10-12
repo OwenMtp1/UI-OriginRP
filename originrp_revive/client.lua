@@ -172,13 +172,21 @@ local function revive(patient)
     end) then return abort(ped) end
     if not placed then placeBag(patient, ped) end
 
-    -- 3. ouvrir le sac (quand la main l'atteint) et prendre le pouls
-    playAnim(ped, A.check, 1)
-    step('check')
+    -- 3. ouvrir le sac (seulement quand la main l'atteint), sortir et enfiler les gants
+    playAnim(ped, A.open, 1)
+    step('open')
     local opened = false
-    if not waitStep(S.check, function(k)
+    if not waitStep(S.open, function(k)
         if not opened and k > Config.Props.bag.openAt then opened = true swapBag(Config.Props.bag.open) end
     end) then return abort(ped) end
+    if not opened then swapBag(Config.Props.bag.open) end
+
+    -- 3 groupes de vérifications avant le massage : conscience, respiration, pouls
+    for _, check in ipairs({ 'conscience', 'respiration', 'pouls' }) do
+        playAnim(ped, A[check], 1)
+        step(check)
+        if not waitStep(S[check]) then return abort(ped) end
+    end
 
     -- 4. mains en position, puis massage cardiaque
     playAnim(ped, A.medicIntro, 0)

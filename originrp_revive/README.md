@@ -50,13 +50,16 @@ source si tu veux retoucher le modèle.
 | Étape | Durée | Animation GTA |
 |---|---|---|
 | Se placer au niveau du torse | 0,6 s | déplacement |
-| S'agenouiller, poser le sac | 1,4 s | `pickup_object` / `putdown_low` |
-| Ouvrir le sac, prendre le pouls | 1,5 s | `amb@medic@standing@tendtodead` |
-| Mains en position | 0,9 s | `mini@cpr@char_a@cpr_def` / `cpr_intro` |
-| Massage cardiaque | 3,6 s | `mini@cpr@char_a@cpr_str` / `cpr_pumpchest` |
-| Reprise du souffle | 1,0 s | `cpr_success` |
+| S'agenouiller, poser le sac à la main | 1,0 s | `pickup_object` / `putdown_low` |
+| Ouvrir le sac, enfiler les gants | 0,9 s | `amb@medic@standing@kneel@idle_a` |
+| Vérification 1 : conscience (tape les épaules) | 0,8 s | `tendtodead@idle_a` / `idle_a` |
+| Vérification 2 : respiration (tête basculée, écoute) | 0,9 s | `tendtodead@idle_a` / `idle_b` |
+| Vérification 3 : pouls carotidien | 0,7 s | `tendtodead@idle_a` / `idle_c` |
+| Mains en position | 0,5 s | `mini@cpr@char_a@cpr_def` / `cpr_intro` |
+| Massage cardiaque | 2,9 s | `mini@cpr@char_a@cpr_str` / `cpr_pumpchest` |
+| Reprise du souffle | 1,1 s | `cpr_success` |
 
-Total : 9 s. Caméra cinématique pour le secouriste et la victime. X annule.
+Total : 9,4 s. Caméra cinématique pour le secouriste et la victime. X annule.
 Le serveur vérifie la distance, le kit, l'état de la victime et la durée réelle avant de réanimer.
 
 ## Limites connues

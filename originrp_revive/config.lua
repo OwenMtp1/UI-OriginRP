@@ -10,14 +10,17 @@ Config.Jobs = nil
 Config.Distance = 2.5              -- distance max pour lancer la réanimation (m)
 Config.CancelKey = 73              -- X : annuler pendant l'animation
 
--- Déroulé (ms). Total = 9 000 ms, toujours sous les 10 s demandées.
+-- Déroulé (ms). Total = 9 400 ms, toujours sous les 10 s demandées.
 Config.Steps = {
-    approach = 600,   -- se placer à côté du torse
-    kneel    = 1400,  -- s'agenouiller et poser le sac médical
-    check    = 1500,  -- ouvrir le sac, prendre le pouls
-    intro    = 900,   -- placer les mains
-    cpr      = 3600,  -- massage cardiaque
-    success  = 1000,  -- la personne reprend son souffle
+    approach    = 600,   -- se placer à côté du torse
+    kneel       = 1000,  -- s'agenouiller et poser le sac à la main
+    open        = 900,   -- ouvrir le sac, sortir et enfiler les gants
+    conscience  = 800,   -- vérification 1 : taper les épaules, appeler la personne
+    respiration = 900,   -- vérification 2 : basculer la tête, écouter le souffle
+    pouls       = 700,   -- vérification 3 : pouls carotidien
+    intro       = 500,   -- placer les mains sur le sternum
+    cpr         = 2900,  -- massage cardiaque
+    success     = 1100,  -- la personne reprend son souffle
 }
 
 -- Position du secouriste par rapport à la personne au sol (x = côté, y = vers la tête)
@@ -32,7 +35,7 @@ Config.Props = {
         closed = `orp_medbag_closed`,
         open = `orp_medbag_open`,
         fallback = `xm_prop_x17_bag_med_01a`,
-        openAt = 0.3,   -- moment (0-1) de l'étape « check » où la main ouvre le sac
+        openAt = 0.25,  -- moment (0-1) de l'étape « open » où la main soulève le couvercle
     },
     -- position du sac dans la main droite (sac GTA de secours / sac personnalisé : poignée en haut, origine au fond)
     hand = { bone = 57005, offset = vector3(0.36, 0.0, -0.04), rotation = vector3(-90.0, 0.0, 90.0) },
@@ -43,7 +46,10 @@ Config.Props = {
 Config.Anims = {
     putdown      = { 'pickup_object', 'putdown_low' },
     kneelEnter   = { 'amb@medic@standing@kneel@enter', 'enter' },
-    check        = { 'amb@medic@standing@tendtodead@idle_a', 'idle_a' },
+    open         = { 'amb@medic@standing@kneel@idle_a', 'idle_a' },
+    conscience   = { 'amb@medic@standing@tendtodead@idle_a', 'idle_a' },
+    respiration  = { 'amb@medic@standing@tendtodead@idle_a', 'idle_b' },
+    pouls        = { 'amb@medic@standing@tendtodead@idle_a', 'idle_c' },
     medicIntro   = { 'mini@cpr@char_a@cpr_def', 'cpr_intro' },
     patientIntro = { 'mini@cpr@char_b@cpr_def', 'cpr_intro' },
     medicCpr     = { 'mini@cpr@char_a@cpr_str', 'cpr_pumpchest' },
