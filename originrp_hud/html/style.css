@@ -1,6 +1,6 @@
 :root {
     --size: 44px;
-    --bar-width: 210px;
+    --bar-width: 170px;
     --bar-height: 8px;
     --gap: 14px;
     --anchor-right: 16%;
@@ -41,10 +41,11 @@ body {
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-/* Faim / soif (jauges rondes), juste au-dessus des barres */
+/* Faim / soif (jauges rondes) empilées, au-dessus des barres */
 .needs {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     gap: calc(var(--size) * 0.24);
 }
 

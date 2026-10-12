@@ -18,10 +18,10 @@ const bars = {};
 
 const config = {
     gauges: ['thirst', 'hunger'],
-    bars: ['health', 'armor'],
+    bars: ['armor', 'health'],
     scale: 1,
     gap: 14,
-    barWidth: 210,
+    barWidth: 170,
     showValues: true,
     lowThreshold: 20,
     hideArmorWhenEmpty: false,
@@ -78,7 +78,7 @@ function applyConfig(data) {
     const scale = Number(config.scale) || 1;
     const root = document.documentElement.style;
     root.setProperty('--size', `${44 * scale}px`);
-    root.setProperty('--bar-width', `${(Number(config.barWidth) || 210) * scale}px`);
+    root.setProperty('--bar-width', `${(Number(config.barWidth) || 170) * scale}px`);
     root.setProperty('--bar-height', `${8 * scale}px`);
     root.setProperty('--gap', `${Number(config.gap) || 0}px`);
     build();

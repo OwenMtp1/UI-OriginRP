@@ -1,8 +1,8 @@
 # originrp_hud
 
 HUD à côté de la minimap, dans le style des menus OriginRP :
-- **vie** et **armure** en barres sur la longueur ;
-- **soif** et **faim** en jauges rondes, juste au-dessus.
+- en bas, alignée sur le bas de la minimap : la **vie** en barre, avec l'**armure** en barre juste au-dessus ;
+- au-dessus : **soif** et **faim** en jauges rondes, l'une sur l'autre.
 
 Le HUD se place automatiquement à droite de la minimap, quelles que soient
 la résolution et la zone de sécurité du joueur.
