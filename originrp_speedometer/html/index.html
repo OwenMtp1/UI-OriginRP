@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>OriginRP Compteur</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="speedo" class="speedo hidden">
+        <!-- Essence -->
+        <div class="side" id="fuel" data-type="fuel">
+            <div class="ring">
+                <svg viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="34"/><circle class="fill" cx="40" cy="40" r="34"/></svg>
+                <span class="side-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v16"/><path d="M3 21h13"/><path d="M7 8h5"/><path d="M15 11h1.5a1.5 1.5 0 0 1 1.5 1.5V17a1.5 1.5 0 0 0 3 0V8.5L18 5"/></svg>
+                </span>
+            </div>
+            <p class="side-value"><span>0</span><small>%</small></p>
+            <p class="side-label">Essence</p>
+        </div>
+
+        <!-- Cadran principal -->
+        <div class="dial">
+            <svg id="dial-svg" viewBox="0 0 320 320"></svg>
+            <div class="center">
+                <p id="speed" class="speed">0</p>
+                <p id="unit" class="unit">km/h</p>
+                <div class="gear-row">
+                    <span id="ind-lights" class="ind" title="Phares">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 5c-4 0-6 3-6 7s2 7 6 7c2.5 0 4-3 4-7s-1.5-7-4-7z"/><path d="M8 8H3M8 12H3M8 16H3"/></svg>
+                    </span>
+                    <span id="gear" class="gear">N</span>
+                    <span id="ind-belt" class="ind" title="Ceinture">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2"/><path d="M8 21v-6.5L7 9.5C7 8 8 7.5 9.5 7.5h5C16 7.5 17 8 17 9.5l-1 5V21"/><path d="M15.5 8 8.5 17"/></svg>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Moteur -->
+        <div class="side" id="engine" data-type="engine">
+            <div class="ring">
+                <svg viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="34"/><circle class="fill" cx="40" cy="40" r="34"/></svg>
+                <span class="side-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 8h6l2 2h3v3h2v-2.5M20 10.5V16M18 13v4h-3l-2 2H8l-2-2H4v-6h3z"/><path d="M9 5h4M11 5v3"/></svg>
+                </span>
+            </div>
+            <p class="side-value"><span>0</span><small>%</small></p>
+            <p class="side-label">Moteur</p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
