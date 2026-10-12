@@ -216,60 +216,180 @@ code { color:var(--cyan); }
         return g;
     }
 
-    // Sac médical (≈ 42 × 26 × 24 cm) avec couvercle articulé et contenu
-    function makeBag() {
-        const M = {
-            fabric: new THREE.MeshStandardMaterial({ map: fabricTex(), roughness: .85 }),
-            dark: new THREE.MeshStandardMaterial({ color: 0x151517, roughness: .7 }),
-            refl: new THREE.MeshStandardMaterial({ color: 0xd9dde2, metalness: .9, roughness: .25 }),
-            cross: new THREE.MeshStandardMaterial({ map: crossTex(), transparent: true, roughness: .6 }),
-            zip: new THREE.MeshStandardMaterial({ color: 0xc8ccd2, metalness: 1, roughness: .2 }),
-            inner: new THREE.MeshStandardMaterial({ color: 0x2a2d33, roughness: .9 }),
-            gauze: new THREE.MeshStandardMaterial({ color: 0xf5f3ee, roughness: .95 }),
-            glove: new THREE.MeshStandardMaterial({ color: 0x3b82f6, roughness: .5 }),
-            syringe: new THREE.MeshPhysicalMaterial({ color: 0xffffff, transmission: .6, transparent: true, opacity: .7, roughness: .05 }),
-            orange: new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: .6 }),
-            green: new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: .5, metalness: .2 }),
-        };
-        const bag = new THREE.Group();
-        const W = .42, H = .2, D = .26;
-        // corps (ouvert par le haut) : fond + parois
-        mesh(rbox(W, .03, D, .012), M.fabric, 0, .015, 0, bag);
-        mesh(rbox(W, H, .03, .012), M.fabric, 0, H / 2, D / 2 - .015, bag);
-        mesh(rbox(W, H, .03, .012), M.fabric, 0, H / 2, -D / 2 + .015, bag);
-        const sideL = mesh(rbox(.03, H, D, .012), M.fabric, W / 2 - .015, H / 2, 0, bag);
-        const sideR = mesh(rbox(.03, H, D, .012), M.fabric, -W / 2 + .015, H / 2, 0, bag);
-        void sideL; void sideR;
-        mesh(new THREE.BoxGeometry(W - .06, .005, D - .06), M.inner, 0, .032, 0, bag);
-        // bande réfléchissante + croix
-        mesh(new THREE.BoxGeometry(W + .004, .022, D + .004), M.refl, 0, .07, 0, bag);
-        const c1 = mesh(new THREE.PlaneGeometry(.12, .12), M.cross, 0, .13, D / 2 + .002, bag); c1.castShadow = false;
-        const c2 = mesh(new THREE.PlaneGeometry(.12, .12), M.cross, 0, .13, -D / 2 - .002, bag); c2.rotation.y = Math.PI; c2.castShadow = false;
-        // contenu
-        const contents = new THREE.Group(); bag.add(contents);
-        for (let i = 0; i < 3; i++) {
-            const r = mesh(new THREE.CylinderGeometry(.03, .03, .08, 24), M.gauze, -.14 + i * .065, .075, -.05, contents);
-            r.rotation.z = Math.PI / 2; r.rotation.y = .2 * i;
+    // ─── Sac d'intervention (≈ 50 × 30 × 32 cm), nylon balistique, couvercle zippé ───
+    const weaveTex = () => tex(256, 256, (g, w, h) => {
+        g.fillStyle = '#808080'; g.fillRect(0, 0, w, h);
+        for (let y = 0; y < h; y += 4) for (let x = 0; x < w; x += 4) {
+            g.fillStyle = ((x + y) / 4) % 2 ? '#9a9a9a' : '#666';
+            g.fillRect(x, y, 4, 2); g.fillStyle = ((x + y) / 4) % 2 ? '#6e6e6e' : '#a0a0a0'; g.fillRect(x, y + 2, 4, 2);
         }
-        mesh(new THREE.BoxGeometry(.12, .09, .07), M.glove, .1, .08, -.05, contents);
-        mesh(new THREE.BoxGeometry(.11, .02, .055), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .7 }), .1, .126, -.05, contents);
-        const syr = mesh(new THREE.CylinderGeometry(.008, .008, .14, 12), M.syringe, -.05, .05, .07, contents); syr.rotation.z = Math.PI / 2;
-        mesh(new THREE.CylinderGeometry(.002, .002, .04, 6), M.zip, -.14, .05, .07, contents).rotation.z = Math.PI / 2;
-        mesh(new THREE.CylinderGeometry(.045, .045, .03, 24), M.orange, .12, .05, .07, contents);
-        const o2 = mesh(new THREE.CylinderGeometry(.025, .025, .16, 16), M.green, -.14, .06, .065, contents); o2.rotation.z = Math.PI / 2;
-        // couvercle articulé (charnière à l'arrière)
+    }, 6);
+    const nylonTex = (base) => tex(512, 512, (g, w, h) => {
+        g.fillStyle = base; g.fillRect(0, 0, w, h);
+        for (let y = 0; y < h; y += 2) { g.fillStyle = `rgba(0,0,0,${y % 4 ? .05 : .1})`; g.fillRect(0, y, w, 1); }
+        speckle(g, w, h, 9000, .05);
+        // usure : bords plus clairs et salissures en bas
+        const e = g.createLinearGradient(0, h, 0, h * .75); e.addColorStop(0, 'rgba(40,25,15,.35)'); e.addColorStop(1, 'rgba(0,0,0,0)');
+        g.fillStyle = e; g.fillRect(0, 0, w, h);
+    });
+    const starTex = () => tex(256, 256, (g, w) => {
+        g.clearRect(0, 0, w, w);
+        g.fillStyle = '#f2f2f2'; g.beginPath(); g.arc(w / 2, w / 2, w / 2 - 4, 0, 7); g.fill();
+        g.save(); g.translate(w / 2, w / 2); g.fillStyle = '#1d4ed8';
+        for (let i = 0; i < 3; i++) { g.rotate(Math.PI / 3); g.fillRect(-w * .1, -w * .38, w * .2, w * .76); }
+        g.restore();
+        g.strokeStyle = '#fff'; g.lineWidth = 9; g.beginPath(); g.moveTo(w / 2, w * .22); g.lineTo(w / 2, w * .78); g.stroke();
+        g.lineWidth = 6; g.beginPath(); g.moveTo(w * .44, w * .3);
+        for (let k = 0; k < 4; k++) g.quadraticCurveTo(k % 2 ? w * .4 : w * .6, w * (.36 + k * .1), w / 2 + (k % 2 ? -1 : 1) * 6, w * (.4 + k * .1));
+        g.stroke();
+    });
+    const labelTex = () => tex(512, 96, (g, w, h) => {
+        g.fillStyle = '#121214'; g.fillRect(0, 0, w, h);
+        g.fillStyle = '#d6d9dd'; g.font = '900 58px Arial'; g.textAlign = 'center'; g.textBaseline = 'middle';
+        g.fillText('PARAMEDIC', w / 2, h / 2 + 3);
+        g.strokeStyle = '#d6d9dd'; g.setLineDash([8, 6]); g.lineWidth = 2; g.strokeRect(6, 6, w - 12, h - 12);
+    });
+    const reflTex = () => tex(256, 32, (g, w, h) => {
+        g.fillStyle = '#c9ccd0'; g.fillRect(0, 0, w, h);
+        for (let x = 0; x < w; x += 6) { g.fillStyle = 'rgba(255,255,255,.35)'; g.fillRect(x, 0, 3, h); }
+    }, 2, 1);
+    const gloveBoxTex = () => tex(256, 128, (g, w, h) => {
+        g.fillStyle = '#f4f4f2'; g.fillRect(0, 0, w, h);
+        g.fillStyle = '#2563eb'; g.fillRect(0, h * .62, w, h * .38);
+        g.fillStyle = '#1e3a8a'; g.font = '900 34px Arial'; g.textAlign = 'center'; g.fillText('NITRILE', w / 2, h * .42);
+        g.fillStyle = '#fff'; g.font = '800 26px Arial'; g.fillText('TAILLE M · 100', w / 2, h * .88);
+    });
+
+    function rimTube(y, w, d, r, radius, mat, parent) {
+        const pts = [];
+        const corners = [[w / 2 - r, d / 2 - r, 0], [-w / 2 + r, d / 2 - r, Math.PI / 2], [-w / 2 + r, -d / 2 + r, Math.PI], [w / 2 - r, -d / 2 + r, Math.PI * 1.5]];
+        for (const [cx, cz, a0] of corners) for (let i = 0; i <= 6; i++) {
+            const a = a0 + (i / 6) * Math.PI / 2;
+            pts.push(new THREE.Vector3(cx + Math.cos(a) * r, y, cz + Math.sin(a) * r));
+        }
+        const curve = new THREE.CatmullRomCurve3(pts, true);
+        return mesh(new THREE.TubeGeometry(curve, 96, radius, 6, true), mat, 0, 0, 0, parent);
+    }
+
+    function makeGlove(mat) {
+        const g = new THREE.Group();
+        const palm = mesh(new THREE.BoxGeometry(.075, .018, .085), mat, 0, 0, 0, g); void palm;
+        for (let f = 0; f < 4; f++) {
+            const fi = mesh(new THREE.CapsuleGeometry(.0085, .045 + (f === 1 || f === 2 ? .01 : 0), 4, 8), mat, -.027 + f * .018, 0, .07, g);
+            fi.rotation.x = Math.PI / 2;
+        }
+        const th = mesh(new THREE.CapsuleGeometry(.009, .035, 4, 8), mat, .045, 0, .02, g); th.rotation.set(Math.PI / 2, 0, -.7);
+        const cuff = mesh(new THREE.CylinderGeometry(.04, .042, .05, 16, 1, true), mat, 0, 0, -.06, g); cuff.rotation.x = Math.PI / 2;
+        cuff.material = mat.clone(); cuff.material.side = THREE.DoubleSide;
+        return g;
+    }
+
+    function makeBag() {
+        const weave = weaveTex();
+        const M = {
+            nylon: new THREE.MeshStandardMaterial({ map: nylonTex('#c0261f'), bumpMap: weave, bumpScale: .0025, roughness: .88 }),
+            black: new THREE.MeshStandardMaterial({ color: 0x141416, bumpMap: weave, bumpScale: .002, roughness: .8 }),
+            piping: new THREE.MeshStandardMaterial({ color: 0x0d0d0f, roughness: .55 }),
+            zip: new THREE.MeshStandardMaterial({ color: 0x1b1b1d, metalness: .6, roughness: .45 }),
+            metal: new THREE.MeshStandardMaterial({ color: 0xb9bec5, metalness: 1, roughness: .25 }),
+            refl: new THREE.MeshStandardMaterial({ map: reflTex(), metalness: .55, roughness: .3 }),
+            star: new THREE.MeshStandardMaterial({ map: starTex(), transparent: true, roughness: .7 }),
+            label: new THREE.MeshStandardMaterial({ map: labelTex(), roughness: .6 }),
+            lining: new THREE.MeshStandardMaterial({ color: 0x3a3e46, bumpMap: weave, bumpScale: .002, roughness: .95 }),
+            elastic: new THREE.MeshStandardMaterial({ color: 0x111827, roughness: .7 }),
+            gauze: new THREE.MeshStandardMaterial({ color: 0xf3f1ea, roughness: .95 }),
+            pvc: new THREE.MeshPhysicalMaterial({ color: 0xe0f2fe, transparent: true, opacity: .28, roughness: .1, clearcoat: 1 }),
+            gloveBox: new THREE.MeshStandardMaterial({ map: gloveBoxTex(), roughness: .8 }),
+            card: new THREE.MeshStandardMaterial({ color: 0xf4f4f2, roughness: .85 }),
+            glove: new THREE.MeshStandardMaterial({ color: 0x3b82f6, roughness: .45 }),
+            orange: new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: .5 }),
+            steel: new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 1, roughness: .2 }),
+            saline: new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: .55, roughness: .05, clearcoat: 1 }),
+            cap: new THREE.MeshStandardMaterial({ color: 0x2563eb, roughness: .4 }),
+            tq: new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: .7 }),
+            red: new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: .6 }),
+        };
+        const W = .5, H = .26, D = .3, T = .022;
+        const bag = new THREE.Group();
+
+        // coque : fond + 4 parois (cavité ouverte sous le couvercle)
+        mesh(rbox(W, T, D, .01), M.nylon, 0, T / 2, 0, bag);
+        mesh(rbox(W, H, T, .01), M.nylon, 0, H / 2, D / 2 - T / 2, bag);
+        mesh(rbox(W, H, T, .01), M.nylon, 0, H / 2, -D / 2 + T / 2, bag);
+        mesh(rbox(T, H, D, .01), M.nylon, W / 2 - T / 2, H / 2, 0, bag);
+        mesh(rbox(T, H, D, .01), M.nylon, -W / 2 + T / 2, H / 2, 0, bag);
+        rimTube(H, W, D, .025, .007, M.piping, bag);
+        rimTube(.006, W, D, .025, .008, M.piping, bag);
+        // bande réfléchissante
+        rimTube(.075, W + .004, D + .004, .026, .012, M.refl, bag).scale.set(1, .9, 1);
+        // poche avant zippée
+        mesh(rbox(W * .78, H * .58, .055, .018), M.nylon, 0, H * .42, D / 2 + .026, bag);
+        mesh(new THREE.BoxGeometry(W * .74, .008, .004), M.zip, 0, H * .68, D / 2 + .054, bag);
+        mesh(new THREE.BoxGeometry(.012, .028, .004), M.metal, W * .3, H * .66, D / 2 + .057, bag);
+        const patch = mesh(new THREE.PlaneGeometry(.1, .1), M.star, -W * .22, H * .4, D / 2 + .0545, bag); patch.castShadow = false;
+        const lab = mesh(new THREE.PlaneGeometry(.17, .032), M.label, W * .1, H * .32, D / 2 + .0545, bag); lab.castShadow = false;
+        // poches latérales
+        for (const s of [1, -1]) {
+            mesh(rbox(.045, H * .55, D * .72, .015), M.nylon, s * (W / 2 + .02), H * .38, 0, bag);
+            mesh(new THREE.BoxGeometry(.004, .008, D * .66), M.zip, s * (W / 2 + .043), H * .6, 0, bag);
+            // anneaux en D pour la bandoulière
+            const d = mesh(new THREE.TorusGeometry(.016, .0035, 6, 16), M.metal, s * (W / 2 + .003), H - .015, 0, bag);
+            d.rotation.y = Math.PI / 2;
+        }
+        // sangles de portage (webbing) sur l'avant et l'arrière
+        for (const z of [D / 2 + .056, -D / 2 - .002]) for (const x of [-.12, .12]) {
+            mesh(new THREE.BoxGeometry(.03, H * .95, .004), M.black, x, H * .5, z, bag);
+        }
+        // patins
+        for (const [x, z] of [[-.2, -.11], [.2, -.11], [-.2, .11], [.2, .11]]) mesh(new THREE.CylinderGeometry(.012, .012, .006, 10), M.piping, x, -.002, z, bag);
+
+        // intérieur
+        mesh(new THREE.BoxGeometry(W - 2 * T, .004, D - 2 * T), M.lining, 0, T + .002, 0, bag);
+        mesh(new THREE.BoxGeometry(.006, H * .7, D - 2 * T), M.lining, -.05, T + H * .35, 0, bag);
+        for (let i = 0; i < 6; i++) mesh(new THREE.BoxGeometry(.022, .012, .004), M.elastic, .02 + i * .035, H * .7, -D / 2 + T + .003, bag);
+
+        const contents = new THREE.Group(); bag.add(contents);
+        // boîte de gants + paire qui dépasse
+        const gb = mesh(new THREE.BoxGeometry(.13, .065, .075), [M.card, M.card, M.card, M.card, M.gloveBox, M.gloveBox], .13, T + .035, -.06, contents);
+        void gb;
+        const boxGloves = new THREE.Group(); boxGloves.position.set(.13, T + .07, -.06); contents.add(boxGloves);
+        const bg1 = makeGlove(M.glove); bg1.rotation.set(-1.2, .3, 0); boxGloves.add(bg1);
+        const bg2 = makeGlove(M.glove); bg2.position.set(.03, -.005, .01); bg2.rotation.set(-1.0, -.4, .2); boxGloves.add(bg2);
+        // compresses dans une pochette transparente
+        mesh(new THREE.BoxGeometry(.15, .07, .1), M.pvc, -.15, T + .036, .06, contents);
+        for (let i = 0; i < 3; i++) { const r = mesh(new THREE.CylinderGeometry(.026, .026, .085, 20), M.gauze, -.2 + i * .05, T + .03, .06, contents); r.rotation.x = Math.PI / 2; }
+        // ciseaux de secours
+        const sh = new THREE.Group(); sh.position.set(.1, T + .012, .08); sh.rotation.y = .4; contents.add(sh);
+        mesh(new THREE.TorusGeometry(.016, .005, 6, 14), M.orange, -.02, 0, 0, sh).rotation.x = Math.PI / 2;
+        mesh(new THREE.TorusGeometry(.016, .005, 6, 14), M.orange, -.02, 0, .03, sh).rotation.x = Math.PI / 2;
+        mesh(new THREE.BoxGeometry(.09, .004, .012), M.steel, .045, .002, .015, sh);
+        // garrot tourniquet
+        const tq = mesh(new THREE.TorusGeometry(.035, .01, 6, 20), M.tq, .0, T + .012, .08, contents); tq.rotation.x = Math.PI / 2;
+        mesh(new THREE.BoxGeometry(.02, .006, .03), M.red, .035, T + .02, .08, contents);
+        // sérum physiologique
+        mesh(new THREE.CylinderGeometry(.022, .022, .09, 16), M.saline, -.16, T + .07, -.07, contents);
+        mesh(new THREE.CylinderGeometry(.012, .012, .015, 12), M.cap, -.16, T + .12, -.07, contents);
+
+        // couvercle (charnière à l'arrière)
         const lid = new THREE.Group(); lid.position.set(0, H, -D / 2); bag.add(lid);
-        mesh(rbox(W + .01, .045, D + .01, .015), M.fabric, 0, .02, D / 2, lid);
-        mesh(new THREE.BoxGeometry(W - .02, .006, .01), M.zip, 0, .002, D, lid);
-        const handleGeo = new THREE.TorusGeometry(.07, .012, 10, 24, Math.PI);
-        const handle = mesh(handleGeo, M.dark, 0, .045, D / 2, lid);
-        handle.rotation.y = Math.PI / 2; handle.rotation.z = 0;
-        handle.rotation.set(0, 0, 0);
-        const c3 = mesh(new THREE.PlaneGeometry(.1, .1), M.cross, 0, .044, D / 2, lid); c3.rotation.x = -Math.PI / 2; c3.castShadow = false;
-        // sangle d'épaule
-        const strap = mesh(new THREE.TorusGeometry(.2, .008, 6, 32, Math.PI), M.dark, 0, .1, 0, bag);
-        strap.rotation.y = Math.PI / 2; strap.visible = false;
-        bag.userData = { lid, contents, strap };
+        mesh(rbox(W + .006, .045, D + .006, .02), M.nylon, 0, .024, D / 2, lid);
+        rimTube(.004, W + .004, D + .004, .025, .007, M.zip, lid).position.z = D / 2;
+        rimTube(.046, W, D, .025, .006, M.piping, lid).position.z = D / 2;
+        for (const x of [-.03, .03]) {
+            mesh(new THREE.BoxGeometry(.012, .03, .004), M.metal, x, -.004, D + .006, lid);
+            mesh(new THREE.TorusGeometry(.007, .002, 5, 10), M.black, x, -.024, D + .006, lid);
+        }
+        const top = mesh(new THREE.PlaneGeometry(.11, .11), M.star, .14, .0475, D / 2, lid); top.rotation.x = -Math.PI / 2; top.castShadow = false;
+        // poignée de portage avec manchon caoutchouc
+        const arc = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(-.13, .046, D / 2), new THREE.Vector3(-.11, .1, D / 2), new THREE.Vector3(0, .125, D / 2),
+            new THREE.Vector3(.11, .1, D / 2), new THREE.Vector3(.13, .046, D / 2),
+        ]);
+        mesh(new THREE.TubeGeometry(arc, 40, .011, 8, false), M.black, 0, 0, 0, lid);
+        const grip = mesh(new THREE.CylinderGeometry(.017, .017, .11, 14), M.piping, 0, .12, D / 2, lid); grip.rotation.z = Math.PI / 2;
+        for (const x of [-.135, .135]) mesh(new THREE.BoxGeometry(.035, .006, .05), M.black, x, .048, D / 2, lid);
+
+        bag.userData = { lid, boxGloves, HANG: H + .125 + .045, makeGlove: () => makeGlove(M.glove) };
         return bag;
     }
 
@@ -366,28 +486,30 @@ code { color:var(--cyan); }
         walkB: pose({ pos: [1.75, .95, KZ], rot: [0, FACE, 0], lSh: [-.05, 0, .12], rSh: [-.35, 0, 0], rEl: [-.3, 0, 0], lHip: [.35, 0, 0], lKn: [.45, 0, 0], rHip: [-.45, 0, 0], rKn: [.25, 0, 0] }),
         walkC: pose({ pos: [1.0, .95, KZ], rot: [0, FACE, 0], lSh: [-.05, 0, .12], rSh: [.2, 0, 0], rEl: [-.2, 0, 0], lHip: [-.2, 0, 0], lKn: [.1, 0, 0], rHip: [.1, 0, 0], rKn: [.15, 0, 0] }),
         kneel1: pose({ pos: [.56, .56, KZ], rot: [0, FACE, 0], spine: [.2, 0, 0], lSh: [-.4, 0, .25], lEl: [-.2, 0, 0], rSh: [-.4, 0, -.1], rEl: [-.4, 0, 0], lHip: [-1.45, 0, .05], lKn: [1.5, 0, 0], rHip: [.05, 0, -.05], rKn: [1.55, 0, 0] }),
-        putdown: pose({ pos: [.55, .52, KZ], rot: [0, FACE, 0], spine: [.45, -.25, .1], neck: [.25, .3, 0], lSh: [-1.2, 0, .55], lEl: [-.2, 0, 0], rSh: [-.75, 0, -.1], rEl: [-.5, 0, 0], lHip: [-1.3, 0, .1], lKn: [1.45, 0, 0], rHip: [.05, 0, -.05], rKn: [1.55, 0, 0] }),
+        putdown: pose({ pos: [.6, .5, KZ], rot: [0, FACE, 0], spine: [.62, .55, .05], neck: [.3, .35, 0], lSh: [-.85, 0, .3], lEl: [-.2, 0, 0], rSh: [-.75, 0, -.1], rEl: [-.5, 0, 0], lHip: [-1.3, 0, .1], lKn: [1.45, 0, 0], rHip: [.05, 0, -.05], rKn: [1.55, 0, 0] }),
         kneel2: pose({ pos: [.52, .5, KZ], rot: [0, FACE, 0], spine: [.3, 0, 0], neck: [.2, 0, 0], lSh: [-.7, 0, .1], lEl: [-.6, 0, 0], rSh: [-.7, 0, -.1], rEl: [-.6, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
-        openBag: pose({ pos: [.52, .5, KZ], rot: [0, FACE, 0], spine: [.55, -.45, .05], neck: [.35, .4, 0], lSh: [-1.5, 0, .5], lEl: [-.4, 0, 0], rSh: [-1.45, 0, .25], rEl: [-.5, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
+        openBag: pose({ pos: [.56, .5, KZ], rot: [0, FACE, 0], spine: [.6, .6, 0], neck: [.4, .3, 0], lSh: [-1.0, 0, .15], lEl: [-.3, 0, 0], rSh: [-1.05, 0, -.05], rEl: [-.5, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
+        gloveOn: pose({ pos: [.54, .5, KZ], rot: [0, FACE, 0], spine: [.15, 0, 0], neck: [.35, 0, 0], lSh: [-1.0, 0, -.35], lEl: [-1.3, 0, 0], rSh: [-1.0, 0, .35], rEl: [-1.3, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
         pulse: pose({ pos: [.5, .5, KZ], rot: [0, FACE, 0], spine: [.6, .35, 0], neck: [.45, -.25, 0], lSh: [-1.0, 0, .1], lEl: [-.9, 0, 0], rSh: [-1.35, 0, -.55], rEl: [-.35, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
         cpr: pose({ pos: [.48, .5, KZ], rot: [0, FACE, 0], spine: [.78, 0, 0], neck: [.45, 0, 0], lSh: [-1.02, 0, -.33], lEl: [0, 0, 0], rSh: [-1.02, 0, .33], rEl: [0, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
         relief: pose({ pos: [.56, .5, KZ], rot: [0, FACE, 0], spine: [.25, 0, 0], neck: [.2, 0, 0], lSh: [-.65, 0, .15], lEl: [-.7, 0, 0], rSh: [-1.0, 0, -.1], rEl: [-.2, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
         support: pose({ pos: [.56, .5, KZ], rot: [0, FACE, 0], spine: [.3, .2, 0], neck: [.25, -.1, 0], lSh: [-.7, 0, .15], lEl: [-.7, 0, 0], rSh: [-1.3, 0, -.35], rEl: [-.35, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
         // patient
         lying: pose({ pos: [0, .12, 0], rot: [-PI / 2, 0, 0], neck: [0, .5, 0], lSh: [0, 0, .28], lEl: [-.2, 0, 0], rSh: [0, 0, -.22], rEl: [-.1, 0, 0], lHip: [0, 0, .08], rHip: [-.05, 0, -.1], rKn: [.1, 0, 0] }),
-        lyingAwake: pose({ pos: [0, .12, 0], rot: [-PI / 2, 0, 0], neck: [-.25, .2, 0], lSh: [0, 0, .28], lEl: [-.4, 0, 0], rSh: [-.2, 0, -.3], rEl: [-.6, 0, 0], lHip: [-.15, 0, .08], lKn: [.3, 0, 0], rHip: [-.05, 0, -.1], rKn: [.1, 0, 0] }),
+        lyingTilt: pose({ pos: [0, .12, 0], rot: [-PI / 2, 0, 0], neck: [-.45, 0, 0], lSh: [0, 0, .28], lEl: [-.2, 0, 0], rSh: [0, 0, -.22], rEl: [-.1, 0, 0], lHip: [0, 0, .08], rHip: [-.05, 0, -.1], rKn: [.1, 0, 0] }),
+        lyingAwake: pose({ pos: [0, .12, 0], rot: [-PI / 2, 0, 0], spine: [.15, 0, 0], neck: [.2, .55, 0], lSh: [0, 0, .35], lEl: [-.4, 0, 0], rSh: [-1.05, 0, .25], rEl: [-1.5, 0, 0], lHip: [-.15, 0, .08], lKn: [.3, 0, 0], rHip: [-.05, 0, -.1], rKn: [.1, 0, 0] }),
         sitting: pose({ pos: [0, .15, .02], rot: [-.35, 0, 0], spine: [.15, 0, 0], neck: [-.1, .35, 0], lSh: [.55, 0, .25], lEl: [0, 0, 0], rSh: [.5, 0, -.25], rEl: [0, 0, 0], lHip: [-1.25, 0, .1], lKn: [.6, 0, 0], rHip: [-1.3, 0, -.12], rKn: [.25, 0, 0] }),
     };
 
     const MEDIC = [
         [0, P.walkA], [.33, P.walkB], [.66, P.walkA], [1.0, P.walkC],
         [1.5, P.kneel1], [1.95, P.putdown], [2.4, P.kneel2],
-        [2.85, P.openBag], [3.3, P.openBag], [3.6, P.kneel2], [3.9, P.pulse], [4.4, P.pulse],
+        [2.75, P.openBag], [3.05, P.openBag], [3.3, P.gloveOn], [3.55, P.gloveOn], [3.75, P.kneel2], [4.0, P.pulse], [4.4, P.pulse],
         [4.8, P.cpr], [8.4, P.cpr], [8.8, P.relief], [9.6, P.support],
     ];
     // les jambes du secouriste suivent la marche : correction des positions intermédiaires
     MEDIC[1][1].pos = [2.05, .95, KZ]; MEDIC[2][1] = pose({ ...P.walkA, pos: [1.5, .95, KZ], lSh: P.walkA.lSh, rSh: P.walkA.rSh, rEl: P.walkA.rEl, lHip: P.walkA.lHip, lKn: P.walkA.lKn, rHip: P.walkA.rHip, rKn: P.walkA.rKn });
-    const PATIENT = [[0, P.lying], [8.4, P.lying], [8.9, P.lyingAwake], [9.6, P.sitting]];
+    const PATIENT = [[0, P.lying], [4.3, P.lying], [4.7, P.lyingTilt], [8.4, P.lyingTilt], [8.9, P.lyingAwake], [9.6, P.sitting]];
 
     // ─── Scène principale ───
     function makeRenderer(host) {
@@ -440,7 +562,6 @@ code { color:var(--cyan); }
     scene.add(medic.root, patient.root);
     const bag = makeBag();
     scene.add(bag);
-    const BAG_GROUND = new THREE.Vector3(.62, 0, .18);
 
     // lumières
     scene.add(new THREE.HemisphereLight(0x8aa2ff, 0x1a1410, .45));
@@ -498,7 +619,17 @@ code { color:var(--cyan); }
     // ─── Moteur d'animation ───
     const state = { t: 0, playing: true, speed: 1 };
     const tmp = new THREE.Vector3();
-    let bagAttached = true;
+    const PLACE_T = 2.2;
+    const gauss = (t, c, w) => Math.exp(-((t - c) / w) ** 2);
+    // position exacte de la main au moment où le sac touche le sol
+    apply(medic, sample(MEDIC, PLACE_T)); medic.root.updateMatrixWorld(true);
+    const BAG_GROUND = medic.lHand.getWorldPosition(new THREE.Vector3());
+    const PLACE_Y = BAG_GROUND.y - bag.userData.HANG;
+    BAG_GROUND.y = 0;
+    // gants que le secouriste sort de la boîte puis enfile
+    const handGloves = [bag.userData.makeGlove(), bag.userData.makeGlove()];
+    medic.lHand.add(handGloves[0]); medic.rHand.add(handGloves[1]);
+    handGloves.forEach((g) => { g.position.set(0, -.05, .02); g.rotation.set(0, 0, 0); g.visible = false; });
 
     function update(t) {
         // secouriste
@@ -510,37 +641,58 @@ code { color:var(--cyan); }
             m.pos = [m.pos[0], m.pos[1] - .035 * c, m.pos[2]];
         }
         apply(medic, m);
-        // gants bleus après ouverture du sac
-        medic.handMat.color.set(t > 3.25 ? 0x3b82f6 : 0xb98263);
+        // gants : pris dans la boîte à 3,0 s, tenus jusqu'à 3,5 s, puis enfilés (mains bleues)
+        const holding = t >= 3.0 && t < 3.5;
+        handGloves.forEach((g) => { g.visible = holding; });
+        bag.userData.boxGloves.visible = t < 3.0;
+        medic.handMat.color.set(t >= 3.5 ? 0x3b82f6 : 0xb98263);
 
         // patient
         const p = sample(PATIENT, t);
+        if (t >= 4.8 && t < 8.4) {
+            // chaque compression secoue le corps inerte
+            const c = Math.max(0, Math.sin((t - 4.8) * PI * 4));
+            p.pos = [p.pos[0], p.pos[1] - .022 * c, p.pos[2]];
+            p.neck = [p.neck[0] + .22 * c, p.neck[1] + .06 * Math.sin((t - 4.8) * PI * 2), p.neck[2]];
+            p.lSh = [p.lSh[0] - .12 * c, p.lSh[1], p.lSh[2] + .1 * c];
+            p.rSh = [p.rSh[0] - .12 * c, p.rSh[1], p.rSh[2] - .1 * c];
+            p.lEl = [p.lEl[0] - .15 * c, 0, 0]; p.rEl = [p.rEl[0] - .15 * c, 0, 0];
+            p.lKn = [p.lKn[0] + .06 * c, 0, 0];
+        }
+        if (t >= 8.35 && t < 9.0) {
+            // grande inspiration, puis 3 quintes de toux
+            const gasp = gauss(t, 8.45, .07);
+            const cough = gauss(t, 8.58, .04) + gauss(t, 8.72, .04) + gauss(t, 8.86, .04);
+            p.spine = [p.spine[0] + .3 * gasp + .18 * cough, p.spine[1], p.spine[2]];
+            p.neck = [p.neck[0] + .35 * gasp + .3 * cough, p.neck[1], p.neck[2]];
+            p.pos = [p.pos[0], p.pos[1] + .02 * gasp, p.pos[2]];
+        }
         apply(patient, p);
         patient.torso.scale.set(1.15, 1, .72);
         if (t >= 4.8 && t < 8.4) {
             const c = Math.max(0, Math.sin((t - 4.8) * PI * 4));
-            patient.torso.scale.z = .72 - .09 * c;
-        } else if (t >= 8.4) {
-            const b = .5 + .5 * Math.sin((t - 8.4) * PI * 2.2);
-            patient.torso.scale.z = .72 + .05 * b;
+            patient.torso.scale.z = .72 - .11 * c;
+        } else if (t >= 8.35) {
+            const gasp = gauss(t, 8.45, .08);
+            const b = .5 + .5 * Math.sin((t - 8.6) * PI * 2.4);
+            patient.torso.scale.z = .72 + .14 * gasp + .04 * b;
         }
 
-        // sac : dans la main jusqu'à 2,15 s, puis posé au sol
-        const shouldAttach = t < 2.15;
-        if (shouldAttach !== bagAttached) bagAttached = shouldAttach;
-        if (bagAttached) {
+        // sac : suit la main jusqu'à ce qu'elle le pose, puis reste à cet endroit
+        if (t < PLACE_T) {
             medic.root.updateMatrixWorld(true);
             medic.lHand.getWorldPosition(tmp);
-            bag.position.set(tmp.x, Math.max(0, tmp.y - .27), tmp.z);
-            bag.rotation.set(0, FACE + PI / 2, .04 * Math.sin(t * 6));
+            bag.position.set(tmp.x, Math.max(0, tmp.y - bag.userData.HANG), tmp.z);
+            const swing = t < 1.0 ? .05 * Math.sin(t * 9) : 0;
+            bag.rotation.set(swing * .5, 0, swing);
         } else {
-            const k = smooth(clamp((t - 2.15) / .2, 0, 1));
-            bag.position.set(BAG_GROUND.x, BAG_GROUND.y + (1 - k) * .05, BAG_GROUND.z);
-            bag.rotation.set(0, .3, 0);
+            const k = smooth(clamp((t - PLACE_T) / .15, 0, 1));
+            bag.position.set(BAG_GROUND.x, Math.max(0, PLACE_Y) * (1 - k), BAG_GROUND.z);
+            bag.rotation.set(0, 0, 0);
         }
-        // couvercle : s'ouvre à 2,9 s, se referme à 9,1 s
-        const open = smooth(clamp((t - 2.9) / .4, 0, 1)) * (1 - smooth(clamp((t - 9.1) / .45, 0, 1)));
-        bag.userData.lid.rotation.x = -1.9 * open;
+        // couvercle : ouvert par le secouriste à 2,6 s, refermé à 9,1 s
+        const open = smooth(clamp((t - 2.6) / .35, 0, 1)) * (1 - smooth(clamp((t - 9.1) / .45, 0, 1)));
+        bag.userData.lid.rotation.x = -1.95 * open;
 
         // lumières
         const s = Math.floor(performance.now() / 110) % 4;
