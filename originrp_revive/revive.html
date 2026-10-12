@@ -490,6 +490,8 @@ code { color:var(--cyan); }
         putdown: pose({ pos: [.92, .5, KZ], rot: [0, FACE, 0], spine: [.5, 1.3, 0], neck: [.3, .2, 0], lSh: [-.7, 0, .15], lEl: [-.2, 0, 0], rSh: [-.75, 0, -.1], rEl: [-.5, 0, 0], lHip: [-1.3, 0, .1], lKn: [1.45, 0, 0], rHip: [.05, 0, -.05], rKn: [1.55, 0, 0] }),
         kneel2: pose({ pos: [.52, .5, KZ], rot: [0, FACE, 0], spine: [.3, 0, 0], neck: [.2, 0, 0], lSh: [-.7, 0, .1], lEl: [-.6, 0, 0], rSh: [-.7, 0, -.1], rEl: [-.6, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
         openBag: pose({ pos: [.72, .5, KZ], rot: [0, FACE, 0], spine: [.6, 1.1, 0], neck: [.4, .1, 0], lSh: [-.95, 0, .1], lEl: [-.3, 0, 0], rSh: [-1.0, 0, -.1], rEl: [-.5, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
+        reachLid: pose({ pos: [.72, .5, KZ], rot: [0, FACE, 0], spine: [.55, 1.1, 0], neck: [.4, .15, 0], lSh: [-.85, 0, .05], lEl: [-.25, 0, 0], rSh: [-.6, 0, -.1], rEl: [-.5, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
+        liftLid: pose({ pos: [.72, .5, KZ], rot: [0, FACE, 0], spine: [.4, 1.0, 0], neck: [.3, .15, 0], lSh: [-1.75, 0, .05], lEl: [-.55, 0, 0], rSh: [-.6, 0, -.1], rEl: [-.5, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
         gloveOn: pose({ pos: [.54, .5, KZ], rot: [0, FACE, 0], spine: [.15, 0, 0], neck: [.35, 0, 0], lSh: [-1.0, 0, -.35], lEl: [-1.3, 0, 0], rSh: [-1.0, 0, .35], rEl: [-1.3, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
         pulse: pose({ pos: [.5, .5, KZ], rot: [0, FACE, 0], spine: [.6, .35, 0], neck: [.45, -.25, 0], lSh: [-1.0, 0, .1], lEl: [-.9, 0, 0], rSh: [-1.35, 0, -.55], rEl: [-.35, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
         cpr: pose({ pos: [.48, .5, KZ], rot: [0, FACE, 0], spine: [.78, 0, 0], neck: [.45, 0, 0], lSh: [-1.02, 0, -.33], lEl: [0, 0, 0], rSh: [-1.02, 0, .33], rEl: [0, 0, 0], lHip: [0, 0, .12], lKn: [1.57, 0, 0], rHip: [0, 0, -.12], rKn: [1.57, 0, 0] }),
@@ -504,8 +506,8 @@ code { color:var(--cyan); }
 
     const MEDIC = [
         [0, P.walkA], [.33, P.walkB], [.66, P.walkA], [1.0, P.walkC],
-        [1.5, P.kneel1], [1.95, P.putdown], [2.4, P.kneel2],
-        [2.75, P.openBag], [3.05, P.openBag], [3.3, P.gloveOn], [3.55, P.gloveOn], [3.75, P.kneel2], [4.0, P.pulse], [4.4, P.pulse],
+        [1.5, P.kneel1], [1.95, P.putdown], [2.25, P.putdown],
+        [2.45, P.reachLid], [2.75, P.liftLid], [2.95, P.openBag], [3.1, P.openBag], [3.3, P.gloveOn], [3.55, P.gloveOn], [3.75, P.kneel2], [4.0, P.pulse], [4.4, P.pulse],
         [4.8, P.cpr], [8.4, P.cpr], [8.8, P.relief], [9.6, P.support],
     ];
     // les jambes du secouriste suivent la marche : correction des positions intermédiaires
@@ -627,32 +629,41 @@ code { color:var(--cyan); }
     const BAG_GROUND = medic.lHand.getWorldPosition(new THREE.Vector3());
     const PLACE_Y = BAG_GROUND.y - bag.userData.HANG;
     BAG_GROUND.y = 0;
+    const LID_A = 2.45, LID_B = 2.75;
+    const handY = (t) => { apply(medic, sample(MEDIC, t)); medic.root.updateMatrixWorld(true); return medic.lHand.getWorldPosition(new THREE.Vector3()).y; };
+    const LID_YA = handY(LID_A), LID_YB = handY(LID_B);
     // gants que le secouriste sort de la boîte puis enfile
     const handGloves = [bag.userData.makeGlove(), bag.userData.makeGlove()];
     medic.lHand.add(handGloves[0]); medic.rHand.add(handGloves[1]);
-    handGloves.forEach((g, i) => { g.position.set(0, -.1, .01); g.rotation.set(-Math.PI / 2, 0, i ? .2 : -.2); g.visible = false; });
+    handGloves.forEach((g) => { g.visible = false; });
 
     function update(t) {
         // secouriste
         const m = sample(MEDIC, t);
+        const env = smooth(clamp((t - 4.8) / .25, 0, 1)) * (1 - smooth(clamp((t - 8.1) / .3, 0, 1)));
         if (t >= 4.8 && t < 8.4) {
             // compressions : ~2 par seconde
-            const c = Math.max(0, Math.sin((t - 4.8) * PI * 4));
+            const c = env * Math.max(0, Math.sin((t - 4.8) * PI * 4));
             m.spine = [m.spine[0] + .08 * c, m.spine[1], m.spine[2]];
             m.pos = [m.pos[0], m.pos[1] - .035 * c, m.pos[2]];
         }
         apply(medic, m);
         // gants : pris dans la boîte à 3,0 s, tenus jusqu'à 3,5 s, puis enfilés (mains bleues)
-        const holding = t >= 3.0 && t < 3.5;
-        handGloves.forEach((g) => { g.visible = holding; });
-        bag.userData.boxGloves.visible = t < 3.0;
-        medic.handMat.color.set(t >= 3.5 ? 0x3b82f6 : 0xb98263);
+        const holding = t >= 3.05 && t < 3.55;
+        const slide = smooth(clamp((t - 3.3) / .25, 0, 1));
+        handGloves.forEach((g, i) => {
+            g.visible = holding;
+            g.position.set(0, -.13 + .1 * slide, .005);
+            g.rotation.set(PI / 2, 0, (i ? .25 : -.25) * (1 - slide));
+        });
+        bag.userData.boxGloves.visible = t < 3.05;
+        medic.handMat.color.set(t >= 3.55 ? 0x3b82f6 : 0xb98263);
 
         // patient
         const p = sample(PATIENT, t);
         if (t >= 4.8 && t < 8.4) {
             // chaque compression secoue le corps inerte
-            const c = Math.max(0, Math.sin((t - 4.8) * PI * 4));
+            const c = env * Math.max(0, Math.sin((t - 4.8) * PI * 4));
             p.pos = [p.pos[0], p.pos[1] - .022 * c, p.pos[2]];
             p.neck = [p.neck[0] + .22 * c, p.neck[1] + .06 * Math.sin((t - 4.8) * PI * 2), p.neck[2]];
             p.lSh = [p.lSh[0] - .12 * c, p.lSh[1], p.lSh[2] + .1 * c];
@@ -660,7 +671,7 @@ code { color:var(--cyan); }
             p.lEl = [p.lEl[0] - .15 * c, 0, 0]; p.rEl = [p.rEl[0] - .15 * c, 0, 0];
             p.lKn = [p.lKn[0] + .06 * c, 0, 0];
         }
-        if (t >= 8.35 && t < 9.0) {
+        if (t >= 8.25 && t < 9.2) {
             // grande inspiration, puis 3 quintes de toux
             const gasp = gauss(t, 8.45, .07);
             const cough = gauss(t, 8.58, .04) + gauss(t, 8.72, .04) + gauss(t, 8.86, .04);
@@ -671,11 +682,11 @@ code { color:var(--cyan); }
         apply(patient, p);
         patient.torso.scale.set(1.15, 1, .72);
         if (t >= 4.8 && t < 8.4) {
-            const c = Math.max(0, Math.sin((t - 4.8) * PI * 4));
+            const c = env * Math.max(0, Math.sin((t - 4.8) * PI * 4));
             patient.torso.scale.z = .72 - .11 * c;
-        } else if (t >= 8.35) {
+        } else if (t >= 8.4) {
             const gasp = gauss(t, 8.45, .08);
-            const b = .5 + .5 * Math.sin((t - 8.6) * PI * 2.4);
+            const b = (.5 - .5 * Math.cos((t - 8.35) * PI * 2.4)) * smooth(clamp((t - 8.35) / .3, 0, 1));
             patient.torso.scale.z = .72 + .14 * gasp + .04 * b;
         }
 
@@ -691,8 +702,13 @@ code { color:var(--cyan); }
             bag.position.set(BAG_GROUND.x, Math.max(0, PLACE_Y) * (1 - k), BAG_GROUND.z);
             bag.rotation.set(0, PI / 2, 0);
         }
-        // couvercle : ouvert par le secouriste à 2,6 s, refermé à 9,1 s
-        const open = smooth(clamp((t - 2.6) / .35, 0, 1)) * (1 - smooth(clamp((t - 9.1) / .45, 0, 1)));
+        // couvercle : ne bouge que lorsque la main le soulève (2,45 → 2,75 s), puis reste ouvert
+        let open = 0;
+        if (t >= LID_B) open = 1;
+        else if (t > LID_A) {
+            medic.root.updateMatrixWorld(true);
+            open = clamp((medic.lHand.getWorldPosition(tmp).y - LID_YA) / (LID_YB - LID_YA), 0, 1);
+        }
         bag.userData.lid.rotation.x = -1.95 * open;
 
         // lumières
