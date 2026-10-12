@@ -72,7 +72,7 @@ code { color:var(--cyan); }
   <header>
     <div>
       <h1>Réanimation <span>avec kit de soin</span> // OriginRP</h1>
-      <p class="sub">Ressource <code>originrp_revive</code> — le secouriste pose son sac médical, prend le pouls, fait un massage cardiaque : réanimation complète en moins de 10 s.</p>
+      <p class="sub">Ressource <code>originrp_revive</code> — aperçu de l'animation jouée en jeu sur les personnages de tes joueurs : sac médical posé au sol, pouls, massage cardiaque, réanimation en moins de 10 s.</p>
     </div>
     <div class="tabs" id="mainTabs"><button data-v="preview" class="on">Animation</button><button data-v="code">Script Lua</button></div>
   </header>
@@ -540,7 +540,7 @@ code { color:var(--cyan); }
     scene.add(curb);
 
     // ambulance en arrière-plan
-    const amb = new THREE.Group(); amb.position.set(-5.4, 0, -2.8); amb.rotation.y = .35; scene.add(amb);
+    const amb = new THREE.Group(); amb.position.set(-5.4, 0, -2.8); amb.rotation.y = .35; // décor non affiché : la réanimation se fait n'importe où
     const white = new THREE.MeshStandardMaterial({ color: 0xf2f2ee, roughness: .45, metalness: .2 });
     const ambSide = new THREE.MeshStandardMaterial({ map: ambTex(), roughness: .45, metalness: .15 });
     const box = mesh(new THREE.BoxGeometry(2.2, 2.1, 3.4), [ambSide, ambSide, white, white, white, white], 0, 1.45, -.6, amb);
@@ -713,7 +713,7 @@ code { color:var(--cyan); }
 
         // lumières
         const s = Math.floor(performance.now() / 110) % 4;
-        strobeR.intensity = s === 0 || s === 1 ? 2.2 : 0; strobeB.intensity = s === 2 || s === 3 ? 2.2 : 0;
+        strobeR.intensity = 0; strobeB.intensity = 0; void s;
         red.emissiveIntensity = strobeR.intensity ? 3 : .2; blue.emissiveIntensity = strobeB.intensity ? 3 : .2;
         heartLight.intensity = t > 8.4 ? 1.2 * Math.max(0, Math.sin((t - 8.4) * PI * 2.4)) : 0;
     }
