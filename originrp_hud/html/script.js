@@ -14,11 +14,15 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 const hud = document.getElementById('hud');
 const gauges = {};
+const bars = {};
 
 const config = {
-    gauges: ['health', 'armor', 'thirst', 'hunger'],
+    gauges: ['thirst', 'hunger'],
+    bars: ['health', 'armor'],
     scale: 1,
     gap: 14,
+    barWidth: 210,
+    showValues: true,
     lowThreshold: 20,
     hideArmorWhenEmpty: false,
 };
@@ -26,7 +30,11 @@ const config = {
 function build() {
     hud.textContent = '';
     for (const key of Object.keys(gauges)) delete gauges[key];
+    for (const key of Object.keys(bars)) delete bars[key];
 
+    // Faim / soif : jauges rondes (inchangées), au-dessus
+    const needs = document.createElement('div');
+    needs.className = 'needs';
     config.gauges.forEach((type) => {
         if (!ICONS[type]) return;
         const node = document.createElement('div');
@@ -45,27 +53,54 @@ function build() {
                     stroke-dasharray="${CIRCUMFERENCE}" stroke-dashoffset="${CIRCUMFERENCE}"/>
             </svg>
             <div class="icon">${ICONS[type]}</div>`;
-        hud.appendChild(node);
+        needs.appendChild(node);
         gauges[type] = { node, bar: node.querySelector('.bar') };
     });
+    if (needs.children.length) hud.appendChild(needs);
+
+    // Vie / armure : barres sur la longueur, en dessous
+    const list = document.createElement('div');
+    list.className = `bars${config.showValues ? '' : ' no-values'}`;
+    config.bars.forEach((type) => {
+        if (!ICONS[type]) return;
+        const node = document.createElement('div');
+        node.className = 'bar-row';
+        node.dataset.type = type;
+        node.innerHTML = `<span class="b-icon">${ICONS[type]}</span><div class="b-track"><i class="b-fill"></i></div><span class="b-val">0</span>`;
+        list.appendChild(node);
+        bars[type] = { node, fill: node.querySelector('.b-fill'), val: node.querySelector('.b-val') };
+    });
+    if (list.children.length) hud.appendChild(list);
 }
 
 function applyConfig(data) {
     Object.assign(config, data || {});
+    const scale = Number(config.scale) || 1;
     const root = document.documentElement.style;
-    root.setProperty('--size', `${44 * (Number(config.scale) || 1)}px`);
+    root.setProperty('--size', `${44 * scale}px`);
+    root.setProperty('--bar-width', `${(Number(config.barWidth) || 210) * scale}px`);
+    root.setProperty('--bar-height', `${8 * scale}px`);
     root.setProperty('--gap', `${Number(config.gap) || 0}px`);
     build();
 }
 
 function setValue(type, value) {
-    const gauge = gauges[type];
-    if (!gauge) return;
     const percent = Math.max(0, Math.min(100, Number(value) || 0));
-    gauge.bar.style.strokeDashoffset = String(CIRCUMFERENCE * (1 - percent / 100));
-    gauge.node.classList.toggle('empty', percent <= 0);
-    gauge.node.classList.toggle('low', percent > 0 && percent <= config.lowThreshold && type !== 'armor');
-    if (type === 'armor') gauge.node.classList.toggle('gone', config.hideArmorWhenEmpty && percent <= 0);
+    const low = percent > 0 && percent <= config.lowThreshold && type !== 'armor';
+    const gauge = gauges[type];
+    if (gauge) {
+        gauge.bar.style.strokeDashoffset = String(CIRCUMFERENCE * (1 - percent / 100));
+        gauge.node.classList.toggle('empty', percent <= 0);
+        gauge.node.classList.toggle('low', low);
+    }
+    const bar = bars[type];
+    if (bar) {
+        bar.fill.style.width = `${percent}%`;
+        bar.val.textContent = Math.round(percent);
+        bar.node.classList.toggle('empty', percent <= 0);
+        bar.node.classList.toggle('low', low);
+        if (type === 'armor') bar.node.classList.toggle('gone', config.hideArmorWhenEmpty && percent <= 0);
+    }
 }
 
 function setAnchor(anchor) {
@@ -110,6 +145,7 @@ if (RESOURCE) {
         demo.thirst = demo.thirst <= 10 ? 90 : demo.thirst - 7;
         demo.hunger = demo.hunger <= 10 ? 80 : demo.hunger - 4;
         demo.armor = demo.armor >= 100 ? 0 : demo.armor + 25;
+        demo.health = demo.health <= 15 ? 100 : demo.health - 9;
         Object.entries(demo).forEach(([t, v]) => setValue(t, v));
     }, 1500);
 }

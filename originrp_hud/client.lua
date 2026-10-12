@@ -79,6 +79,9 @@ RegisterNUICallback('ready', function(_, cb)
     lastSent = {}
     cb({
         gauges = Config.Gauges,
+        bars = Config.Bars,
+        barWidth = Config.BarWidth,
+        showValues = Config.ShowValues,
         scale = Config.Scale,
         gap = Config.Gap,
         lowThreshold = Config.LowThreshold,

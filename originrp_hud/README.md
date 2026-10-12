@@ -1,7 +1,10 @@
 # originrp_hud
 
-HUD à côté de la minimap : vie, armure, soif, faim, dans le style des menus OriginRP.
-Les jauges se placent automatiquement à droite de la minimap, quelles que soient
+HUD à côté de la minimap, dans le style des menus OriginRP :
+- **vie** et **armure** en barres sur la longueur ;
+- **soif** et **faim** en jauges rondes, juste au-dessus.
+
+Le HUD se place automatiquement à droite de la minimap, quelles que soient
 la résolution et la zone de sécurité du joueur.
 
 ## Installation
@@ -9,7 +12,7 @@ la résolution et la zone de sécurité du joueur.
 1. Copier le dossier `originrp_hud` dans `resources/`.
 2. Ajouter `ensure originrp_hud` dans `server.cfg` (après ESX / QBCore).
 3. **Désactiver l'ancien HUD** (sinon les deux s'affichent).
-4. Réglages dans `config.lua` (jauges affichées, taille, seuil d'alerte…).
+4. Réglages dans `config.lua` (jauges et barres affichées, longueur des barres, taille, seuil d'alerte…).
 
 ## Faim / soif
 
@@ -25,7 +28,7 @@ exports.originrp_hud:setStatus('thirst', 40)
 
 - `/hud` affiche / masque le HUD (commande modifiable dans `config.lua`).
 - Masqué automatiquement dans le menu pause, écran noir, et quand la minimap est cachée.
-- Sous 20 % (réglable), la jauge passe en rouge et clignote. L'armure vide est grisée.
+- Sous 20 % (réglable), la jauge ou la barre passe en rouge et clignote. L'armure vide est grisée.
 - `exports.originrp_hud:setVisible(false)` pour le masquer depuis un autre script (cinématique…).
 
 ## Aperçu hors jeu

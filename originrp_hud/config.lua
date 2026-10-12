@@ -5,10 +5,19 @@ Config = {}
 -- exports.originrp_hud:setStatus('hunger', 75)).
 Config.Framework = 'auto'
 
--- Jauges affichées, dans l'ordre (retirer une ligne pour la masquer)
-Config.Gauges = { 'health', 'armor', 'thirst', 'hunger' }
+-- Jauges rondes (au-dessus), dans l'ordre (retirer une ligne pour la masquer)
+Config.Gauges = { 'thirst', 'hunger' }
 
--- Taille des jauges (1.0 = 44 px en 1080p)
+-- Barres sur la longueur (en dessous), dans l'ordre
+Config.Bars = { 'health', 'armor' }
+
+-- Longueur des barres en pixels (en 1080p, avant Config.Scale)
+Config.BarWidth = 210
+
+-- Afficher la valeur (0 à 100) au bout des barres
+Config.ShowValues = true
+
+-- Taille générale (1.0 = jauges de 44 px en 1080p)
 Config.Scale = 1.0
 
 -- Espace entre la minimap et les jauges, en pixels
