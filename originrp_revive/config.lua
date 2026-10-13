@@ -18,9 +18,10 @@ Config.Steps = {
     conscience  = 800,   -- vérification 1 : taper les épaules, appeler la personne
     respiration = 900,   -- vérification 2 : basculer la tête, écouter le souffle
     pouls       = 700,   -- vérification 3 : pouls carotidien
-    intro       = 500,   -- placer les mains sur le sternum
-    cpr         = 2900,  -- massage cardiaque
-    success     = 1100,  -- la personne reprend son souffle
+    intro       = 400,   -- placer les mains sur le sternum
+    cpr         = 1600,  -- massage cardiaque
+    success     = 1000,  -- la personne reprend son souffle
+    getup       = 1500,  -- se relève, accompagnée par le secouriste (après la réanimation)
 }
 
 -- Position du secouriste par rapport à la personne au sol (x = côté, y = vers la tête)
@@ -57,6 +58,7 @@ Config.Anims = {
     medicWin     = { 'mini@cpr@char_a@cpr_str', 'cpr_success' },
     patientWin   = { 'mini@cpr@char_b@cpr_str', 'cpr_success' },
     kneelExit    = { 'amb@medic@standing@kneel@exit', 'exit' },
+    patientGetUp = { 'get_up@sat_on_floor@to_stand', 'getup_0' },   -- se relever du sol (à vérifier en jeu)
 }
 
 -- Caméra cinématique pendant la réanimation (secouriste et patient)

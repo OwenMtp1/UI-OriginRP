@@ -3,7 +3,8 @@ local Busy = {}     -- source (secouriste ou patient) -> true
 
 local function totalDuration()
     local t = 0
-    for _, ms in pairs(Config.Steps) do t = t + ms end
+    -- le relevé a lieu après la réanimation : il n'entre pas dans la durée contrôlée
+    for name, ms in pairs(Config.Steps) do if name ~= 'getup' then t = t + ms end end
     return t
 end
 

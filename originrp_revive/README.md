@@ -55,9 +55,10 @@ source si tu veux retoucher le modèle.
 | Vérification 1 : conscience (tape les épaules) | 0,8 s | `tendtodead@idle_a` / `idle_a` |
 | Vérification 2 : respiration (tête basculée, écoute) | 0,9 s | `tendtodead@idle_a` / `idle_b` |
 | Vérification 3 : pouls carotidien | 0,7 s | `tendtodead@idle_a` / `idle_c` |
-| Mains en position | 0,5 s | `mini@cpr@char_a@cpr_def` / `cpr_intro` |
-| Massage cardiaque | 2,9 s | `mini@cpr@char_a@cpr_str` / `cpr_pumpchest` |
-| Reprise du souffle | 1,1 s | `cpr_success` |
+| Mains en position | 0,4 s | `mini@cpr@char_a@cpr_def` / `cpr_intro` |
+| Massage cardiaque | 1,6 s | `mini@cpr@char_a@cpr_str` / `cpr_pumpchest` |
+| Reprise du souffle | 1,0 s | `cpr_success` |
+| Relevé accompagné (après la réanimation) | 1,5 s | secouriste `kneel@exit`, victime `get_up@sat_on_floor@to_stand` (à vérifier en jeu) |
 
 Total : 9,4 s. Caméra cinématique pour le secouriste et la victime. X annule.
 Le serveur vérifie la distance, le kit, l'état de la victime et la durée réelle avant de réanimer.

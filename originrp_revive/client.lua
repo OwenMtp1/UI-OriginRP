@@ -205,14 +205,16 @@ local function revive(patient)
     TriggerServerEvent('originrp_revive:finish')
     lib.hideTextUI()
     stopCam()
-    -- le secouriste referme et reprend son sac en se relevant
+    -- 6. le secouriste se relève en même temps que la personne pour l'accompagner,
+    --    puis referme et reprend son sac
+    playAnim(ped, A.kneelExit, 0, S.getup)
+    Wait(S.getup)
     if custom() and bag then
         swapBag(Config.Props.bag.closed)
         FreezeEntityPosition(bag, false)
         attachToHand(ped, bag)
     end
-    playAnim(ped, A.kneelExit, 0, 1200)
-    SetTimeout(1200, deleteBag)
+    SetTimeout(800, deleteBag)
     running = false
 end
 
@@ -248,6 +250,15 @@ RegisterNetEvent('originrp_revive:patientStop', function(success)
     patientActive = false
     stopCam()
     if success then
+        -- une fois réanimée, la personne se relève doucement (pas de téléportation debout)
+        SetTimeout(150, function()
+            local ped = PlayerPedId()
+            if not IsEntityDead(ped) then
+                local A = Config.Anims.patientGetUp
+                lib.requestAnimDict(A[1])
+                TaskPlayAnim(ped, A[1], A[2], 2.0, -2.0, Config.Steps.getup, 0, 0.0, false, false, false)
+            end
+        end)
         AnimpostfxPlay('SuccessNeutral', 0, false)
         SetTimeout(1500, function() AnimpostfxStop('SuccessNeutral') end)
     end
