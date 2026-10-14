@@ -130,3 +130,34 @@ add_principal identifier.license:XXXXXXXX group.admin   # pour chaque membre du 
 
 Ouvrir `originrp_menu/html/index.html` dans un navigateur (données de démo, avec un exemple de sous-menu sur « Paramètres »).
 `index.html#entreprise`, `#organisation` et `#staff` ouvrent directement ces menus. Menu fermé : F5, F6, F7 ou F10 pour le rouvrir.
+
+## Événements illégaux (menu staff, F10)
+
+Dans le menu staff, **Événements illégaux** contient trois sections : **KOTH**, **Cargaison** et **Go-Fast**. Chacune propose :
+
+- **Lancer** un événement (le serveur en choisit un au hasard dans sa liste) ;
+- **Lister** les entrées, avec **Créer** en tête de liste. Chaque entrée ouvre ses actions : **Renommer**, **Modifier**, **Supprimer**, **Se téléporter**. Pour les cargaisons et les go-fast : **Téléporter au départ** et **Téléporter à l'arrivée**.
+
+Le menu ne fait que transmettre les actions : c'est le script de l'événement qui les exécute. Il faut donc, côté serveur :
+
+```lua
+-- Entrées affichées dans les listes (à appeler au démarrage et à chaque changement)
+exports.originrp_menu:setEventList('koth', {
+    { id = 1, label = 'Vinewood', description = 'Zone nord', value = '3 victoires' },
+})
+
+-- Lancer : le serveur choisit une entrée au hasard
+AddEventHandler('originrp_menu:events:onLaunch', function(source, kind)
+    -- ex. lancer un KOTH aléatoire
+end)
+
+-- Actions : kind = 'koth' | 'cargaison' | 'gofast', id, action = 'create' | 'rename' | 'edit' | 'delete' | 'tp' | 'tp_start' | 'tp_end'
+AddEventHandler('originrp_menu:events:onAction', function(source, data)
+    -- ex. data.action == 'tp' -> téléporter source à l'entrée data.id
+end)
+```
+
+- Les événements sont ignorés si le joueur n'a pas la permission `originrp.staff` (même vérification que pour l'ouverture du menu).
+- Créer, renommer ou modifier demande des informations (nom, positions…) : c'est au script de l'événement de les demander, par exemple avec son propre menu ou un clavier.
+- Les listes ne se mettent à jour que lorsque le menu est ouvert ou que `setEventList` est appelé.
+- Les libellés et les actions se modifient dans `Config.EventTypes` (`originrp_menu/config.lua`).

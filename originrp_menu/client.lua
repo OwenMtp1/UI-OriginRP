@@ -196,6 +196,77 @@ AddEventHandler('onResourceStop', function(resource)
     end
 end)
 
+---------------------------------------------------------------------------
+-- Listes d'événements (KOTH, cargaisons, go-fast) alimentées par le serveur
+---------------------------------------------------------------------------
+-- Les menus « _liste » gardent leur rubrique « Créer » (base), puis reçoivent
+-- une rubrique par entrée. Chaque entrée ouvre un menu d'actions généré ici.
+local listBase = {}
+for id, menu in pairs(Config.Menus) do
+    if menu.kind then listBase[id] = menu.items end
+end
+
+local function clearEntryMenus(kind)
+    local prefix = kind .. ':'
+    for id in pairs(Config.Menus) do
+        if id:sub(1, #prefix) == prefix then Config.Menus[id] = nil end
+    end
+end
+
+local function entryMenu(kind, entry)
+    local kindType = Config.EventTypes[kind]
+    local items = {}
+    for _, a in ipairs(kindType.actions) do
+        items[#items + 1] = {
+            icon = a.icon,
+            label = a.label,
+            serverEvent = 'originrp_menu:events:action',
+            args = { { kind = kind, id = entry.id, action = a.action } },
+        }
+    end
+    return {
+        title = entry.label,
+        subtitle = ('Menu staff › %s'):format(kindType.label),
+        counter = true,
+        hints = true,
+        items = items,
+    }
+end
+
+local function setList(kind, entries)
+    local listId = kind .. '_liste'
+    local menu = Config.Menus[listId]
+    local kindType = Config.EventTypes[kind]
+    if not menu or not kindType then return end
+
+    clearEntryMenus(kind)
+    local items = {}
+    for _, item in ipairs(listBase[listId] or {}) do items[#items + 1] = item end
+
+    for _, entry in ipairs(entries or {}) do
+        local key = ('%s:%s'):format(kind, entry.id)
+        Config.Menus[key] = entryMenu(kind, entry)
+        items[#items + 1] = {
+            icon = kindType.icon,
+            label = entry.label,
+            description = entry.description,
+            value = entry.value,
+            submenu = key,
+        }
+    end
+
+    if not entries or #entries == 0 then
+        items[#items + 1] = { icon = 'info', label = 'Aucune entrée', description = 'Rien de créé pour le moment', disabled = true }
+    end
+
+    menu.items = items
+    refresh()
+end
+
+RegisterNetEvent('originrp_menu:events:setList', setList)
+
+exports('setList', setList)
+
 exports('openMenu', openMenu)
 exports('closeMenu', closeMenu)
 exports('setMenu', setMenu)

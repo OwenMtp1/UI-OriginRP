@@ -57,6 +57,43 @@ Config.Keybinds = {
         close       false pour garder le menu ouvert après l'action (défaut : true)
 ]]
 
+-- Actions proposées pour chaque entrée d'une liste.
+-- Pour cargaison et go-fast : le téléport est au départ ou à l'arrivée.
+Config.EventTypes = {
+    koth = {
+        label = 'KOTH',
+        icon = 'shield',
+        actions = {
+            { action = 'rename', label = 'Renommer',           icon = 'file' },
+            { action = 'edit',   label = 'Modifier',           icon = 'key' },
+            { action = 'delete', label = 'Supprimer',          icon = 'ban' },
+            { action = 'tp',     label = 'Se téléporter',      icon = 'map' },
+        },
+    },
+    cargaison = {
+        label = 'Cargaison',
+        icon = 'briefcase',
+        actions = {
+            { action = 'rename',   label = 'Renommer',                    icon = 'file' },
+            { action = 'edit',     label = 'Modifier',                    icon = 'key' },
+            { action = 'delete',   label = 'Supprimer',                   icon = 'ban' },
+            { action = 'tp_start', label = 'Téléporter au départ',        icon = 'map' },
+            { action = 'tp_end',   label = 'Téléporter à l\'arrivée',     icon = 'map' },
+        },
+    },
+    gofast = {
+        label = 'Go-Fast',
+        icon = 'car',
+        actions = {
+            { action = 'rename',   label = 'Renommer',                    icon = 'file' },
+            { action = 'edit',     label = 'Modifier',                    icon = 'key' },
+            { action = 'delete',   label = 'Supprimer',                   icon = 'ban' },
+            { action = 'tp_start', label = 'Téléporter au départ',        icon = 'map' },
+            { action = 'tp_end',   label = 'Téléporter à l\'arrivée',     icon = 'map' },
+        },
+    },
+}
+
 Config.Menus = {
     main = {
         title = 'Menu F5',
@@ -145,6 +182,7 @@ Config.Menus = {
             { id = 'moi',     icon = 'user',     label = 'Moi',                description = 'Noclip, invisibilité, téléportation',  event = 'originrp_menu:staff:moi' },
             { id = 'joueurs', icon = 'users',    label = 'Joueurs',            description = 'Liste et actions sur les joueurs',     value = '0 en ligne', event = 'originrp_menu:staff:joueurs' },
             { id = 'serveur', icon = 'server',   label = 'Gestion du serveur', description = 'Météo, heure, annonces',               event = 'originrp_menu:staff:serveur' },
+            { id = 'evenements', icon = 'shield', label = 'Événements illégaux', description = 'KOTH, cargaisons et go-fast',          submenu = 'evenements' },
             { id = 'bans',    icon = 'ban',      label = 'Bans',               description = 'Consulter et gérer les bannissements', event = 'originrp_menu:staff:bans' },
             { id = 'params',  icon = 'settings', label = 'Paramètres',         description = 'Préférences du staff',                 event = 'originrp_menu:staff:parametres' },
         },
@@ -152,7 +190,9 @@ Config.Menus = {
         -- Joueurs en ligne : mis à jour automatiquement par server.lua.
         -- Reports en attente : le système de reports de la base doit faire,
         -- côté serveur, GlobalState.originrp_reports = <nombre>
+        -- Listes des événements (KOTH, cargaisons, go-fast) demandées au serveur
         onOpen = function()
+            TriggerServerEvent('originrp_menu:events:requestLists')
             local reports = GlobalState.originrp_reports or 0
             local players = GlobalState.originrp_players or 0
             return {
@@ -162,6 +202,88 @@ Config.Menus = {
                 },
             }
         end,
+    },
+
+    -- ===================== Événements illégaux (staff) =====================
+    -- Structure : Événements > KOTH / Cargaison / Go-Fast > Lancer / Lister > entrée > actions.
+    -- Les menus « _liste » reçoivent leurs entrées du serveur (voir README).
+
+    evenements = {
+        title = 'Événements illégaux',
+        subtitle = 'Menu staff › Gestion des événements',
+        counter = true,
+        hints = true,
+        items = {
+            { id = 'koth',      icon = 'shield',   label = 'KOTH',      description = 'Zones de contrôle',           submenu = 'koth' },
+            { id = 'cargaison', icon = 'briefcase', label = 'Cargaison', description = 'Livraisons de cargaisons',     submenu = 'cargaison' },
+            { id = 'gofast',    icon = 'car',      label = 'Go-Fast',   description = 'Courses de go-fast',          submenu = 'gofast' },
+        },
+    },
+
+    koth = {
+        title = 'KOTH',
+        subtitle = 'Menu staff › Événements',
+        counter = true,
+        hints = true,
+        items = {
+            { icon = 'shield', label = 'Lancer un KOTH', description = 'Lance un KOTH tiré au hasard dans la liste', serverEvent = 'originrp_menu:events:launch', args = { { kind = 'koth' } } },
+            { icon = 'file',   label = 'Lister les KOTH', description = 'Voir, modifier et supprimer les KOTH', submenu = 'koth_liste' },
+        },
+    },
+
+    koth_liste = {
+        title = 'Liste des KOTH',
+        subtitle = 'Menu staff › KOTH',
+        kind = 'koth',
+        counter = true,
+        hints = true,
+        items = {
+            { icon = 'star', label = 'Créer un KOTH', description = 'Créer à votre position', serverEvent = 'originrp_menu:events:action', args = { { kind = 'koth', action = 'create' } } },
+        },
+    },
+
+    cargaison = {
+        title = 'Cargaison',
+        subtitle = 'Menu staff › Événements',
+        counter = true,
+        hints = true,
+        items = {
+            { icon = 'briefcase', label = 'Lancer une cargaison', description = 'Lance une cargaison tirée au hasard dans la liste', serverEvent = 'originrp_menu:events:launch', args = { { kind = 'cargaison' } } },
+            { icon = 'file',      label = 'Lister les cargaisons', description = 'Voir, modifier et supprimer les cargaisons', submenu = 'cargaison_liste' },
+        },
+    },
+
+    cargaison_liste = {
+        title = 'Liste des cargaisons',
+        subtitle = 'Menu staff › Cargaison',
+        kind = 'cargaison',
+        counter = true,
+        hints = true,
+        items = {
+            { icon = 'star', label = 'Créer une cargaison', description = 'Créer les points de départ et d\'arrivée', serverEvent = 'originrp_menu:events:action', args = { { kind = 'cargaison', action = 'create' } } },
+        },
+    },
+
+    gofast = {
+        title = 'Go-Fast',
+        subtitle = 'Menu staff › Événements',
+        counter = true,
+        hints = true,
+        items = {
+            { icon = 'car',  label = 'Lancer un go-fast', description = 'Lance un go-fast tiré au hasard dans la liste', serverEvent = 'originrp_menu:events:launch', args = { { kind = 'gofast' } } },
+            { icon = 'file', label = 'Lister les go-fast', description = 'Voir, modifier et supprimer les go-fast', submenu = 'gofast_liste' },
+        },
+    },
+
+    gofast_liste = {
+        title = 'Liste des go-fast',
+        subtitle = 'Menu staff › Go-Fast',
+        kind = 'gofast',
+        counter = true,
+        hints = true,
+        items = {
+            { icon = 'star', label = 'Créer un go-fast', description = 'Créer les points de départ et d\'arrivée', serverEvent = 'originrp_menu:events:action', args = { { kind = 'gofast', action = 'create' } } },
+        },
     },
 
     -- Exemple de sous-menu : dans "main", remplacez
