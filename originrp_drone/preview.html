@@ -526,7 +526,7 @@ table{width:100%;border-collapse:collapse}td{padding:6px 4px;border-bottom:1px s
     mk(fg, foamMat, caseG, .08); mk(box(CW - .05, .01, CD - .05), std({ color: '#151617', roughness: 1 }), caseG, .05, 0, foamTop - .065, 0); }
   const recess = std({ color: '#0b0b0c', roughness: 1 });
   // batteries de rechange
-  const batMat = std({ color: '#8e9297', roughness: .45, envMapIntensity: .6 });
+  const batMat = std({ color: '#26282b', roughness: .45, envMapIntensity: .6 });
   for (const z of [-.05, .1]) { const b = mk(rbox(.06, .04, .12, .006), batMat, caseG, .2, .055, foamTop - .03, z); mk(box(.055, .001, .05), std({ map: warnDecal, transparent: true }), caseG, .2, .055, foamTop - .009, z); }
   // poignée de transport avant (rabattable)
   const handle = new THREE.Group(); handle.position.set(0, HB - .035, -CD / 2 - .012); caseG.add(handle);
@@ -567,10 +567,10 @@ table{width:100%;border-collapse:collapse}td{padding:6px 4px;border-bottom:1px s
   latches.forEach((p) => { for (const sx of [-.025, .025]) mk(cyl(.004, .004, .004, 10), steel, p, .2, sx, .012, -.009).rotation.x = PI / 2; });
 
   // ─── Drone OR-D2 « Vigie » (classe 3,7 kg, empattement 67 cm) ───
-  const bodyMat = phys({ color: '#1b1e21', envMapIntensity: .6, roughness: .48, metalness: .05, clearcoat: .35, clearcoatRoughness: .4 });
-  const topMat = phys({ color: '#272a2e', envMapIntensity: .6, roughness: .42, clearcoat: .5, clearcoatRoughness: .3 });
+  const bodyMat = phys({ color: '#08090a', envMapIntensity: .22, roughness: .55, metalness: 0, clearcoat: .12, clearcoatRoughness: .5 });
+  const topMat = phys({ color: '#0e0f11', envMapIntensity: .25, roughness: .45, clearcoat: .2, clearcoatRoughness: .4 });
   const carbonMat = phys({ map: T.carbon, roughness: .3, clearcoat: .8, clearcoatRoughness: .15, color: '#ffffff' });
-  const alu = std({ color: '#3d434b', metalness: .9, roughness: .32 });
+  const alu = std({ color: '#1c1e21', metalness: .8, roughness: .38, envMapIntensity: .5 });
   const glass = phys({ color: '#05070a', metalness: .2, roughness: .04, clearcoat: 1 });
   const bladeMat = std({ color: '#0f1011', roughness: .55 });
   const accent = std({ color: '#26e0ff', emissive: '#26e0ff', emissiveIntensity: .0, roughness: .4 });
@@ -656,14 +656,12 @@ table{width:100%;border-collapse:collapse}td{padding:6px 4px;border-bottom:1px s
 
   // ─── Livrée et détails du drone ───
   const livery = tex(512, 512, (g, w, h) => {
-    g.fillStyle = '#eef0f2'; g.fillRect(0, 0, w, h);
-    g.fillStyle = '#0f1216'; g.fillRect(0, 0, w, 90); g.fillRect(0, h - 90, w, 90);
-    g.fillStyle = '#1d5fd1'; g.fillRect(0, 90, w, 22); g.fillRect(0, h - 112, w, 22);
-    g.fillStyle = '#0f1216'; g.font = 'bold 74px Arial Black, Arial'; g.textAlign = 'center'; g.fillText('ORIGIN', w / 2, 230);
+    g.fillStyle = '#121315'; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#2a2c30'; g.font = 'bold 74px Arial Black, Arial'; g.textAlign = 'center'; g.fillText('ORIGIN', w / 2, 230);
     g.font = 'bold 42px Arial'; g.fillText('AIR UNIT · 07', w / 2, 290);
-    g.fillStyle = 'rgba(0,0,0,.06)'; for (let i = 0; i < 60; i++) g.fillRect(Math.random() * w, Math.random() * h, 10 + Math.random() * 40, 1.2);
+    g.fillStyle = 'rgba(255,255,255,.03)'; for (let i = 0; i < 60; i++) g.fillRect(Math.random() * w, Math.random() * h, 10 + Math.random() * 40, 1.2);
   });
-  const topLiv = mk(new THREE.PlaneGeometry(.12, .17), std({ map: livery, roughness: .35, envMapIntensity: .8 }), frame, .7, 0, .1745, -.01); topLiv.rotation.x = -PI / 2; topLiv.castShadow = false;
+  const topLiv = mk(new THREE.PlaneGeometry(.12, .17), std({ map: livery, roughness: .5, envMapIntensity: .2 }), frame, .7, 0, .1745, -.01); topLiv.rotation.x = -PI / 2; topLiv.castShadow = false;
   for (const [x, z] of [[-.058, .085], [.058, .085], [-.058, -.1], [.058, -.1]]) mk(cyl(.003, .003, .003, 10), std({ color: '#888', metalness: .9, roughness: .3 }), frame, .7, x, .176, z);
   for (const sx of [-1, 1]) { const ln = mk(box(.002, .06, .2), std({ color: '#0c0d0e' }), frame, .7, sx * .0805, .115, 0); ln.castShadow = false; }
   for (const sx of [-1, 1]) { const a = mk(cyl(.003, .002, .09, 8), std({ color: '#141414' }), frame, .5, sx * .06, .055, -.12); a.rotation.set(-.6, 0, sx * .35); }
@@ -673,6 +671,10 @@ table{width:100%;border-collapse:collapse}td{padding:6px 4px;border-bottom:1px s
   const glow = (col, s, parent, x, y, z) => { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: col, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0 })); sp.scale.set(s, s, 1); sp.position.set(x, y, z); parent.add(sp); return sp; };
   arms.forEach((a, i) => { a.glow = glow(i < 2 ? '#ff3030' : '#30ff60', .09, a.pivot, 0, -.016, .23); });
   const beaconGlow = glow('#ff2a3a', .22, frame, 0, .205, -.13);
+  // feu rouge clignotant à l'avant
+  const noseLed = mk(new THREE.SphereGeometry(.0065, 14, 10), new THREE.MeshBasicMaterial({ color: '#3a0508' }), frame, 1, 0, .102, .139);
+  const noseGlow = glow('#ff1020', .16, frame, 0, .102, .145);
+  const noseL = new THREE.PointLight('#ff1020', 0, .6); noseL.position.set(0, .102, .16); frame.add(noseL);
 
   // ─── Télécommande à écran (radiocommande professionnelle 7") ───
   const ctrl = new THREE.Group(); scene.add(ctrl);
@@ -1077,6 +1079,7 @@ table{width:100%;border-collapse:collapse}td{padding:6px 4px;border-bottom:1px s
     arms.forEach((a, i) => { const on = powered && (i < 2 || blink || S.rpm > 100); a.led.material.color.set(on ? (i < 2 ? '#ff3030' : '#30ff60') : '#1a1a1a'); a.ledL.intensity = on ? .5 : 0; a.glow.material.opacity = on ? .9 : 0; });
     batLeds.forEach((l, i) => l.material.color.set(powered && (i % 4) < 3 ? '#39ff6a' : '#18221a'));
     const bOn = (S.rpm > 100) && ((t % 1.5) < .05 || ((t - .15) % 1.5) < .05); beacon.material.color.set(bOn ? '#ff2a3a' : '#3a0a10'); beaconL.intensity = bOn ? 3 : 0; beaconGlow.material.opacity = bOn ? 1 : 0;
+    const nOn = powered && (t % 1) < .5; noseLed.material.color.set(nOn ? '#ff1424' : '#3a0508'); noseGlow.material.opacity = nOn ? 1 : 0; noseL.intensity = nOn ? 1.5 : 0;
     accent.emissiveIntensity = (S.mode === 'fly' || t > 11.25) ? 1.2 : 0;
     spot.intensity = S.light ? 8 : 0;
   }
@@ -1098,7 +1101,7 @@ table{width:100%;border-collapse:collapse}td{padding:6px 4px;border-bottom:1px s
 
   // ─── Caméras ───
   const wcam = new THREE.PerspectiveCamera(42, 1, .02, 800); scene.add(wcam);
-  const fill = new THREE.PointLight('#cfe0ff', .5, 6); wcam.add(fill); fill.position.set(.5, .6, 0);
+  const fill = new THREE.PointLight('#cfe0ff', .22, 6); wcam.add(fill); fill.position.set(.5, .6, 0);
   const SHOTS = [  // t, cible, theta, phi, distance
     [0, [0, .7, -1.6], .5, 1.25, 4.2], [2.2, [0, .4, -.5], .9, 1.05, 2.6], [3.3, [0, .3, -.2], .25, .95, 1.9], [5.6, [-.2, .35, -.2], .55, .9, 1.8],
     [7.1, [0, .6, -.25], .7, 1.05, 1.35], [8.6, [0, .6, -.25], -.7, 1.05, 1.35], [9.5, [-.6, .25, -.6], -.3, .95, 1.6], [10.0, [.1, .4, -.4], .4, 1.0, 1.9], [11.6, [0, .9, -1.0], 2.6, 1.2, 1.4],
