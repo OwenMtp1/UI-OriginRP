@@ -22,3 +22,11 @@ if which == 'hero':
     r = build_ctrl(); r.location = (0.32, -0.42, 0.075); r.rotation_euler = (math.radians(62), 0, math.radians(-12))
     studio(target=(0, -0.1, 0.25), cam_loc=(1.15, -1.55, 0.85), lens=45, samples=spp, res=(1920, 1080))
     render(os.path.join(out, 'final_hero.png'))
+
+if which == 'wreck':
+    from drone_model import build_wreck, smoke
+    reset(); build_wreck()
+    smoke((0.03, 0.02, 0.32), 0.3, 7.0); smoke((0.08, 0.1, 0.75), 0.45, 4.0)
+    studio(target=(0, 0, 0.2), cam_loc=(0.85, -1.0, 0.55), lens=45, samples=spp, res=(1600, 1000))
+    bpy.context.scene.cycles.volume_step_rate = 4
+    render(os.path.join(out, 'final_wreck.png'))

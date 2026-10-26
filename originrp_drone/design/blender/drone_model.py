@@ -129,6 +129,51 @@ def build_drone(folded=0.0):
         box(f'antenna{sx}', (0.004, 0.012, 0.055), (sx * 0.045, -0.13, Z0 - 0.02), M['poly'], bevel=0.0015, rot=(math.radians(-25), 0, 0), parent=root)
     return root, props
 
+
+def build_wreck():
+    """Drone abattu : bras arraché, hélices cassées, coque fissurée et noircie."""
+    root, props = build_drone(0.0)
+    O = bpy.data.objects
+    burnt = mat('burnt', (0.006, 0.006, 0.006), rough=0.9, wear=0.8, wear_color=(0.06, 0.05, 0.045), dust=0.12, grain=0.08, grain_scale=900)
+    ash = mat('ash', (0.09, 0.085, 0.08), rough=1.0, grain=0.3)
+    dead = mat('dead_led', (0.05, 0.0, 0.0), rough=0.4)
+    for o in list(O):
+        if o.type != 'MESH': continue
+        if any(o.name.startswith(n) for n in ('blade1', 'tip1', 'blade3', 'tip3', 'blade2-1', 'tip2-1', 'leg1', 'foot1', 'leg3', 'foot3')): O.remove(o); continue
+        if o.name in ('hull', 'top', 'battery') or o.name.startswith('armClamp'): o.data.materials.clear(); o.data.materials.append(burnt)
+        if o.name in ('noseLed', 'laser') or o.name.startswith('armLed') or o.name.startswith('led'): o.data.materials.clear(); o.data.materials.append(dead)
+    # bras arrière droit arraché (pend et tordu), bras avant droit plié
+    O['armPivot3'].rotation_euler = (math.radians(35), math.radians(-25), math.radians(-120))
+    O['armPivot1'].rotation_euler = (math.radians(-18), 0, math.radians(30))
+    O['gimbal'].rotation_euler = (math.radians(28), math.radians(12), 0)
+    # fissures + traces de brûlure + éclats de carbone
+    for k, (x, y, r) in enumerate([(0.01, 0.03, 25), (-0.02, -0.01, -40), (0.025, -0.06, 70), (-0.03, 0.07, 10)]):
+        box(f'crack{k}', (0.002, 0.05, 0.002), (x, y, 0.075 + 0.0825), ash, rot=(0, 0, math.radians(r)), parent=root)
+    for k in range(5):
+        box(f'shard{k}', (0.01 + k * 0.003, 0.03, 0.002), (0.1 - k * 0.04, -0.2 + k * 0.03, 0.001), O['carbon'] if 'carbon' in O else burnt, rot=(0, 0, k), parent=root) if False else None
+    root.rotation_euler = (math.radians(-6), math.radians(-24), math.radians(20))
+    root.location.z = -0.01
+    return root
+
+def smoke(loc, size=0.5, strength=6.0):
+    bpy.ops.mesh.primitive_cube_add(size=1, location=loc); c = bpy.context.active_object; c.scale = (size, size, size * 1.8)
+    m = bpy.data.materials.new('smoke'); m.use_nodes = True; nt = m.node_tree; nt.nodes.clear()
+    out = nt.nodes.new('ShaderNodeOutputMaterial'); vol = nt.nodes.new('ShaderNodeVolumePrincipled')
+    vol.inputs['Color'].default_value = (0.02, 0.02, 0.02, 1); nt.links.new(vol.outputs[0], out.inputs['Volume'])
+    tc = nt.nodes.new('ShaderNodeTexCoord'); nz = nt.nodes.new('ShaderNodeTexNoise'); nz.inputs['Scale'].default_value = 5.5; nz.inputs['Detail'].default_value = 6
+    nt.links.new(tc.outputs['Object'], nz.inputs['Vector'])
+    grad = nt.nodes.new('ShaderNodeTexGradient'); grad.gradient_type = 'SPHERICAL'; nt.links.new(tc.outputs['Object'], grad.inputs['Vector'])
+    g2 = nt.nodes.new('ShaderNodeMath'); g2.operation = 'MULTIPLY_ADD'; g2.inputs[1].default_value = 2.2; g2.inputs[2].default_value = -0.9; nt.links.new(grad.outputs['Fac'], g2.inputs[0])
+    mx = nt.nodes.new('ShaderNodeMath'); mx.operation = 'MAXIMUM'; mx.inputs[1].default_value = 0; nt.links.new(g2.outputs[0], mx.inputs[0])
+    n2 = nt.nodes.new('ShaderNodeMath'); n2.operation = 'MULTIPLY_ADD'; n2.inputs[1].default_value = 1.6; n2.inputs[2].default_value = -0.45; nt.links.new(nz.outputs['Fac'], n2.inputs[0])
+    n3 = nt.nodes.new('ShaderNodeMath'); n3.operation = 'MAXIMUM'; n3.inputs[1].default_value = 0; nt.links.new(n2.outputs[0], n3.inputs[0])
+    mul = nt.nodes.new('ShaderNodeMath'); mul.operation = 'MULTIPLY'; nt.links.new(mx.outputs[0], mul.inputs[0]); nt.links.new(n3.outputs[0], mul.inputs[1])
+    k = nt.nodes.new('ShaderNodeMath'); k.operation = 'MULTIPLY'; k.inputs[1].default_value = strength * 12; nt.links.new(mul.outputs[0], k.inputs[0])
+    mx = k
+    nt.links.new(mx.outputs[0], vol.inputs['Density'])
+    c.data.materials.append(m)
+    return c
+
 if __name__ == '__main__':
     out = sys.argv[-1]
     reset()

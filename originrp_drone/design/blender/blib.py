@@ -91,6 +91,7 @@ def _nodes(mat):
 def mat(name, color, rough=0.5, metal=0.0, wear=0.0, wear_color=None, wear_rough=None, grain=0.0, grain_scale=600.0, coat=0.0, emit=None, emit_strength=0.0, dust=0.0, alpha=1.0, transmission=0.0):
     """Principled + usure des arêtes (normale biseautée vs normale réelle) + grain + poussière."""
     m = bpy.data.materials.new(name); nt, bs = _nodes(m); L = nt.links.new
+    m["p"] = {"c": list(color), "r": rough, "m": metal, "e": list(emit) if emit else None, "es": emit_strength, "coat": coat}
     base = nt.nodes.new('ShaderNodeRGB'); base.outputs[0].default_value = (*color, 1)
     col_out = base.outputs[0]
     rough_v = nt.nodes.new('ShaderNodeValue'); rough_v.outputs[0].default_value = rough; rough_out = rough_v.outputs[0]
@@ -132,6 +133,7 @@ def mat(name, color, rough=0.5, metal=0.0, wear=0.0, wear_color=None, wear_rough
 
 def carbon(name):
     m = bpy.data.materials.new(name); nt, bs = _nodes(m); L = nt.links.new
+    m["p"] = {"c": [0.02, 0.02, 0.022], "r": 0.32, "m": 0.0, "e": None, "es": 0, "coat": 0.8}
     tc = nt.nodes.new('ShaderNodeTexCoord'); mp = nt.nodes.new('ShaderNodeMapping'); mp.inputs['Rotation'].default_value[2] = math.radians(45)
     L(tc.outputs['Object'], mp.inputs['Vector'])
     ck = nt.nodes.new('ShaderNodeTexChecker'); ck.inputs['Scale'].default_value = 900

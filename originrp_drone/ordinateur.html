@@ -15,8 +15,8 @@ table{width:100%;border-collapse:collapse;margin-top:10px}td{padding:6px 4px;bor
 <main><section class="card"><div class="label">Modèle 3D</div><div id="rc3d"></div><div class="hint">Glisser pour tourner · molette pour zoomer. L'écran du modèle affiche en direct la même interface que l'écran agrandi.</div>
 <table><tr><td>Écran</td><td>7" haute luminosité, tactile</td></tr><tr><td>Commandes</td><td>2 manches, 4 boutons, RTH, FN, 2 molettes, 2 gâchettes</td></tr><tr><td>Antennes</td><td>Rabattables · portée 350 m en jeu</td></tr><tr><td>En jeu</td><td>Tenue à deux mains ou posée au sol</td></tr></table></section>
 <section class="card"><div class="label">Écran de pilotage (interactif)</div><div id="screenBig"></div>
-<div class="bar"><button data-act="photo">📷 Photo</button><button data-act="rec">● Vidéo</button><button data-act="vision">◐ Vision</button><button data-act="zout">− Zoom</button><button data-act="zin">＋ Zoom</button><button data-act="track">⌖ Suivi</button><button data-act="light">☀ Projecteur</button><button data-act="rth">⌂ Retour pilote</button></div>
-<div class="hint">Les boutons de droite de l'écran sont cliquables · molette sur l'écran pour zoomer.</div></section></main></div><script>/**
+<div class="bar"><button data-act="photo">📷 Photo</button><button data-act="rec">● Vidéo</button><button data-act="vision">◐ Vision</button><button data-act="zout">− Zoom</button><button data-act="zin">＋ Zoom</button><button data-act="track">⌖ Suivi</button><button data-act="light">☀ Projecteur</button><button data-act="rth">⌂ Retour pilote</button></div><div class="bar"><button data-act="hit">🔫 Simuler un tir (−34)</button><button data-act="jam">📡 Brouilleur GPS</button><button data-act="reset">♻ Réinitialiser</button></div>
+<div class="hint">Les boutons de droite de l'écran sont cliquables · molette sur l'écran pour zoomer. Batterie : 2 h de vol (temps accéléré ×60 ici).</div></section></main></div><script>/**
  * @license
  * Copyright 2010-2023 Three.js Authors
  * SPDX-License-Identifier: MIT
@@ -4366,7 +4366,7 @@ window.GLTFLoader = GLTFLoader;
   const fcam = new THREE.PerspectiveCamera(58, 16 / 9, .1, 600);
 
   // ─── État de l'interface ───
-  const S = { vision: 0, zoom: 1, rec: false, recT: 0, track: false, light: false, rth: false, alt: 42, dist: 126, bat: 87, hdg: 274, t: 0, toast: '', toastT: 0, photo: 0 };
+  const S = { lost: null, hp: 100, battery: 100, vision: 0, zoom: 1, rec: false, recT: 0, track: false, light: false, rth: false, alt: 42, dist: 126, bat: 87, hdg: 274, t: 0, toast: '', toastT: 0, photo: 0 };
   const VIS = ['OPTIQUE', 'THERMIQUE', 'NOCTURNE'];
   const iron = (h) => { const st = [[0, '#07001a'], [.25, '#3a0a6e'], [.5, '#b0185a'], [.72, '#f26b0c'], [.9, '#ffd23a'], [1, '#ffffff']]; const c = new THREE.Color(); for (let i = 1; i < st.length; i++) if (h <= st[i][0]) return c.set(st[i - 1][1]).lerp(new THREE.Color(st[i][1]), (h - st[i - 1][0]) / (st[i][0] - st[i - 1][0])); return c.set('#fff'); };
   const tmats = new Map(); const tmat = (h) => { const k = Math.round(h * 30); if (!tmats.has(k)) tmats.set(k, new THREE.MeshBasicMaterial({ color: iron(k / 30).convertSRGBToLinear(), toneMapped: false })); return tmats.get(k); };
@@ -4414,6 +4414,17 @@ window.GLTFLoader = GLTFLoader;
     g.fillStyle = 'rgba(0,0,0,.6)'; g.fillRect(W / 2 - tw / 2 - 14, H - 54, tw + 28, 34); g.fillStyle = '#ffcf4a'; g.textAlign = 'center'; g.fillText(st, W / 2, H - 46); g.textAlign = 'left';
     if (S.toastT > 0) { g.globalAlpha = Math.min(1, S.toastT); g.fillStyle = 'rgba(0,0,0,.7)'; g.fillRect(W / 2 - 200, 110, 400, 40); g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(S.toast, W / 2, 120); g.textAlign = 'left'; g.globalAlpha = 1; }
     if (S.t - S.photo < .15) { g.fillStyle = 'rgba(255,255,255,.6)'; g.fillRect(0, 0, W, H); }
+    // barres vie / batterie
+    const barsY = 120; g.font = 'bold 15px Consolas, monospace';
+    [['ÉTAT', S.hp, Math.round(S.hp) + ' %'], ['BATT.', S.battery, `${Math.round(S.battery)} % · ${Math.floor(S.battery * 1.2 / 60)} h ${String(Math.round(S.battery * 1.2 % 60)).padStart(2, '0')}`]].forEach(([l, v, txt], i) => {
+      const y = barsY + i * 26; g.fillStyle = cy; g.fillText(l, 24, y); g.fillStyle = 'rgba(0,0,0,.55)'; g.fillRect(84, y + 2, 180, 12);
+      g.fillStyle = v <= 20 ? '#ef4444' : v <= 50 ? '#f59e0b' : '#4ade80'; g.fillRect(84, y + 2, 180 * v / 100, 12); g.strokeStyle = 'rgba(255,255,255,.4)'; g.strokeRect(84, y + 2, 180, 12); g.fillStyle = wh; g.fillText(txt, 274, y); });
+    if (S.lost) {
+      const im = g.createImageData(W, H); for (let i = 0; i < im.data.length; i += 4) { const v = Math.random() * 110; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; } g.putImageData(im, 0, 0);
+      g.fillStyle = 'rgba(0,0,0,.8)'; g.fillRect(W / 2 - 330, H / 2 - 90, 660, 180); g.strokeStyle = '#ef4444'; g.lineWidth = 4; g.strokeRect(W / 2 - 330, H / 2 - 90, 660, 180);
+      g.textAlign = 'center'; g.fillStyle = (S.t % 1.2) < .8 ? '#ff4d4d' : '#902020'; g.font = 'bold 64px Consolas, monospace'; g.fillText('AUCUN SIGNAL', W / 2, H / 2 - 62);
+      g.fillStyle = '#fff'; g.font = '28px Arial'; g.fillText({ destroyed: 'Votre drone a été détruit', jammed: 'Le réseau rencontre des perturbations', battery: 'Batterie vide · atterrissage forcé' }[S.lost], W / 2, H / 2 + 22); g.textAlign = 'left';
+    }
   }
   const toast = (m) => { S.toast = m; S.toastT = 2.2; };
   function act(key) {
@@ -4423,6 +4434,9 @@ window.GLTFLoader = GLTFLoader;
     if (key === 'track') { S.track = !S.track; toast(S.track ? 'Cible verrouillée' : 'Suivi désactivé'); }
     if (key === 'light') { S.light = !S.light; toast(S.light ? 'Projecteur allumé' : 'Projecteur éteint'); }
     if (key === 'rth') { S.rth = !S.rth; toast(S.rth ? 'Retour automatique au pilote' : 'Retour annulé'); }
+    if (key === 'hit') { S.hp = Math.max(0, S.hp - 34); toast('Drone touché · état ' + Math.round(S.hp) + ' %'); if (S.hp <= 0) S.lost = 'destroyed'; }
+    if (key === 'jam') { S.lost = S.lost === 'jammed' ? null : 'jammed'; }
+    if (key === 'reset') { S.lost = null; S.hp = 100; S.battery = 100; }
     if (key === 'zin') S.zoom = Math.min(8, S.zoom * 1.4); if (key === 'zout') S.zoom = Math.max(1, S.zoom / 1.4);
   }
   ui.addEventListener('click', (e) => { const r = ui.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * 1280, y = (e.clientY - r.top) / r.height * 720; BTN.forEach(([, k], i) => { const [bx, by, bw, bh] = btnRect(i); if (x > bx && x < bx + bw && y > by && y < by + bh) act(k); }); });
@@ -4462,7 +4476,7 @@ window.GLTFLoader = GLTFLoader;
   const clock = new THREE.Clock();
   function frame() {
     const dt = Math.min(clock.getDelta(), .05); S.t += dt; if (S.rec) S.recT += dt; S.toastT = Math.max(0, S.toastT - dt);
-    S.hdg = (S.hdg + dt * (S.rth ? 25 : 6)) % 360; S.alt += Math.sin(S.t * .6) * dt * .5; S.bat = Math.max(5, S.bat - dt * .05); S.dist = S.rth ? Math.max(4, S.dist - dt * 12) : 126 + Math.sin(S.t * .2) * 8;
+    S.hdg = (S.hdg + dt * (S.rth ? 25 : 6)) % 360; S.alt += Math.sin(S.t * .6) * dt * .5; S.bat = Math.max(5, S.bat - dt * .05); if (!S.lost) S.battery = Math.max(0, S.battery - dt * 100 / 7200 * 60); if (S.battery <= 0 && !S.lost) S.lost = 'battery'; S.dist = S.rth ? Math.max(4, S.dist - dt * 12) : 126 + Math.sin(S.t * .2) * 8;
     for (const m of movers) { m.z += m.v * dt; if (m.z > 160) m.z = -160; if (m.z < -160) m.z = 160; m.g.position.set(m.lane, 0, m.z); m.g.rotation.y = m.v > 0 ? 0 : PI; }
     // caméra du drone : orbite lente au-dessus du carrefour, zoom optique
     const a = S.hdg * PI / 180, R0 = 60;

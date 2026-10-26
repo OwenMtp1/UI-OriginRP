@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><link rel="stylesheet" href="style.css"></head>
+<body>
+<div id="hud" class="hidden">
+  <div class="frame"></div>
+  <div class="top">
+    <span id="rec" class="rec">● REC 00:00</span>
+    <span id="mode">OPTIQUE · ZOOM 1.0×</span>
+    <span class="right"><span id="sig">▂▄▆█</span> <span id="serial">OR-D2</span></span>
+  </div>
+  <div class="bars">
+    <div class="bar"><label>ÉTAT DU DRONE</label><div class="track"><i id="hp"></i></div><b id="hpTxt">100 %</b></div>
+    <div class="bar"><label>BATTERIE</label><div class="track"><i id="bat"></i></div><b id="batTxt">100 % · 2:00</b></div>
+  </div>
+  <div class="tele">
+    <div><small>ALT</small><b id="alt">0.0</b> m</div>
+    <div><small>VIT</small><b id="spd">0</b> km/h</div>
+    <div><small>DIST</small><b id="dist">0</b> m</div>
+    <div><small>CAP</small><b id="hdg">000</b>°</div>
+  </div>
+  <div class="cross"><i></i><i></i><b></b></div>
+  <div id="state" class="state">AU SOL · PRÊT</div>
+  <div class="keys">
+    <span><kbd>Z Q S D</kbd> déplacer</span><span><kbd>Espace</kbd>/<kbd>Ctrl</kbd> monter / descendre</span><span><kbd>A</kbd>/<kbd>E</kbd> tourner</span>
+    <span><kbd>Souris</kbd> caméra</span><span><kbd>Molette</kbd> zoom</span><span><kbd>N</kbd> vision</span><span><kbd>L</kbd> projecteur</span>
+    <span><kbd>R</kbd> rec</span><span><kbd>H</kbd> retour</span><span><kbd>G</kbd> poser / tenir</span><span><kbd>⌫</kbd> atterrir et quitter</span>
+  </div>
+  <div id="dmg" class="dmg"></div>
+  <div id="nosig" class="nosig hidden"><canvas id="noise"></canvas><div class="box"><h1>AUCUN SIGNAL</h1><p id="nosigTxt"></p></div></div>
+</div>
+<script src="app.js"></script>
+</body></html>

@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<CMapTypes>
+  <archetypes>
+    <Item type="CBaseArchetypeDef">
+      <lodDist value="120" />
+      <flags value="0" />
+      <specialAttribute value="0" />
+      <bbMin x="-0.3362341" y="-0.42646182" z="0.008000001" />
+      <bbMax x="0.21721877" y="0.42646182" z="0.18450001" />
+      <bsCentre x="-0.05950766" y="0.0" z="0.096250005" />
+      <bsRadius value="0.5159799" />
+      <hdTextureDist value="100" />
+      <name>orp_drone</name>
+      <textureDictionary>orp_drone</textureDictionary>
+      <physicsDictionary>orp_drone</physicsDictionary>
+      <assetType>ASSET_TYPE_DRAWABLE</assetType>
+      <assetName>orp_drone</assetName>
+    </Item>
+    <Item type="CBaseArchetypeDef">
+      <lodDist value="120" />
+      <flags value="0" />
+      <specialAttribute value="0" />
+      <bbMin x="-0.2595976" y="-0.25568575" z="0.008000001" />
+      <bbMax x="0.26156652" y="0.29075503" z="0.18450001" />
+      <bsCentre x="0.0009844601" y="0.017534643" z="0.096250005" />
+      <bsRadius value="0.3877376" />
+      <hdTextureDist value="100" />
+      <name>orp_drone_folded</name>
+      <textureDictionary>orp_drone_folded</textureDictionary>
+      <physicsDictionary>orp_drone_folded</physicsDictionary>
+      <assetType>ASSET_TYPE_DRAWABLE</assetType>
+      <assetName>orp_drone_folded</assetName>
+    </Item>
+    <Item type="CBaseArchetypeDef">
+      <lodDist value="120" />
+      <flags value="0" />
+      <specialAttribute value="0" />
+      <bbMin x="-0.26491308" y="-0.21212953" z="-0.0837557" />
+      <bbMax x="0.23384428" y="0.46315056" z="0.27916205" />
+      <bsCentre x="-0.015534401" y="0.12551051" z="0.097703174" />
+      <bsRadius value="0.45729405" />
+      <hdTextureDist value="100" />
+      <name>orp_drone_wreck</name>
+      <textureDictionary>orp_drone_wreck</textureDictionary>
+      <physicsDictionary>orp_drone_wreck</physicsDictionary>
+      <assetType>ASSET_TYPE_DRAWABLE</assetType>
+      <assetName>orp_drone_wreck</assetName>
+    </Item>
+    <Item type="CBaseArchetypeDef">
+      <lodDist value="120" />
+      <flags value="0" />
+      <specialAttribute value="0" />
+      <bbMin x="-0.41" y="-0.31877783" z="-0.002000004" />
+      <bbMax x="0.41" y="0.3095" z="0.32700002" />
+      <bsCentre x="0.0" y="-0.0046389103" z="0.16250001" />
+      <bsRadius value="0.54207337" />
+      <hdTextureDist value="100" />
+      <name>orp_dronecase</name>
+      <textureDictionary>orp_dronecase</textureDictionary>
+      <physicsDictionary>orp_dronecase</physicsDictionary>
+      <assetType>ASSET_TYPE_DRAWABLE</assetType>
+      <assetName>orp_dronecase</assetName>
+    </Item>
+    <Item type="CBaseArchetypeDef">
+      <lodDist value="120" />
+      <flags value="0" />
+      <specialAttribute value="0" />
+      <bbMin x="-0.41" y="-0.31877786" z="-0.0019999966" />
+      <bbMax x="0.41" y="0.5178736" z="0.74611604" />
+      <bsCentre x="0.0" y="0.09954786" z="0.37205803" />
+      <bsRadius value="0.6949934" />
+      <hdTextureDist value="100" />
+      <name>orp_dronecase_open</name>
+      <textureDictionary>orp_dronecase_open</textureDictionary>
+      <physicsDictionary>orp_dronecase_open</physicsDictionary>
+      <assetType>ASSET_TYPE_DRAWABLE</assetType>
+      <assetName>orp_dronecase_open</assetName>
+    </Item>
+    <Item type="CBaseArchetypeDef">
+      <lodDist value="120" />
+      <flags value="0" />
+      <specialAttribute value="0" />
+      <bbMin x="-0.1500001" y="-0.095" z="-0.059762906" />
+      <bbMax x="0.1500001" y="0.15277855" z="0.041" />
+      <bsCentre x="0.0" y="0.028889276" z="-0.009381453" />
+      <bsRadius value="0.20096485" />
+      <hdTextureDist value="100" />
+      <name>orp_drone_rc</name>
+      <textureDictionary>orp_drone_rc</textureDictionary>
+      <physicsDictionary>orp_drone_rc</physicsDictionary>
+      <assetType>ASSET_TYPE_DRAWABLE</assetType>
+      <assetName>orp_drone_rc</assetName>
+    </Item>
+  </archetypes>
+  <name>orp_drone</name>
+</CMapTypes>
