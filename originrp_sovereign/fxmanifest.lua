@@ -3,7 +3,7 @@ game 'gta5'
 lua54 'yes'
 
 name 'originrp_sovereign'
-description 'OriginRP - ORIGIN Sovereign : pistolet de luxe (clone de WEAPON_PISTOL) avec finitions'
+description 'OriginRP - Sovereign .50 : pistolet lourd canon long (stats clonées de WEAPON_PISTOL) avec camos'
 version '1.0.0'
 
 files {

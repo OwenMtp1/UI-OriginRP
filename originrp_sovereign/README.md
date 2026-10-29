@@ -1,9 +1,11 @@
-# originrp_sovereign — ORIGIN Sovereign (pistolet de luxe .45)
+# originrp_sovereign — Sovereign .50 (pistolet lourd canon long)
 
 Nouvelle arme pour le serveur, avec **exactement les mêmes stats que le pistolet de GTA** (`WEAPON_PISTOL`) : recul, dégâts, cadence, précision, portée, sons et animations sont **clonés depuis tes propres fichiers du jeu**. Seul le modèle change.
 
-- Finition **Noire** (d'origine) : DLC noir, gravures et pièces dorées, plaquettes ébène avec médaillon « O ».
-- **Édition Halloween** (finition achetable) : citrouilles, chauves-souris et toile gravées en orange, plaquettes couleur os avec crâne.
+Design inspiré du cal .50 (Desert Eagle) avec canon long : canon à section triangulaire avec rail, frein de bouche et guidon fibre optique, culasse striée, crosse métal avec plaques caoutchouc piquetées, pontet à crochet.
+
+- Finition **Noire** (d'origine) : camo carbone forgé noir avec écailles hexagonales, usure des arêtes.
+- **Édition Halloween** (finition achetable) : camo cartoon (citrouilles, fantômes, chauves-souris, bonbons, étoiles sur nuit violette).
 - Aperçu : `preview.html` (3D, tir, rechargement, inspection, boutique). Rendus dans `design/`.
 
 ## 1. Générer les .meta (stats identiques au pistolet GTA)
@@ -43,11 +45,11 @@ Sources XML CodeWalker dans `xml_source/` (+ fichier Blender) :
 
 ```lua
 -- dans Weapons
-['WEAPON_ORPSOVEREIGN'] = { label = 'ORIGIN Sovereign', weight = 1100, durability = 0.1, ammoname = 'ammo-9' },
+['WEAPON_ORPSOVEREIGN'] = { label = 'Sovereign .50', weight = 1100, durability = 0.1, ammoname = 'ammo-9' },
 
 -- dans Components
 ['at_orpsov_halloween'] = {
-    label = 'Finition Halloween (Sovereign)', type = 'skin', weight = 20,
+    label = 'Camo Halloween (Sovereign)', type = 'skin', weight = 20,
     client = { component = { `COMPONENT_ORPSOVEREIGN_SKIN_HW` }, usetime = 2500 },
 },
 ```
