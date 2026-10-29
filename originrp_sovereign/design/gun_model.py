@@ -383,4 +383,10 @@ def solid(path, col):
     n = tile_noise(64, 5, 0).resize((S, S))
     img = Image.new('RGB', (S, S), col)
     dk = Image.new('RGB', (S, S), tuple(int(c * .88) for c in col))
-    Image.composite(dk, img, n.point(lambda v: int(v * .5))).save(path); return path
+    img = Image.composite(dk, img, n.point(lambda v: int(v * .5)))
+    # crasse dans les zones peu manipulées + micro-rayures : aspect peinture cerakote usée
+    g = tile_noise(6, 17, 10).resize((S, S)).point(lambda v: max(0, v - 120) * 1.4).point(int)
+    img = Image.composite(Image.new('RGB', (S, S), tuple(int(c * .55) for c in col)), img, g)
+    scratches(img, 260, tuple(min(255, int(c * 1.25 + 25)) for c in col), 11)
+    scratches(img, 140, tuple(int(c * .6) for c in col), 12)
+    img.save(path); return path

@@ -51,9 +51,9 @@ def finish_part(o, mat_, bevel=0.0009, uv=None, parent=None):
     return o
 
 # finitions unies : (couleur peinture sRGB, teinte linéaire des pièces métal, rugosité, métal)
-SOLID = {'bleu': ((28, 78, 190), (0.015, 0.045, 0.16), 0.32, 0.35),
-         'rose': ((236, 92, 160), (0.2, 0.03, 0.09), 0.32, 0.3),
-         'noirmat': ((22, 22, 23), (0.012, 0.012, 0.013), 0.75, 0.0)}
+SOLID = {'bleu': ((22, 62, 160), None, 0.34, 0.65),
+         'rose': ((214, 78, 142), None, 0.34, 0.6),
+         'noirmat': ((24, 24, 26), None, 0.62, 0.35)}
 
 def build_deagle(finish='noir'):
     if finish in SOLID: return build_solid(finish)
@@ -71,15 +71,15 @@ def _build(finish, sol):
     stip = stipple(os.path.join(TEX, 'stipple.png'))
     if sol:
         # tout de la même couleur : peinture unie + pièces métal teintées
-        tw = tuple(c * 0.5 for c in tint)
+        # peinture couleur sur la carcasse ; acier bronzé, caoutchouc et rail restent noirs (contraste façon GTA)
         M = {
-            'camo': camo_mat(f'camo_{finish}', camo, rough=rgh, metal=mtl, wear_col=tw),
-            'steel': mat(f'steel_{finish}', tint, rough=min(rgh + .05, .8), metal=mtl, wear=0.4, wear_color=tw, wear_rough=rgh),
-            'polish': mat(f'polish_{finish}', tint, rough=rgh, metal=mtl),
-            'rubber': mat(f'rubber_{finish}', tw, rough=0.85, grain=1.6, grain_scale=380),
+            'camo': camo_mat(f'camo_{finish}', camo, rough=rgh, metal=mtl, wear_col=(0.3, 0.3, 0.32)),
+            'steel': mat(f'steel_{finish}', (0.02, 0.02, 0.022), rough=0.3, metal=1.0, wear=0.6, wear_color=(0.14, 0.14, 0.15), wear_rough=0.25),
+            'polish': mat(f'polish_{finish}', (0.06, 0.06, 0.065), rough=0.3, metal=1.0),
+            'rubber': mat(f'rubber_{finish}', (0.008, 0.008, 0.009), rough=0.85, grain=1.6, grain_scale=380),
             'dark': mat(f'bore_{finish}', (0.002, 0.002, 0.002), rough=0.5),
             'fiber': mat(f'fiber_{finish}', (0.6, 0.02, 0.01), rough=0.15, emit=(1.0, 0.05, 0.02), emit_strength=12),
-            'panel': mat(f'panel_{finish}', tw, rough=0.85, grain=1.6, grain_scale=380),
+            'panel': rubber_mat(f'panel_{finish}', stip),
             'dot': mat(f'dot_{finish}', (0.03, 0.03, 0.03), rough=0.5),
         }
         UVS = 0.11
@@ -247,7 +247,7 @@ if __name__ == '__main__':
         r.rotation_euler = (0, 0, math.radians(-90)); r.location = (0, 0, 0.17)
         cam = studio(target=(0.0, -0.12, 0.15), cam_loc=(0.78, -1.0, 0.42), lens=55, samples=spp, res=(1600, 1000))
         L = bpy.data.lights; L['rim2'].energy = 1.2; L['key'].color = (0.96, 0.97, 1.0); L['key'].energy *= 1.3; L['fill'].energy = 9
-        L['rim'].energy *= 0.4; L['top'].energy *= 0.3
+        L['rim'].energy *= 0.6; L['top'].energy *= 0.3
         for n in ('rim', 'rim2', 'top'): L[n].size *= 3
         render(os.path.join(out, f'de_{finish}_34.png'))
         aim(cam, (-0.95, -0.13, 0.15), (0.0, -0.13, 0.15)); render(os.path.join(out, f'de_{finish}_side.png'))
