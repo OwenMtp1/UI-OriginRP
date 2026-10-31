@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Origin Roleplay – Panneaux Twitch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@500;600;700&display=swap">
+    <link rel="stylesheet" href="../commun/kit.css">
+    <script src="../config.js"></script>
+    <script src="../commun/kit.js"></script>
+    <style>
+        html, body { width: 340px; overflow: visible; }
+        body { background: #000; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+        .panel { position: relative; width: 320px; height: 160px; overflow: hidden; border-radius: 0; display: flex; align-items: center; gap: 16px; padding: 0 24px;
+            background: radial-gradient(ellipse 80% 90% at 30% 50%, rgba(46, 18, 92, 0.7), transparent 75%), linear-gradient(135deg, #0d0719, #050309); }
+        .panel .streaks i { height: 1.5px; }
+        .panel .emblem { --e: 96px; flex-shrink: 0; }
+        .panel .lbl { position: relative; display: flex; flex-direction: column; gap: 8px; }
+        .panel .lbl b { white-space: nowrap; font-family: var(--title); font-weight: 900; font-size: 24px; letter-spacing: 0.12em; text-transform: uppercase; line-height: 1; }
+        .panel .lbl small { font-size: 12px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: var(--v4); }
+        .panel .lbl::after { content: ''; width: 64px; height: 2px; background: linear-gradient(90deg, var(--v3), transparent); box-shadow: 0 0 8px var(--v2); }
+    </style>
+</head>
+<body>
+    <div class="panel" id="p-apropos"><div class="streaks"></div><div class="emblem"></div><div class="lbl"><small>Origin Roleplay</small><b>À propos</b></div></div>
+    <div class="panel" id="p-regles"><div class="streaks"></div><div class="emblem"></div><div class="lbl"><small>Origin Roleplay</small><b>Règles</b></div></div>
+    <div class="panel" id="p-discord"><div class="streaks"></div><div class="emblem"></div><div class="lbl"><small>Communauté</small><b>Discord</b></div></div>
+    <div class="panel" id="p-serveur"><div class="streaks"></div><div class="emblem"></div><div class="lbl"><small>Nous rejoindre</small><b>Serveur</b></div></div>
+    <div class="panel" id="p-boutique"><div class="streaks"></div><div class="emblem"></div><div class="lbl"><small>Origin Roleplay</small><b>Boutique</b></div></div>
+    <div class="panel" id="p-planning"><div class="streaks"></div><div class="emblem"></div><div class="lbl"><small>Mes lives</small><b>Planning</b></div></div>
+</body>
+</html>

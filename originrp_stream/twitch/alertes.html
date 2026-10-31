@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Origin Roleplay – Alertes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@500;600;700&display=swap">
+    <link rel="stylesheet" href="../commun/kit.css">
+    <script src="../config.js"></script>
+    <script src="../commun/kit.js"></script>
+    <style>
+        html, body { width: 1920px; height: 1080px; }
+        .alert { position: absolute; left: 50%; top: 90px; width: 760px; padding: 34px 40px 34px 34px; border-radius: 28px; display: flex; align-items: center; gap: 30px; transform: translate(-50%, -30px) scale(0.92); opacity: 0; transition: transform 0.55s cubic-bezier(.2, 1.3, .3, 1), opacity 0.4s ease; }
+        .alert.show { transform: translate(-50%, 0) scale(1); opacity: 1; }
+        .alert .emblem { --e: 150px; flex-shrink: 0; }
+        .alert .txt { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+        .alert .kicker { font-size: 18px; }
+        .alert .who { font-family: var(--title); font-weight: 900; font-size: 54px; line-height: 1; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0 0 24px rgba(124, 58, 237, 0.7); }
+        .alert .sub { font-size: 22px; }
+        .alert .sub b { color: var(--v4); }
+        .shine { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; }
+        .shine::before { content: ''; position: absolute; top: 0; bottom: 0; width: 30%; left: -40%; background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.12), transparent); transform: skewX(-20deg); }
+        .alert.show .shine::before { animation: shine 1.1s 0.35s ease-out; }
+        @keyframes shine { to { left: 120%; } }
+    </style>
+</head>
+<body class="transparent anim">
+    <div class="alert glass corners" id="alert">
+        <div class="shine"></div>
+        <div class="emblem"></div>
+        <div class="txt">
+            <span class="kicker" id="a-kind"></span>
+            <span class="who" id="a-name"></span>
+            <span class="sub" id="a-sub"></span>
+        </div>
+    </div>
+    <script>
+        const TYPES = {
+            follow: { kind: 'Nouveau follow', sub: () => 'rejoint la famille <b>Origin</b>' },
+            sub:    { kind: 'Nouvel abonné', sub: (m) => m ? `abonné depuis <b>${m} mois</b>` : 'merci pour ton soutien !' },
+            don:    { kind: 'Don', sub: (m) => `vient d'envoyer <b>${m || '5 €'}</b>` },
+            raid:   { kind: 'Raid', sub: (m) => `débarque avec <b>${m || '20'} viewers</b>` },
+        };
+        const DEMO = [['follow', 'Kenzo'], ['sub', 'Lyna', '3'], ['don', 'Mehdi', '10 €'], ['raid', 'StreamerRP', '45']];
+        const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        function play(type, name, amount) {
+            const t = TYPES[type] || TYPES.follow;
+            document.getElementById('a-kind').textContent = t.kind;
+            document.getElementById('a-name').textContent = name;
+            document.getElementById('a-sub').innerHTML = t.sub(amount ? esc(amount) : '');
+            const el = document.getElementById('alert');
+            el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 5200);
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            if (P.has('type')) {
+                const run = () => play(P.get('type'), P.get('nom') || 'Pseudo', P.get('montant'));
+                run(); setInterval(run, 7000);
+            } else {
+                let i = 0;
+                const run = () => { play(...DEMO[i]); i = (i + 1) % DEMO.length; };
+                run(); setInterval(run, 6500);
+            }
+        });
+    </script>
+</body>
+</html>

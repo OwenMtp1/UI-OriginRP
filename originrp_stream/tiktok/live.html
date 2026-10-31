@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Origin Roleplay – Overlay TikTok LIVE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@500;600;700&display=swap">
+    <link rel="stylesheet" href="../commun/kit.css">
+    <script src="../config.js"></script>
+    <script src="../commun/kit.js"></script>
+    <style>
+        html, body { width: 1080px; height: 1920px; }
+        /* En haut, sous la barre TikTok (profil / spectateurs) ; le bas reste libre pour le chat */
+        .top { position: absolute; left: 50%; top: 230px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 18px; }
+        .card { display: flex; align-items: center; gap: 26px; padding: 14px 40px; border-radius: 28px; }
+        .card .word { font-size: 30px; }
+        .card .word::after { height: 1.5px; }
+        .card .emblem { --e: 120px; }
+        .info { display: flex; align-items: center; gap: 12px; padding: 12px 24px; border-radius: 18px; font-size: 24px; font-weight: 600; }
+        .info .live-dot { flex-shrink: 0; }
+    </style>
+</head>
+<body class="transparent anim">
+    <div class="top">
+        <div class="card glass corners">
+            <span class="word white">Origin</span>
+            <div class="emblem"></div>
+            <span class="word violet">Roleplay</span>
+        </div>
+        <div class="info glass"><span class="live-dot"></span><span id="info"></span></div>
+    </div>
+    <script>document.addEventListener('DOMContentLoaded', () => ticker(document.getElementById('info'), K.infos, 6000));</script>
+</body>
+</html>

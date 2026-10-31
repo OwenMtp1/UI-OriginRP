@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Origin Roleplay – Début de live</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@500;600;700&display=swap">
+    <link rel="stylesheet" href="../commun/kit.css">
+    <script src="../config.js"></script>
+    <script src="../commun/kit.js"></script>
+    <style>
+        html, body { width: 1920px; height: 1080px; }
+        .left { position: absolute; left: 150px; top: 50%; transform: translateY(-52%); display: flex; flex-direction: column; gap: 30px; }
+        .kicker { font-size: 24px; }
+        .title { font-size: 128px; }
+        .meta { display: flex; gap: 18px; align-items: center; margin-top: 16px; }
+        .count { font-family: var(--title); font-weight: 800; font-size: 54px; letter-spacing: 0.06em; padding: 0.25em 0.7em; border-radius: 20px; font-variant-numeric: tabular-nums; }
+        .who { font-size: 28px; }
+        .right { position: absolute; right: 150px; top: 50%; transform: translateY(-50%); }
+        .bottom { position: absolute; left: 150px; right: 150px; bottom: 80px; display: flex; flex-direction: column; gap: 22px; }
+        .bar { height: 6px; border-radius: 6px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
+        .bar i { display: block; height: 100%; width: 40%; border-radius: inherit; background: linear-gradient(90deg, var(--v1), var(--v4)); box-shadow: 0 0 14px var(--v2); animation: load 3.2s ease-in-out infinite; }
+        @keyframes load { 0% { transform: translateX(-110%); } 100% { transform: translateX(260%); } }
+        .info { font-size: 28px; font-weight: 600; color: var(--muted); }
+        .go .count { color: #fff; background: linear-gradient(135deg, var(--v1), var(--v3)); border-color: transparent; }
+    </style>
+</head>
+<body class="anim">
+    <div class="stage">
+        <div class="bands"></div>
+        <div class="streaks"></div>
+        <div class="left">
+            <span class="kicker" data-f="{serveur} · {slogan}"></span>
+            <h1 class="title">Le live<br>commence<br><em>bientôt</em></h1>
+            <div class="meta" id="meta">
+                <span class="count glass corners" id="count">05:00</span>
+                <span class="pill who" data-if="streamer"><span class="live-dot"></span><span data-k="streamer"></span></span>
+            </div>
+        </div>
+        <div class="right"><div class="emblem" style="--e: 560px"></div></div>
+        <div class="bottom">
+            <div class="bar"><i></i></div>
+            <p class="info" id="info"></p>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            countdown(document.getElementById('count'), Number(P.get('min') || 5), () => {
+                document.getElementById('meta').classList.add('go');
+                document.getElementById('count').textContent = "C'est parti !";
+            });
+            // Le titre affiche déjà le slogan : le bandeau commence par le message suivant
+            ticker(document.getElementById('info'), [...K.infos.slice(1), K.infos[0]]);
+        });
+    </script>
+</body>
+</html>

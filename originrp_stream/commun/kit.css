@@ -1,0 +1,139 @@
+/* ===== Origin Roleplay — kit stream ===== */
+:root {
+    --bg0: #030207;
+    --bg1: #0b0616;
+    --bg2: #160b2c;
+    --v1: #6d28d9;
+    --v2: #7c3aed;
+    --v3: #8b5cf6;
+    --v4: #a78bfa;
+    --white: #f6f3ff;
+    --muted: rgba(226, 216, 255, 0.62);
+    --live: #ff3b5c;
+    --title: 'Montserrat', 'Inter', sans-serif;
+    --text: 'Inter', 'Segoe UI', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { overflow: hidden; }
+body { font-family: var(--text); color: var(--white); -webkit-font-smoothing: antialiased; }
+body.transparent { background: transparent; }
+
+/* Scène : fond sombre violet avec halo central */
+.stage {
+    position: relative;
+    width: 100vw; height: 100vh;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse 55% 60% at 50% 45%, rgba(46, 18, 92, 0.55), transparent 70%),
+        radial-gradient(ellipse at 50% 50%, var(--bg1) 0%, var(--bg0) 75%);
+}
+.stage::after {
+    /* grain très léger */
+    content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.06;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Bandes diagonales sombres (comme le visuel de profil) */
+.bands { position: absolute; inset: 0; pointer-events: none; }
+.bands i {
+    position: absolute; left: -40%; width: 180%; height: 26%;
+    transform: rotate(-40deg);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.005));
+    border-top: 1px solid rgba(139, 92, 246, 0.14);
+}
+
+/* Traits de lumière violets en diagonale */
+.streaks { position: absolute; inset: 0; pointer-events: none; }
+.streaks i {
+    position: absolute; left: -40%; width: 180%; height: 2px;
+    transform: rotate(-40deg);
+    background: linear-gradient(90deg, transparent 0%, transparent 30%, rgba(124, 58, 237, 0.2) 40%, #a78bfa 50%, rgba(124, 58, 237, 0.2) 60%, transparent 70%, transparent 100%);
+    background-size: 250% 100%;
+    background-position: var(--p, 50%) 0;
+    filter: drop-shadow(0 0 6px rgba(124, 58, 237, 0.9));
+    opacity: var(--o, 1);
+}
+.anim .streaks i { animation: sweep var(--t, 7s) linear infinite; animation-delay: var(--d, 0s); }
+@keyframes sweep { from { background-position: 130% 0; } to { background-position: -30% 0; } }
+
+/* Emblème : logo + anneaux */
+.emblem { position: relative; width: var(--e, 400px); aspect-ratio: 1; }
+.emblem::before {
+    content: ''; position: absolute; inset: 14%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(124, 58, 237, 0.35), transparent 68%);
+    filter: blur(10px);
+}
+.emblem svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.emblem .ring { fill: none; stroke: rgba(139, 92, 246, 0.35); stroke-width: 0.8; }
+.emblem .ring.faint { stroke: rgba(139, 92, 246, 0.16); }
+.emblem .arc { fill: none; stroke: var(--v3); stroke-width: 1.8; stroke-linecap: round; filter: drop-shadow(0 0 3px rgba(139, 92, 246, 0.9)); transform-origin: 100px 100px; }
+.emblem .arc.b { stroke: var(--v4); stroke-width: 1.2; opacity: 0.8; }
+.emblem .arc.c { stroke: var(--v2); stroke-width: 1; opacity: 0.6; }
+.anim .emblem .arc { animation: spin 14s linear infinite; }
+.anim .emblem .arc.b { animation-duration: 20s; animation-direction: reverse; }
+.anim .emblem .arc.c { animation-duration: 28s; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.emblem img {
+    position: absolute; left: 50%; top: 50%; width: 60%;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 0 calc(var(--e, 400px) * 0.03) rgba(139, 92, 246, 0.75));
+}
+.anim .emblem img { animation: breathe 4s ease-in-out infinite; }
+@keyframes breathe { 50% { filter: drop-shadow(0 0 calc(var(--e, 400px) * 0.05) rgba(167, 139, 250, 0.95)); } }
+
+/* Mot-symbole « ORIGIN | ROLEPLAY » */
+.word {
+    font-family: var(--title); font-weight: 800;
+    letter-spacing: 0.32em; text-transform: uppercase;
+    display: inline-flex; flex-direction: column; align-items: center; gap: 0.35em;
+}
+.word.white { color: var(--white); text-shadow: 0 0 18px rgba(167, 139, 250, 0.55); }
+.word.violet { color: var(--v3); text-shadow: 0 0 18px rgba(124, 58, 237, 0.6); }
+.word::after {
+    content: ''; width: 118%; height: 2px; margin-right: 0.32em;
+    background: linear-gradient(90deg, transparent, var(--v3) 30%, var(--v4) 50%, var(--v3) 70%, transparent);
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.8);
+}
+
+/* Titres et textes */
+.kicker { font-family: var(--title); font-weight: 700; letter-spacing: 0.35em; text-transform: uppercase; color: var(--v4); }
+.title { font-family: var(--title); font-weight: 900; text-transform: uppercase; line-height: 0.95; letter-spacing: 0.02em; }
+.title em { font-style: normal; color: var(--v3); text-shadow: 0 0 30px rgba(124, 58, 237, 0.65); }
+.sub { color: var(--muted); font-weight: 500; }
+
+.pill {
+    display: inline-flex; align-items: center; gap: 0.6em;
+    padding: 0.55em 1.1em;
+    border-radius: 999px;
+    background: rgba(22, 12, 44, 0.75);
+    border: 1px solid rgba(167, 139, 250, 0.35);
+    box-shadow: 0 0 24px rgba(124, 58, 237, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    font-weight: 700;
+}
+.pill svg { width: 1.15em; height: 1.15em; color: var(--v4); flex-shrink: 0; }
+.live-dot { width: 0.6em; height: 0.6em; border-radius: 50%; background: var(--live); box-shadow: 0 0 10px var(--live); animation: blink 1.4s ease-in-out infinite; }
+@keyframes blink { 50% { opacity: 0.35; } }
+
+/* Carte « verre violet » des UI du serveur */
+.glass {
+    position: relative;
+    background: linear-gradient(160deg, rgba(36, 20, 70, 0.82), rgba(14, 8, 30, 0.86));
+    border: 1px solid rgba(167, 139, 250, 0.28);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(10px);
+}
+.glass.corners::before, .glass.corners::after {
+    content: ''; position: absolute; width: 38%; height: 55%; pointer-events: none;
+    border-radius: inherit;
+}
+.glass.corners::before { left: -2px; top: -2px; border-top: 2.5px solid var(--v4); border-left: 2.5px solid var(--v4); -webkit-mask-image: radial-gradient(circle at 0 0, #000 35%, transparent 70%); mask-image: radial-gradient(circle at 0 0, #000 35%, transparent 70%); filter: drop-shadow(0 0 6px var(--v2)); }
+.glass.corners::after { right: -2px; bottom: -2px; border-bottom: 2.5px solid var(--v4); border-right: 2.5px solid var(--v4); -webkit-mask-image: radial-gradient(circle at 100% 100%, #000 35%, transparent 70%); mask-image: radial-gradient(circle at 100% 100%, #000 35%, transparent 70%); filter: drop-shadow(0 0 6px var(--v2)); }
+
+/* Bandeau d'infos qui défilent */
+.ticker { transition: opacity 0.45s ease, transform 0.45s ease; }
+.ticker.out { opacity: 0; transform: translateY(8px); }
+
+.center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.hidden-if-empty:empty { display: none; }

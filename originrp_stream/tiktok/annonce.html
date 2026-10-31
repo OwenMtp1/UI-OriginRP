@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Origin Roleplay – Annonce TikTok</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@500;600;700&display=swap">
+    <link rel="stylesheet" href="../commun/kit.css">
+    <script src="../config.js"></script>
+    <script src="../commun/kit.js"></script>
+    <style>
+        html, body { width: 1080px; height: 1920px; }
+        .center { gap: 34px; padding: 0 80px; }
+        .brand { display: flex; gap: 40px; font-size: 34px; }
+        .title { font-size: 150px; margin-top: 30px; }
+        .name { font-family: var(--title); font-weight: 900; font-size: 92px; line-height: 1; text-transform: uppercase; text-shadow: 0 0 34px rgba(124, 58, 237, 0.6); word-break: break-word; }
+        .sub { font-size: 38px; }
+        .col { display: flex; flex-direction: column; gap: 20px; align-items: center; margin-top: 30px; font-size: 34px; }
+        .badge { display: inline-flex; align-items: center; gap: 14px; padding: 14px 30px; border-radius: 16px; background: var(--live); box-shadow: 0 0 30px rgba(255, 59, 92, 0.5); font-family: var(--title); font-weight: 900; font-size: 32px; letter-spacing: 0.2em; text-transform: uppercase; }
+        .badge .live-dot { background: #fff; box-shadow: 0 0 10px #fff; }
+    </style>
+</head>
+<body>
+    <div class="stage">
+        <div class="bands"></div>
+        <div class="streaks"></div>
+        <div class="center">
+            <div class="emblem" style="--e: 520px"></div>
+            <div class="brand"><span class="word white">Origin</span><span class="word violet">Roleplay</span></div>
+            <span class="badge"><span class="live-dot"></span>Live ce soir</span>
+            <p class="name" id="name"></p>
+            <p class="sub" data-f="sur {serveur} · {slogan}"></p>
+            <div class="col">
+                <span class="pill"><span data-icon="clock"></span><span data-f="Dès {heure}"></span></span>
+                <span class="pill"><span data-icon="discord"></span><span data-k="discord"></span></span>
+            </div>
+        </div>
+    </div>
+    <script>document.addEventListener('DOMContentLoaded', () => { document.getElementById('name').textContent = K.streamer || 'Nom du streamer'; });</script>
+</body>
+</html>

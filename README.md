@@ -19,6 +19,7 @@
 | `originrp_tatoueur` | Salon de tatouage (6 zones, recherche, aperçu sur le personnage) |
 | `originrp_creation` | Création de personnage (6 étapes, caméra, aperçu en direct) |
 | `originrp_speedometer` | Compteur de vitesse (vitesse, régime, rapport, essence, moteur, voyants) |
+| `originrp_stream` | Kit stream Twitch / TikTok (profil, bannières, écrans animés, overlay, alertes, annonces) |
 
 ## originrp_menu
 

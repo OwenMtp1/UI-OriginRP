@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Origin Roleplay – Overlay en jeu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@500;600;700&display=swap">
+    <link rel="stylesheet" href="../commun/kit.css">
+    <script src="../config.js"></script>
+    <script src="../commun/kit.js"></script>
+    <style>
+        html, body { width: 1920px; height: 1080px; }
+        .brand { position: absolute; left: 36px; top: 30px; display: flex; align-items: center; gap: 16px; padding: 10px 26px 10px 12px; border-radius: 22px; }
+        .brand .emblem { --e: 74px; }
+        .brand .name { display: flex; flex-direction: column; gap: 4px; }
+        .brand .name b { font-family: var(--title); font-weight: 800; font-size: 20px; letter-spacing: 0.26em; text-transform: uppercase; }
+        .brand .name b span { color: var(--v3); }
+        .brand .name small { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+        .cam { position: absolute; right: 36px; bottom: 36px; width: 480px; height: 270px; border-radius: 22px; background: transparent; }
+        .cam-tag { position: absolute; left: 18px; bottom: -18px; padding: 8px 18px; border-radius: 12px; font-family: var(--title); font-weight: 800; font-size: 18px; letter-spacing: 0.12em; text-transform: uppercase; background: linear-gradient(135deg, var(--v1), var(--v3)); box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5); }
+        .info { position: absolute; right: 36px; bottom: 336px; display: flex; align-items: center; gap: 12px; max-width: 560px; padding: 12px 20px; border-radius: 16px; font-size: 18px; font-weight: 600; }
+        .info .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--v4); box-shadow: 0 0 10px var(--v3); flex-shrink: 0; }
+        .no-cam .cam { display: none; }
+        .no-cam .info { bottom: 36px; }
+    </style>
+</head>
+<body class="transparent anim">
+    <div class="brand glass corners">
+        <div class="emblem"></div>
+        <div class="name">
+            <b>Origin <span>Roleplay</span></b>
+            <small><span class="live-dot"></span>En direct <span data-if="streamer">· <span data-k="streamer"></span></span></small>
+        </div>
+    </div>
+    <div class="info glass"><span class="dot"></span><span id="info"></span></div>
+    <div class="cam glass corners"><span class="cam-tag hidden-if-empty" data-k="streamer"></span></div>
+    <script>
+        if (P.get('cam') === '0') document.body.classList.add('no-cam');
+        document.addEventListener('DOMContentLoaded', () => ticker(document.getElementById('info'), K.infos, 7000));
+    </script>
+</body>
+</html>

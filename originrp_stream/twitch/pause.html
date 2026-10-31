@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Origin Roleplay – Pause</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@500;600;700&display=swap">
+    <link rel="stylesheet" href="../commun/kit.css">
+    <script src="../config.js"></script>
+    <script src="../commun/kit.js"></script>
+    <style>
+        html, body { width: 1920px; height: 1080px; }
+        .center { gap: 26px; }
+        .title { font-size: 150px; margin-top: 10px; }
+        .sub { font-size: 34px; }
+        .count { font-family: var(--title); font-weight: 800; font-size: 44px; padding: 0.25em 0.8em; border-radius: 18px; font-variant-numeric: tabular-nums; }
+        .info { position: absolute; left: 0; right: 0; bottom: 80px; text-align: center; font-size: 28px; font-weight: 600; color: var(--muted); }
+    </style>
+</head>
+<body class="anim">
+    <div class="stage">
+        <div class="bands"></div>
+        <div class="streaks"></div>
+        <div class="center">
+            <div class="emblem" style="--e: 420px"></div>
+            <h1 class="title">Pau<em>se</em></h1>
+            <p class="sub">On revient très vite, ne bouge pas !</p>
+            <span class="count glass corners" id="count" style="display:none"></span>
+        </div>
+        <p class="info" id="info"></p>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (P.has('min')) {
+                const el = document.getElementById('count');
+                el.style.display = '';
+                countdown(el, Number(P.get('min')), () => { el.textContent = 'De retour !'; });
+            }
+            ticker(document.getElementById('info'));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Origin Roleplay – Annonce de live</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@500;600;700&display=swap">
+    <link rel="stylesheet" href="../commun/kit.css">
+    <script src="../config.js"></script>
+    <script src="../commun/kit.js"></script>
+    <style>
+        html, body { width: 1920px; height: 1080px; }
+        .left { position: absolute; left: 150px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 30px; max-width: 1050px; }
+        .badge { align-self: flex-start; display: inline-flex; align-items: center; gap: 12px; padding: 12px 24px; border-radius: 14px; background: var(--live); box-shadow: 0 0 30px rgba(255, 59, 92, 0.5); font-family: var(--title); font-weight: 900; font-size: 26px; letter-spacing: 0.2em; text-transform: uppercase; }
+        .badge .live-dot { background: #fff; box-shadow: 0 0 10px #fff; }
+        .name { font-family: var(--title); font-weight: 900; font-size: 140px; line-height: 0.95; text-transform: uppercase; text-shadow: 0 0 40px rgba(124, 58, 237, 0.55); word-break: break-word; }
+        .on { font-size: 40px; font-weight: 600; color: var(--muted); }
+        .on b { font-family: var(--title); font-weight: 800; letter-spacing: 0.16em; color: var(--white); }
+        .on b span { color: var(--v3); }
+        .row { display: flex; gap: 18px; font-size: 28px; margin-top: 10px; }
+        .right { position: absolute; right: 130px; top: 50%; transform: translateY(-50%); }
+    </style>
+</head>
+<body>
+    <div class="stage">
+        <div class="bands"></div>
+        <div class="streaks"></div>
+        <div class="left">
+            <span class="badge"><span class="live-dot"></span>En live</span>
+            <h1 class="name" id="name"></h1>
+            <p class="on">sur <b>Origin <span>Roleplay</span></b></p>
+            <div class="row">
+                <span class="pill"><span data-icon="clock"></span><span data-f="Dès {heure}"></span></span>
+                <span class="pill"><span data-icon="discord"></span><span data-k="discord"></span></span>
+            </div>
+        </div>
+        <div class="right"><div class="emblem" style="--e: 560px"></div></div>
+    </div>
+    <script>document.addEventListener('DOMContentLoaded', () => { document.getElementById('name').textContent = K.streamer || 'Nom du streamer'; });</script>
+</body>
+</html>
