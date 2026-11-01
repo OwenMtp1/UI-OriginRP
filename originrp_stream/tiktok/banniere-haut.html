@@ -60,6 +60,11 @@
             let size = parseFloat(getComputedStyle(el).fontSize);
             el.style.whiteSpace = 'nowrap';
             while (el.scrollWidth > max && size > 48) { size -= 4; el.style.fontSize = size + 'px'; }
+            // Le poste aussi : réduit jusqu'à tenir sur une ligne
+            const role = document.getElementById('role');
+            let rs = parseFloat(getComputedStyle(role).fontSize);
+            role.style.whiteSpace = 'nowrap';
+            while (role.scrollWidth > max && rs > 14) { rs -= 1; role.style.fontSize = rs + 'px'; }
         }
         document.fonts.ready.then(fitName);
         document.getElementById('role').textContent = P.get('role') || "Co-fondateur d'Origin RP";
