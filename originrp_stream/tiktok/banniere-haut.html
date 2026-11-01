@@ -28,6 +28,12 @@
         .role { display: flex; align-items: center; gap: 22px; margin-top: 6px; }
         .role::before, .role::after { content: ''; width: 90px; height: 2px; background: linear-gradient(90deg, transparent, var(--v3)); box-shadow: 0 0 8px var(--v2); }
         .role::after { transform: scaleX(-1); }
+        /* Personnage cartoon à gauche (?perso=malou, par défaut pour Malou) */
+        .perso { position: absolute; left: 14px; bottom: 0; height: 560px; z-index: 1; filter: drop-shadow(0 0 18px rgba(124, 58, 237, 0.45)); }
+        .with-perso .center { left: 400px; padding-top: 80px; }
+        .with-perso .name { font-size: 112px; }
+        .with-perso .role::before, .with-perso .role::after { display: none; }
+        .with-perso .role span { font-size: 23px; }
         .role span {
             font-family: var(--title); font-weight: 800; font-size: 30px; letter-spacing: 0.22em; text-transform: uppercase;
             color: var(--v4); text-shadow: 0 0 16px rgba(124, 58, 237, 0.6);
@@ -38,6 +44,7 @@
     <div class="stage">
         <div class="bands"></div>
         <div class="streaks"></div>
+        <img class="perso" id="perso" alt="" hidden>
         <div class="center">
             <div class="emblem"></div>
             <h1 class="name" id="name"></h1>
@@ -47,6 +54,14 @@
     <script>
         document.getElementById('name').textContent = P.get('nom') || 'Malou';
         document.getElementById('role').textContent = P.get('role') || "Co-fondateur d'Origin RP";
+        // Personnage : ?perso=nom_du_fichier (commun/persos/*.svg). Malou par défaut, aucun pour un autre pseudo.
+        const perso = P.has('perso') ? P.get('perso') : (P.has('nom') ? '' : 'malou');
+        if (perso) {
+            const img = document.getElementById('perso');
+            img.src = '../commun/persos/' + perso.replace(/[^\w-]/g, '') + '.svg';
+            img.hidden = false;
+            document.body.classList.add('with-perso');
+        }
     </script>
 </body>
 </html>

@@ -51,6 +51,9 @@ Le cadre caméra est en bas à droite : placer la webcam dessous.
 Pour un autre streamer : `tiktok/banniere-haut.html?nom=Pseudo&role=Streamer officiel`, puis capture en 1080 × 656
 (ou me demander l'export). Le contenu est décalé vers le bas pour ne pas passer sous les onglets TikTok.
 
+Le personnage cartoon de Malou est à gauche (`commun/persos/malou.svg`). Pour un autre streamer avec son personnage :
+ajouter son dessin dans `commun/persos/` puis `?nom=Pseudo&perso=nom_du_fichier` (sans `.svg`).
+
 ## Bannière TikTok du bas
 
 `export/tiktok-banniere-bas.png` (1080 × 656) remplit exactement la bande sous le gameplay quand une vidéo 16:9
