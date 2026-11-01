@@ -29,7 +29,7 @@
         .role::before, .role::after { content: ''; width: 90px; height: 2px; background: linear-gradient(90deg, transparent, var(--v3)); box-shadow: 0 0 8px var(--v2); }
         .role::after { transform: scaleX(-1); }
         /* Personnage cartoon à gauche (?perso=malou, par défaut pour Malou) */
-        .perso { position: absolute; left: 14px; bottom: 0; height: 560px; z-index: 1; filter: drop-shadow(0 0 18px rgba(124, 58, 237, 0.45)); }
+        .perso { position: absolute; left: 22px; bottom: 0; height: 576px; z-index: 1; filter: drop-shadow(0 0 18px rgba(124, 58, 237, 0.45)); }
         .with-perso .center { left: 400px; padding-top: 80px; }
         .with-perso .name { font-size: 112px; }
         .with-perso .role::before, .with-perso .role::after { display: none; }
@@ -54,11 +54,12 @@
     <script>
         document.getElementById('name').textContent = P.get('nom') || 'Malou';
         document.getElementById('role').textContent = P.get('role') || "Co-fondateur d'Origin RP";
-        // Personnage : ?perso=nom_du_fichier (commun/persos/*.svg). Malou par défaut, aucun pour un autre pseudo.
-        const perso = P.has('perso') ? P.get('perso') : (P.has('nom') ? '' : 'malou');
+        // Personnage : ?perso=fichier (dans commun/persos/, .svg si pas d'extension). Malou par défaut, aucun pour un autre pseudo.
+        const perso = P.has('perso') ? P.get('perso') : (P.has('nom') ? '' : 'malou.png');
         if (perso) {
             const img = document.getElementById('perso');
-            img.src = '../commun/persos/' + perso.replace(/[^\w-]/g, '') + '.svg';
+            const file = perso.replace(/[^\w.-]/g, '');
+            img.src = '../commun/persos/' + (file.includes('.') ? file : file + '.svg');
             img.hidden = false;
             document.body.classList.add('with-perso');
         }
