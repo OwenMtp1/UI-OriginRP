@@ -45,6 +45,12 @@ Le cadre caméra est en bas à droite : placer la webcam dessous.
 - `twitch/annonce.html?nom=Pseudo&heure=21h00` (1920 × 1080) : visuel « En live » pour Discord, X, Instagram.
 - `tiktok/annonce.html?nom=Pseudo&heure=21h00` (1080 × 1920) : story ou post TikTok.
 
+## Bannière TikTok du haut
+
+`export/tiktok-banniere-haut-malou.png` (1080 × 656) remplit la bande au-dessus du gameplay, avec le pseudo et le rôle.
+Pour un autre streamer : `tiktok/banniere-haut.html?nom=Pseudo&role=Streamer officiel`, puis capture en 1080 × 656
+(ou me demander l'export). Le contenu est décalé vers le bas pour ne pas passer sous les onglets TikTok.
+
 ## Bannière TikTok du bas
 
 `export/tiktok-banniere-bas.png` (1080 × 656) remplit exactement la bande sous le gameplay quand une vidéo 16:9

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Origin Roleplay – Bannière TikTok (haut)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@500;600;700&display=swap">
+    <link rel="stylesheet" href="../commun/kit.css">
+    <script src="../config.js"></script>
+    <script src="../commun/kit.js"></script>
+    <style>
+        /* 1080 × 656 : remplit la bande au-dessus d'un gameplay 16:9 dans une vidéo TikTok 1080 × 1920.
+           ?nom=...&role=... pour un autre streamer. Le contenu est décalé vers le bas
+           pour ne pas passer sous les onglets TikTok en haut de l'écran. */
+        html, body { width: 1080px; height: 656px; }
+        .stage::before {
+            content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; z-index: 2;
+            background: linear-gradient(90deg, transparent, var(--v3) 25%, var(--v4) 50%, var(--v3) 75%, transparent);
+            box-shadow: 0 0 16px var(--v2);
+        }
+        .center { gap: 18px; padding-top: 90px; }
+        .emblem { --e: 190px; }
+        .name {
+            font-family: var(--title); font-weight: 900; font-size: 124px; line-height: 0.95;
+            letter-spacing: 0.08em; text-transform: uppercase; padding-left: 0.08em;
+            text-shadow: 0 0 34px rgba(124, 58, 237, 0.7), 0 4px 18px rgba(0, 0, 0, 0.5);
+        }
+        .role { display: flex; align-items: center; gap: 22px; margin-top: 6px; }
+        .role::before, .role::after { content: ''; width: 90px; height: 2px; background: linear-gradient(90deg, transparent, var(--v3)); box-shadow: 0 0 8px var(--v2); }
+        .role::after { transform: scaleX(-1); }
+        .role span {
+            font-family: var(--title); font-weight: 800; font-size: 30px; letter-spacing: 0.22em; text-transform: uppercase;
+            color: var(--v4); text-shadow: 0 0 16px rgba(124, 58, 237, 0.6);
+        }
+    </style>
+</head>
+<body class="anim">
+    <div class="stage">
+        <div class="bands"></div>
+        <div class="streaks"></div>
+        <div class="center">
+            <div class="emblem"></div>
+            <h1 class="name" id="name"></h1>
+            <div class="role"><span id="role"></span></div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('name').textContent = P.get('nom') || 'Malou';
+        document.getElementById('role').textContent = P.get('role') || "Co-fondateur d'Origin RP";
+    </script>
+</body>
+</html>
