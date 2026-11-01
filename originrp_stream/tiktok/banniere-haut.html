@@ -53,6 +53,15 @@
     </div>
     <script>
         document.getElementById('name').textContent = P.get('nom') || 'Malou';
+        // Réduit le pseudo s'il dépasse la place disponible
+        function fitName() {
+            const el = document.getElementById('name');
+            const max = document.querySelector('.center').clientWidth - 40;
+            let size = parseFloat(getComputedStyle(el).fontSize);
+            el.style.whiteSpace = 'nowrap';
+            while (el.scrollWidth > max && size > 48) { size -= 4; el.style.fontSize = size + 'px'; }
+        }
+        document.fonts.ready.then(fitName);
         document.getElementById('role').textContent = P.get('role') || "Co-fondateur d'Origin RP";
         // Personnage : ?perso=fichier (dans commun/persos/, .svg si pas d'extension). Malou par défaut, aucun pour un autre pseudo.
         const perso = P.has('perso') ? P.get('perso') : (P.has('nom') ? '' : 'malou.png');
@@ -62,6 +71,14 @@
             img.src = '../commun/persos/' + (file.includes('.') ? file : file + '.svg');
             img.hidden = false;
             document.body.classList.add('with-perso');
+            // Largeur selon l'image (520 px max), puis le texte occupe la place restante
+            img.addEventListener('load', () => {
+                const w = Math.min(520, img.naturalWidth * 576 / img.naturalHeight);
+                img.style.width = w + 'px';
+                img.style.height = 'auto';
+                document.querySelector('.center').style.left = Math.max(400, 22 + w + 14) + 'px';
+                fitName();
+            });
         }
     </script>
 </body>

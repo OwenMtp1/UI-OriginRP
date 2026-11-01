@@ -47,7 +47,9 @@ Le cadre caméra est en bas à droite : placer la webcam dessous.
 
 ## Bannière TikTok du haut
 
-`export/tiktok-banniere-haut-malou.png` (1080 × 656) remplit la bande au-dessus du gameplay, avec le pseudo et le rôle.
+`export/tiktok-banniere-haut-malou.png` et `export/tiktok-banniere-haut-simba.png` (1080 × 656) remplissent la bande
+au-dessus du gameplay, avec le personnage, le pseudo et le rôle.
+Simba : `tiktok/banniere-haut.html?nom=Simba&role=Fondateur d'Origin RP&perso=simba.png`.
 Pour un autre streamer : `tiktok/banniere-haut.html?nom=Pseudo&role=Streamer officiel`, puis capture en 1080 × 656
 (ou me demander l'export). Le contenu est décalé vers le bas pour ne pas passer sous les onglets TikTok.
 
