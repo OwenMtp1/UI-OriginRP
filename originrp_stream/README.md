@@ -33,7 +33,6 @@ Cocher **Actualiser le navigateur quand la scène devient active** pour relancer
 | `twitch/overlay.html` | 1920 × 1080, transparent | `?nom=Pseudo`, `&cam=0` sans cadre caméra |
 | `twitch/alertes.html` | 1920 × 1080, transparent | voir « Alertes » |
 | `tiktok/live.html` | 1080 × 1920, transparent | — |
-| `tiktok/banniere-bas.html` | 1080 × 1920, transparent | `?seule=1` : bannière seule (1080 × 460) |
 
 Pour ajouter des paramètres, décocher « Fichier local » et coller l'adresse complète, par exemple :
 `file:///C:/kit/originrp_stream/twitch/debut.html?min=10&nom=Kenzo`
@@ -48,13 +47,8 @@ Le cadre caméra est en bas à droite : placer la webcam dessous.
 
 ## Bannière TikTok du bas
 
-- `export/tiktok-banniere-bas.png` (1080 × 460, fond transparent autour) : la bannière seule, à poser en bas d'une vidéo dans CapCut ou TikTok.
-- `tiktok/banniere-bas.html` (1080 × 1920, transparent) : la même, animée, placée en bas de l'écran, à ajouter comme source navigateur.
-
-Sur TikTok, le pseudo et la description de la vidéo s'affichent en bas : remonter la bannière si elle est cachée.
-
-Ouvrir la page dans un navigateur avec le bon pseudo, puis faire une capture à la bonne taille
-(ou me demander l'export PNG pour un streamer).
+`export/tiktok-banniere-bas.png` (1080 × 656) remplit exactement la bande sous le gameplay quand une vidéo 16:9
+est centrée dans un format TikTok 1080 × 1920. Dans CapCut : placer le gameplay au centre, puis la bannière collée en bas.
 
 ## Alertes
 

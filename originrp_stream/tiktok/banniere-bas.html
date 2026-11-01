@@ -9,39 +9,31 @@
     <script src="../config.js"></script>
     <script src="../commun/kit.js"></script>
     <style>
-        /* 1080 × 1920 transparent : bannière encadrée en bas de la vidéo.
-           ?seule=1 : la bannière seule (1080 × 440) pour l'exporter en image. */
-        html, body { width: 1080px; height: 1920px; }
-        .frame {
-            position: absolute; left: 40px; right: 40px; bottom: 60px; height: 380px;
-            border-radius: 34px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+        /* 1080 × 656 : remplit la bande noire sous un gameplay 16:9 dans une vidéo TikTok 1080 × 1920 */
+        html, body { width: 1080px; height: 656px; }
+        .stage::before {
+            content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; z-index: 2;
+            background: linear-gradient(90deg, transparent, var(--v3) 25%, var(--v4) 50%, var(--v3) 75%, transparent);
+            box-shadow: 0 0 16px var(--v2);
         }
-        .frame .clip { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; }
-        .frame .bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 50% 45%, rgba(46, 18, 92, 0.7), transparent 75%), linear-gradient(135deg, #0d0719, #040208); }
-        .frame .streaks i { height: 1.5px; }
-        .row { position: relative; display: flex; align-items: center; justify-content: center; gap: 30px; }
-        .row .word { font-size: 40px; }
-        .row .emblem { --e: 210px; }
-        .pill { position: relative; font-size: 30px; padding: 0.45em 1.1em; }
-        body.seule { width: 1080px; height: 460px; }
-        body.seule .frame { bottom: 40px; }
+        .center { gap: 40px; padding-top: 10px; }
+        .row { display: flex; align-items: center; justify-content: center; gap: 26px; }
+        .row .word { font-size: 38px; }
+        .pill { font-size: 34px; padding: 0.45em 1.2em; }
     </style>
 </head>
-<body class="transparent anim">
-    <div class="frame glass corners">
-        <div class="clip">
-            <div class="bg"></div>
-            <div class="bands"></div>
-            <div class="streaks"></div>
+<body class="anim">
+    <div class="stage">
+        <div class="bands"></div>
+        <div class="streaks"></div>
+        <div class="center">
+            <div class="row">
+                <span class="word white">Origin</span>
+                <div class="emblem" style="--e: 300px"></div>
+                <span class="word violet">Roleplay</span>
+            </div>
+            <span class="pill"><span data-icon="discord"></span><span data-k="discord"></span></span>
         </div>
-        <div class="row">
-            <span class="word white">Origin</span>
-            <div class="emblem"></div>
-            <span class="word violet">Roleplay</span>
-        </div>
-        <span class="pill"><span data-icon="discord"></span><span data-k="discord"></span></span>
     </div>
-    <script>if (P.get('seule') === '1') document.body.classList.add('seule');</script>
 </body>
 </html>
