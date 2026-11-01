@@ -50,7 +50,7 @@ Le cadre caméra est en bas à droite : placer la webcam dessous.
 `export/tiktok-banniere-haut-malou.png` et `export/tiktok-banniere-haut-simba.png` (1080 × 656) remplissent la bande
 au-dessus du gameplay, avec le personnage, le pseudo et le rôle.
 Simba : `tiktok/banniere-haut.html?nom=Simba&role=Fondateur d'Origin RP&perso=simba.png` (ancienne capture 3D : `perso=simba-render.png`).
-Équipe de communication : `tiktok/banniere-haut.html?nom=OriginRP&role=Équipe de communication OriginRP&perso=communication.png`.
+Équipe de communication : `tiktok/banniere-haut.html?nom=OriginRP&role=Équipe de communication OriginRP&perso=communication.png` (première version : `perso=communication-v1.png`).
 Un pseudo ou un poste trop long est réduit automatiquement pour tenir sur une ligne.
 Pour un autre streamer : `tiktok/banniere-haut.html?nom=Pseudo&role=Streamer officiel`, puis capture en 1080 × 656
 (ou me demander l'export). Le contenu est décalé vers le bas pour ne pas passer sous les onglets TikTok.
