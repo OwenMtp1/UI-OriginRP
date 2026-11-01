@@ -4,7 +4,7 @@
 window.KIT = {
     serveur: 'Origin Roleplay',
     slogan: 'Serveur GTA V Roleplay',
-    discord: 'discord.gg/originrp',          // à remplacer par le vrai lien
+    discord: 'discord.gg/originfr',
     connexion: 'Recherche « Origin Roleplay » sur FiveM',
     streamer: '',                            // ?nom=... dans l'adresse
     heure: '21h00',                          // ?heure=... (annonces)

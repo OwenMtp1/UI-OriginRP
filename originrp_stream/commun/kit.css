@@ -126,10 +126,9 @@ body.transparent { background: transparent; }
 }
 .glass.corners::before, .glass.corners::after {
     content: ''; position: absolute; width: 38%; height: 55%; pointer-events: none;
-    border-radius: inherit;
 }
-.glass.corners::before { left: -2px; top: -2px; border-top: 2.5px solid var(--v4); border-left: 2.5px solid var(--v4); -webkit-mask-image: radial-gradient(circle at 0 0, #000 35%, transparent 70%); mask-image: radial-gradient(circle at 0 0, #000 35%, transparent 70%); filter: drop-shadow(0 0 6px var(--v2)); }
-.glass.corners::after { right: -2px; bottom: -2px; border-bottom: 2.5px solid var(--v4); border-right: 2.5px solid var(--v4); -webkit-mask-image: radial-gradient(circle at 100% 100%, #000 35%, transparent 70%); mask-image: radial-gradient(circle at 100% 100%, #000 35%, transparent 70%); filter: drop-shadow(0 0 6px var(--v2)); }
+.glass.corners::before { border-top-left-radius: inherit; left: -2px; top: -2px; border-top: 2.5px solid var(--v4); border-left: 2.5px solid var(--v4); -webkit-mask-image: radial-gradient(circle at 0 0, #000 35%, transparent 70%); mask-image: radial-gradient(circle at 0 0, #000 35%, transparent 70%); filter: drop-shadow(0 0 6px var(--v2)); }
+.glass.corners::after { border-bottom-right-radius: inherit; right: -2px; bottom: -2px; border-bottom: 2.5px solid var(--v4); border-right: 2.5px solid var(--v4); -webkit-mask-image: radial-gradient(circle at 100% 100%, #000 35%, transparent 70%); mask-image: radial-gradient(circle at 100% 100%, #000 35%, transparent 70%); filter: drop-shadow(0 0 6px var(--v2)); }
 
 /* Bandeau d'infos qui défilent */
 .ticker { transition: opacity 0.45s ease, transform 0.45s ease; }

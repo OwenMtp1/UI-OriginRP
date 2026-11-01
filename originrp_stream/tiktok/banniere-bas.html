@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Origin Roleplay – Bannière TikTok (bas)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Inter:wght@500;600;700&display=swap">
+    <link rel="stylesheet" href="../commun/kit.css">
+    <script src="../config.js"></script>
+    <script src="../commun/kit.js"></script>
+    <style>
+        /* 1080 × 1920 transparent : bannière encadrée en bas de la vidéo.
+           ?seule=1 : la bannière seule (1080 × 440) pour l'exporter en image. */
+        html, body { width: 1080px; height: 1920px; }
+        .frame {
+            position: absolute; left: 40px; right: 40px; bottom: 60px; height: 380px;
+            border-radius: 34px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+        }
+        .frame .clip { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; }
+        .frame .bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 50% 45%, rgba(46, 18, 92, 0.7), transparent 75%), linear-gradient(135deg, #0d0719, #040208); }
+        .frame .streaks i { height: 1.5px; }
+        .row { position: relative; display: flex; align-items: center; justify-content: center; gap: 30px; }
+        .row .word { font-size: 40px; }
+        .row .emblem { --e: 210px; }
+        .pill { position: relative; font-size: 30px; padding: 0.45em 1.1em; }
+        body.seule { width: 1080px; height: 460px; }
+        body.seule .frame { bottom: 40px; }
+    </style>
+</head>
+<body class="transparent anim">
+    <div class="frame glass corners">
+        <div class="clip">
+            <div class="bg"></div>
+            <div class="bands"></div>
+            <div class="streaks"></div>
+        </div>
+        <div class="row">
+            <span class="word white">Origin</span>
+            <div class="emblem"></div>
+            <span class="word violet">Roleplay</span>
+        </div>
+        <span class="pill"><span data-icon="discord"></span><span data-k="discord"></span></span>
+    </div>
+    <script>if (P.get('seule') === '1') document.body.classList.add('seule');</script>
+</body>
+</html>

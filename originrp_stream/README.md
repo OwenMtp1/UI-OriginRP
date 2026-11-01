@@ -4,7 +4,7 @@ Visuels Twitch et TikTok pour les streamers du serveur, dans la DA violette d'Or
 
 ## Avant tout
 
-Ouvrir `config.js` et remplacer **le lien Discord** (provisoire) et, si besoin, le slogan et le texte de connexion.
+Le lien Discord (`discord.gg/originfr`), le slogan et le texte de connexion se modifient dans `config.js`.
 Tous les visuels lisent ce fichier.
 
 ## Images prêtes à envoyer (`export/`)
@@ -33,6 +33,7 @@ Cocher **Actualiser le navigateur quand la scène devient active** pour relancer
 | `twitch/overlay.html` | 1920 × 1080, transparent | `?nom=Pseudo`, `&cam=0` sans cadre caméra |
 | `twitch/alertes.html` | 1920 × 1080, transparent | voir « Alertes » |
 | `tiktok/live.html` | 1080 × 1920, transparent | — |
+| `tiktok/banniere-bas.html` | 1080 × 1920, transparent | `?seule=1` : bannière seule (1080 × 460) |
 
 Pour ajouter des paramètres, décocher « Fichier local » et coller l'adresse complète, par exemple :
 `file:///C:/kit/originrp_stream/twitch/debut.html?min=10&nom=Kenzo`
@@ -44,6 +45,13 @@ Le cadre caméra est en bas à droite : placer la webcam dessous.
 
 - `twitch/annonce.html?nom=Pseudo&heure=21h00` (1920 × 1080) : visuel « En live » pour Discord, X, Instagram.
 - `tiktok/annonce.html?nom=Pseudo&heure=21h00` (1080 × 1920) : story ou post TikTok.
+
+## Bannière TikTok du bas
+
+- `export/tiktok-banniere-bas.png` (1080 × 460, fond transparent autour) : la bannière seule, à poser en bas d'une vidéo dans CapCut ou TikTok.
+- `tiktok/banniere-bas.html` (1080 × 1920, transparent) : la même, animée, placée en bas de l'écran, à ajouter comme source navigateur.
+
+Sur TikTok, le pseudo et la description de la vidéo s'affichent en bas : remonter la bannière si elle est cachée.
 
 Ouvrir la page dans un navigateur avec le bon pseudo, puis faire une capture à la bonne taille
 (ou me demander l'export PNG pour un streamer).
