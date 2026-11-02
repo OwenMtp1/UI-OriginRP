@@ -3,7 +3,7 @@ Config = {}
 -- Logo affiché en haut à gauche des menus.
 -- nil = logo "A" intégré. Pour une image : placez-la dans html/img/ puis
 -- Config.Logo = 'img/logo.png'
-Config.Logo = nil
+Config.Logo = 'img/logo.png'
 
 -- Touches qui ouvrent un menu. Chaque joueur peut les réassigner dans
 -- Paramètres > Raccourcis clavier > FiveM.

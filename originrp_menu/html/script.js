@@ -57,6 +57,7 @@ const LOGO = `
 
 const PREVIEW = {
     root: 'main',
+    logo: 'img/logo.png',
     menus: {
         main: {
             title: 'Menu F5',
