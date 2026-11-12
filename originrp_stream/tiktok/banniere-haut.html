@@ -38,21 +38,57 @@
             font-family: var(--title); font-weight: 800; font-size: 30px; letter-spacing: 0.22em; text-transform: uppercase;
             color: var(--v4); text-shadow: 0 0 16px rgba(124, 58, 237, 0.6);
         }
+        .runner { bottom: 0; }
+
+        /* ===== Animation (source Navigateur dans OBS) =====
+           Entrée au chargement (≈ 2 s), puis animation continue. ?intro=0 pour l'enlever. */
+        .name { position: relative; }
+        .name::after {
+            /* reflet qui passe sur le pseudo */
+            content: attr(data-text); position: absolute; inset: 0; padding-left: inherit; white-space: nowrap;
+            color: transparent; text-shadow: none; pointer-events: none;
+            background: linear-gradient(100deg, transparent 42%, rgba(255, 255, 255, 0.95) 50%, transparent 58%);
+            background-size: 260% 100%; background-position: 160% 0;
+            -webkit-background-clip: text; background-clip: text;
+        }
+        .anim .name::after { animation: shine 7s ease-in-out 2.4s infinite; }
+        @keyframes shine { 0% { background-position: 160% 0; } 30%, 100% { background-position: -60% 0; } }
+
+        .anim .perso { animation: halo 4s ease-in-out infinite; }
+        @keyframes halo {
+            50% { filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.85)) drop-shadow(0 0 3px rgba(196, 181, 253, 0.7)); }
+        }
+        .anim .role span { animation: glow 3.5s ease-in-out infinite; }
+        @keyframes glow { 50% { text-shadow: 0 0 26px rgba(139, 92, 246, 0.95); color: #c4b5fd; } }
+
+        .anim:not(.no-intro) .perso { animation: persoIn 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both, halo 4s ease-in-out 1.2s infinite; }
+        .anim:not(.no-intro) .emblem { animation: popIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.35s both; }
+        .anim:not(.no-intro) .name { animation: riseIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.7s both; }
+        .anim:not(.no-intro) .role { animation: riseIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 1.05s both; }
+        .anim:not(.no-intro) .stage::before { animation: lineIn 1s ease-out 0.2s both; }
+        @keyframes persoIn { from { opacity: 0; transform: translateX(-80px); } to { opacity: 1; transform: none; } }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.55) rotate(-40deg); } to { opacity: 1; transform: none; } }
+        @keyframes riseIn { from { opacity: 0; transform: translateY(26px); filter: blur(10px); } to { opacity: 1; transform: none; filter: none; } }
+        @keyframes lineIn { from { transform: scaleX(0); } to { transform: scaleX(1); } }
     </style>
 </head>
 <body class="anim">
     <div class="stage">
         <div class="bands"></div>
         <div class="streaks"></div>
+        <div class="particles" data-n="26"></div>
         <img class="perso" id="perso" alt="" hidden>
         <div class="center">
             <div class="emblem"></div>
             <h1 class="name" id="name"></h1>
             <div class="role"><span id="role"></span></div>
         </div>
+        <i class="runner"></i>
     </div>
     <script>
-        document.getElementById('name').textContent = P.get('nom') || 'Malou';
+        const nameEl = document.getElementById('name');
+        nameEl.textContent = P.get('nom') || 'Malou';
+        nameEl.dataset.text = nameEl.textContent;   // copie du pseudo pour le reflet animé
         // Réduit le pseudo s'il dépasse la place disponible
         function fitName() {
             const el = document.getElementById('name');

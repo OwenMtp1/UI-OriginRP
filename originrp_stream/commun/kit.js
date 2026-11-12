@@ -84,5 +84,21 @@ function icons() {
     document.querySelectorAll('[data-icon]').forEach((el) => { el.innerHTML = ICON[el.dataset.icon] || ''; });
 }
 
-function kit() { fx(); emblems(); fill(); icons(); }
+// Particules lumineuses qui montent : <div class="particles" data-n="24"></div>
+// Positions tirées d'une suite fixe : le rendu est le même à chaque chargement.
+function particles() {
+    document.querySelectorAll('.particles:empty').forEach((el) => {
+        let seed = 7;
+        const r = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+        const n = Number(el.dataset.n) || 24;
+        el.innerHTML = Array.from({ length: n }, () =>
+            `<i style="left:${(r() * 100).toFixed(1)}%;--s:${(2 + r() * 3).toFixed(1)}px;--t:${(7 + r() * 8).toFixed(1)}s;` +
+            `--d:-${(r() * 14).toFixed(1)}s;--x:${Math.round((r() - 0.5) * 70)}px;--o:${(0.35 + r() * 0.6).toFixed(2)}"></i>`).join('');
+    });
+}
+
+// ?intro=0 : pas d'animation d'entrée (le visuel apparaît directement)
+function intro() { if (P.get('intro') === '0') document.body.classList.add('no-intro'); }
+
+function kit() { intro(); fx(); particles(); emblems(); fill(); icons(); }
 document.addEventListener('DOMContentLoaded', kit);

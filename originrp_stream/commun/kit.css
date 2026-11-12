@@ -136,3 +136,25 @@ body.transparent { background: transparent; }
 
 .center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
 .hidden-if-empty:empty { display: none; }
+
+/* Particules lumineuses qui montent (bannières) */
+.particles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.particles i {
+    position: absolute; bottom: -10px; width: var(--s, 3px); height: var(--s, 3px); border-radius: 50%;
+    background: #c4b5fd; box-shadow: 0 0 8px 2px rgba(139, 92, 246, 0.8); opacity: 0;
+}
+.anim .particles i { animation: rise var(--t, 10s) linear infinite; animation-delay: var(--d, 0s); }
+@keyframes rise {
+    0% { transform: translate(0, 0); opacity: 0; }
+    12%, 75% { opacity: var(--o, 0.7); }
+    100% { transform: translate(var(--x, 0), -110vh); opacity: 0; }
+}
+
+/* Point de lumière qui court le long d'un filet : <i class="runner"></i> */
+.runner {
+    position: absolute; left: -25%; width: 22%; height: 3px; z-index: 3; pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgba(196, 181, 253, 0.9) 45%, #fff 50%, rgba(196, 181, 253, 0.9) 55%, transparent);
+    filter: drop-shadow(0 0 6px #a78bfa) drop-shadow(0 0 14px #7c3aed);
+}
+.anim .runner { animation: run 5s cubic-bezier(0.45, 0, 0.55, 1) 1.6s infinite; }
+@keyframes run { 0% { left: -25%; } 60%, 100% { left: 105%; } }

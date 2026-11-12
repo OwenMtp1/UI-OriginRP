@@ -20,12 +20,32 @@
         .row { display: flex; align-items: center; justify-content: center; gap: 26px; }
         .row .word { font-size: 38px; }
         .pill { font-size: 34px; padding: 0.45em 1.2em; }
+        .runner { top: 0; }
+
+        /* ===== Animation (source Navigateur dans OBS) =====
+           Entrée au chargement (≈ 2 s), puis animation continue. ?intro=0 pour l'enlever. */
+        .anim .pill { animation: pulse 3.5s ease-in-out infinite; }
+        @keyframes pulse {
+            50% { box-shadow: 0 0 40px rgba(124, 58, 237, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08); border-color: rgba(196, 181, 253, 0.7); }
+        }
+        .anim:not(.no-intro) .row .emblem { animation: popIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s both; }
+        .anim:not(.no-intro) .row .word.white { animation: fromLeft 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.45s both; }
+        .anim:not(.no-intro) .row .word.violet { animation: fromRight 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.45s both; }
+        .anim:not(.no-intro) .pill { animation: riseIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.9s both, pulse 3.5s ease-in-out 1.8s infinite; }
+        .anim:not(.no-intro) .stage::before { animation: lineIn 1s ease-out 0.1s both; }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.55) rotate(-40deg); } to { opacity: 1; transform: none; } }
+        @keyframes fromLeft { from { opacity: 0; transform: translateX(-60px); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+        @keyframes fromRight { from { opacity: 0; transform: translateX(60px); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+        @keyframes riseIn { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
+        @keyframes lineIn { from { transform: scaleX(0); } to { transform: scaleX(1); } }
     </style>
 </head>
 <body class="anim">
     <div class="stage">
         <div class="bands"></div>
         <div class="streaks"></div>
+        <div class="particles" data-n="22"></div>
+        <i class="runner"></i>
         <div class="center">
             <div class="row">
                 <span class="word white">Origin</span>

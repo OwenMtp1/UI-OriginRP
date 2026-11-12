@@ -20,6 +20,20 @@ Tous les visuels lisent ce fichier.
 
 Les fichiers `apercu-*` et `exemple-*` servent seulement d'aperçu.
 
+## Liens en ligne pour OBS (`obs.html`)
+
+`obs.html` liste toutes les bannières et tous les écrans animés, avec un aperçu en direct, l'adresse à copier
+et la taille à régler dans OBS. Une fois le dépôt publié avec GitHub Pages, le staff n'a rien à télécharger :
+
+`https://owenmtp1.github.io/UI-OriginRP/originrp_stream/obs.html`
+
+Dans OBS : **Sources › + › Navigateur**, décocher **Fichier local**, coller l'adresse copiée dans **URL**, régler la taille,
+puis cocher **Actualiser le navigateur quand la scène devient active** pour rejouer l'animation d'entrée.
+
+Publication (une seule fois) : sur GitHub, **Settings › Pages › Build and deployment**, Source **Deploy from a branch**,
+choisir la branche par défaut du dépôt et le dossier **/ (root)**, puis **Save**. L'adresse est prête au bout d'une à deux minutes,
+et chaque modification poussée sur cette branche est mise en ligne automatiquement.
+
 ## Écrans animés pour OBS
 
 Dans OBS : **Sources › + › Navigateur**, cocher **Fichier local**, choisir le fichier, puis régler la taille indiquée.
@@ -47,8 +61,14 @@ Le cadre caméra est en bas à droite : placer la webcam dessous.
 
 ## Bannière TikTok du haut
 
-`export/tiktok-banniere-haut-malou.png` et `export/tiktok-banniere-haut-simba.png` (1080 × 656) remplissent la bande
+`export/tiktok-banniere-haut-malou.png`, `-simba.png`, `-communication.png` et `-owen.png` (1080 × 656) remplissent la bande
 au-dessus du gameplay, avec le personnage, le pseudo et le rôle.
+
+La page est animée (source Navigateur dans OBS, 1080 × 656) : entrée du personnage, du logo, du pseudo et du poste
+au chargement (≈ 2 s), puis halo du personnage qui respire, reflet sur le pseudo, lumière qui court sur le filet du bas,
+anneaux du logo qui tournent et particules. `&intro=0` affiche directement le visuel sans l'entrée.
+
+Owen : `tiktok/banniere-haut.html?nom=Owen&role=Co-fondateur d'Origin RP&perso=owen.png`.
 Simba : `tiktok/banniere-haut.html?nom=Simba&role=Fondateur d'Origin RP&perso=simba.png` (ancienne capture 3D : `perso=simba-render.png`).
 Équipe de communication : `tiktok/banniere-haut.html?nom=OriginRP&role=Équipe de communication OriginRP&perso=communication.png` (première version : `perso=communication-v1.png`).
 Un pseudo ou un poste trop long est réduit automatiquement pour tenir sur une ligne.
@@ -63,6 +83,8 @@ ajouter son image (PNG détouré ou SVG) dans `commun/persos/` puis `?nom=Pseudo
 
 `export/tiktok-banniere-bas.png` (1080 × 656) remplit exactement la bande sous le gameplay quand une vidéo 16:9
 est centrée dans un format TikTok 1080 × 1920. Dans CapCut : placer le gameplay au centre, puis la bannière collée en bas.
+Version animée pour OBS : `tiktok/banniere-bas.html` (1080 × 656), avec entrée du logo, des mots et du lien Discord,
+puis lien Discord qui pulse, lumière sur le filet du haut et particules.
 
 ## Alertes
 
