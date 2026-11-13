@@ -17,6 +17,7 @@ Tous les visuels lisent ce fichier.
 | `twitch-hors-ligne.png` (1920 × 1080) | Twitch : Paramètres › Chaîne › Bannière du lecteur vidéo |
 | `twitch-panneau-*.png` (320 × 160) | Twitch : À propos › Modifier les panneaux (un panneau par image) |
 | `twitch-debut.png`, `twitch-pause.png`, `twitch-fin.png` | Version image fixe des écrans animés |
+| `twitch-overlay-transparent.png`, `twitch-alerte-transparent.png` (1920 × 1080), `tiktok-live-transparent.png` (1080 × 1920) | PNG transparents de l'overlay, d'une alerte et de l'overlay TikTok LIVE |
 
 Les fichiers `apercu-*` et `exemple-*` servent seulement d'aperçu.
 
