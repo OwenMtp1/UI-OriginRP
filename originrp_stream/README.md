@@ -70,7 +70,7 @@ au chargement (≈ 2 s), puis halo du personnage qui respire, reflet sur le pseu
 anneaux du logo qui tournent et particules. `&intro=0` affiche directement le visuel sans l'entrée.
 
 Owen : `tiktok/banniere-haut.html?nom=Owen&role=Co-fondateur d'Origin RP&perso=owen.png`.
-Le personnage d'Owen (`commun/persos/owen.png`) a le même rendu illustré que celui de Malou ; la capture 3D d'origine est gardée : `perso=owen-render.png`.
+Le personnage d'Owen (`commun/persos/owen.png`) est une illustration dans le style de Malou, légèrement plus proche du style GTA ; la capture 3D d'origine est gardée : `perso=owen-render.png`.
 Simba : `tiktok/banniere-haut.html?nom=Simba&role=Fondateur d'Origin RP&perso=simba.png` (ancienne capture 3D : `perso=simba-render.png`).
 Équipe de communication : `tiktok/banniere-haut.html?nom=OriginRP&role=Équipe de communication OriginRP&perso=communication.png` (première version : `perso=communication-v1.png`).
 Un pseudo ou un poste trop long est réduit automatiquement pour tenir sur une ligne.
