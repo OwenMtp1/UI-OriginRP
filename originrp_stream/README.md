@@ -66,7 +66,7 @@ Le cadre caméra est en bas à droite : placer la webcam dessous.
 au-dessus du gameplay, avec le personnage, le pseudo et le rôle.
 
 La page est animée (source Navigateur dans OBS, 1080 × 656) : entrée du personnage, du logo, du pseudo et du poste
-au chargement (≈ 2 s), puis halo du personnage qui respire, reflet sur le pseudo, lumière qui court sur le filet du bas,
+au chargement (≈ 2 s), puis reflet sur le pseudo, lumière qui court sur le filet du bas,
 anneaux du logo qui tournent et particules. `&intro=0` affiche directement le visuel sans l'entrée.
 
 Owen : `tiktok/banniere-haut.html?nom=Owen&role=Co-fondateur d'Origin RP&perso=owen.png`.

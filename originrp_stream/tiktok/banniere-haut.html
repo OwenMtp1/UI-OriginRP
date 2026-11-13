@@ -41,7 +41,7 @@
         .runner { bottom: 0; }
 
         /* ===== Animation (source Navigateur dans OBS) =====
-           Entrée au chargement (≈ 2 s), puis animation continue. ?intro=0 pour l'enlever. */
+           Entrée au chargement (≈ 2 s), puis animation continue (reflet, lumière, particules ; le halo du personnage reste fixe). ?intro=0 pour l'enlever. */
         .name { position: relative; }
         .name::after {
             /* reflet qui passe sur le pseudo */
@@ -54,14 +54,10 @@
         .anim .name::after { animation: shine 7s ease-in-out 2.4s infinite; }
         @keyframes shine { 0% { background-position: 160% 0; } 30%, 100% { background-position: -60% 0; } }
 
-        .anim .perso { animation: halo 4s ease-in-out infinite; }
-        @keyframes halo {
-            50% { filter: drop-shadow(0 0 30px rgba(139, 92, 246, 0.85)) drop-shadow(0 0 3px rgba(196, 181, 253, 0.7)); }
-        }
         .anim .role span { animation: glow 3.5s ease-in-out infinite; }
         @keyframes glow { 50% { text-shadow: 0 0 26px rgba(139, 92, 246, 0.95); color: #c4b5fd; } }
 
-        .anim:not(.no-intro) .perso { animation: persoIn 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both, halo 4s ease-in-out 1.2s infinite; }
+        .anim:not(.no-intro) .perso { animation: persoIn 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both; }
         .anim:not(.no-intro) .emblem { animation: popIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.35s both; }
         .anim:not(.no-intro) .name { animation: riseIn 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.7s both; }
         .anim:not(.no-intro) .role { animation: riseIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 1.05s both; }
